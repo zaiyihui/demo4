@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="280" d:DesignHeight="180"
+        x:Class="ComputerCompanion.Views.MainWindow"
+        Title="Computer Companion"
+        WindowStyle="None"
+        Background="Transparent"
+        AllowsTransparency="True"
+        Topmost="True"
+        Width="280"
+        Height="180"
+        ResizeMode="NoResize">
+    <Window.Styles>
+        <Style>
+            <Setter Property="TextBlock.FontFamily" Value="Segoe UI, sans-serif"/>
+            <Setter Property="TextBlock.FontSize" Value="14"/>
+            <Setter Property="TextBlock.Foreground" Value="White"/>
+        </Style>
+    </Window.Styles>
+
+    <Border CornerRadius="12" Background="#1a1a2eea" Padding="16">
+        <StackPanel Spacing="12">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <TextBlock Text="⚡" FontSize="20" Margin="0 0 8 0"/>
+                <TextBlock Text="Computer Companion" FontSize="16" FontWeight="Bold"/>
+            </StackPanel>
+
+            <Border Height="1" Background="#333"/>
+
+            <TextBlock Text="{Binding CpuInfo}" Foreground="#4ecdc4"/>
+            <TextBlock Text="{Binding GpuInfo}" Foreground="#a29bfe"/>
+            <TextBlock Text="{Binding MemInfo}" Foreground="#fd79a8"/>
+        </StackPanel>
+    </Border>
+</Window>
