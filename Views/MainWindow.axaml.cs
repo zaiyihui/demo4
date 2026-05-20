@@ -2,9 +2,10 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Platform;
 using ComputerCompanion.Helpers;
+using ComputerCompanion.ViewModels;
 using System;
-using System.Runtime.InteropServices;
 
 namespace ComputerCompanion.Views;
 
@@ -16,6 +17,8 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        ExtendClientAreaToDecorationsHint = true;
+        ExtendClientAreaTitleBarHeightHint = -1;
         AddHandler(PointerPressedEvent, OnPointerPressed, RoutingStrategies.Tunnel);
         AddHandler(PointerReleasedEvent, OnPointerReleased, RoutingStrategies.Tunnel);
         AddHandler(PointerMovedEvent, OnPointerMoved, RoutingStrategies.Tunnel);
@@ -61,6 +64,18 @@ public partial class MainWindow : Window
         else if (e.Key == Key.F1)
         {
             ToggleClickThrough();
+        }
+        else if (e.Key == Key.F2)
+        {
+            ToggleGameMode();
+        }
+    }
+
+    private void ToggleGameMode()
+    {
+        if (DataContext is MainWindowViewModel vm)
+        {
+            vm.ToggleGameMode();
         }
     }
 
@@ -115,8 +130,7 @@ public partial class MainWindow : Window
 
     private IntPtr GetWindowHandle()
     {
-        var platformImpl = PlatformImpl;
-        var handleProperty = platformImpl?.GetType().GetProperty("Handle");
-        return handleProperty != null ? (IntPtr)handleProperty.GetValue(platformImpl) : IntPtr.Zero;
+        var handle = TryGetPlatformHandle();
+        return handle != null ? handle.Handle : IntPtr.Zero;
     }
 }

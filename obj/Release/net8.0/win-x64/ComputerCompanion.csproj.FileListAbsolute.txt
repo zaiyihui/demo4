@@ -244,3 +244,5 @@ D:\BC\xiangmu\demo4\demo4\bin\Release\net8.0\win-x64\msquic.dll
 D:\BC\xiangmu\demo4\demo4\obj\Release\net8.0\win-x64\Computer.4FC2D4F6.Up2Date
 D:\BC\xiangmu\demo4\demo4\obj\Release\net8.0\win-x64\ComputerCompanion.genruntimeconfig.cache
 D:\BC\xiangmu\demo4\demo4\obj\Release\net8.0\win-x64\ref\ComputerCompanion.dll
+D:\BC\xiangmu\demo4\demo4\obj\Release\net8.0\win-x64\ComputerCompanion.sourcelink.json
+D:\BC\xiangmu\demo4\demo4\bin\Release\net8.0\win-x64\Newtonsoft.Json.dll

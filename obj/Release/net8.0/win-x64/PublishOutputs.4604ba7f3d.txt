@@ -215,6 +215,7 @@ D:\BC\xiangmu\demo4\demo4\bin\Release\publish\HidSharp.dll
 D:\BC\xiangmu\demo4\demo4\bin\Release\publish\LibreHardwareMonitorLib.dll
 D:\BC\xiangmu\demo4\demo4\bin\Release\publish\MicroCom.Runtime.dll
 D:\BC\xiangmu\demo4\demo4\bin\Release\publish\Mono.Posix.NETStandard.dll
+D:\BC\xiangmu\demo4\demo4\bin\Release\publish\Newtonsoft.Json.dll
 D:\BC\xiangmu\demo4\demo4\bin\Release\publish\RAMSPDToolkit-NDD.dll
 D:\BC\xiangmu\demo4\demo4\bin\Release\publish\SkiaSharp.dll
 D:\BC\xiangmu\demo4\demo4\bin\Release\publish\System.CodeDom.dll

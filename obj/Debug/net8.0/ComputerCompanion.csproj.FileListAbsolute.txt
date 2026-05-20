@@ -1,3 +1,4 @@
+D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\ComputerCompanion.pdb
 D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\ComputerCompanion.csproj.AssemblyReference.cache
 D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\Avalonia\Resources.Inputs.cache
 D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\Avalonia\resources
@@ -5,6 +6,7 @@ D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\ComputerCompanion.GeneratedMSBuildEdi
 D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\ComputerCompanion.AssemblyInfoInputs.cache
 D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\ComputerCompanion.AssemblyInfo.cs
 D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\ComputerCompanion.csproj.CoreCompileInputs.cache
+D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\ComputerCompanion.sourcelink.json
 D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\ComputerCompanion.dll
 D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\refint\ComputerCompanion.dll
 D:\BC\xiangmu\demo4\demo4\obj\Debug\net8.0\ComputerCompanion.pdb
@@ -12,7 +14,6 @@ D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\ComputerCompanion.exe
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\ComputerCompanion.deps.json
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\ComputerCompanion.runtimeconfig.json
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\ComputerCompanion.dll
-D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\ComputerCompanion.pdb
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\Avalonia.Base.dll
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\Avalonia.Controls.dll
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\Avalonia.DesignerSupport.dll
@@ -46,6 +47,7 @@ D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\MicroCom.Runtime.dll
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\Microsoft.Extensions.Logging.Abstractions.dll
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\Microsoft.IO.RecyclableMemoryStream.dll
+D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\Newtonsoft.Json.dll
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\RAMSPDToolkit-NDD.dll
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\SkiaSharp.dll
 D:\BC\xiangmu\demo4\demo4\bin\Debug\net8.0\System.CodeDom.dll
