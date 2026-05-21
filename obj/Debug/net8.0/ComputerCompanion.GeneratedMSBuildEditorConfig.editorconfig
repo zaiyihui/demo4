@@ -20,12 +20,15 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = ComputerCompanion
-build_property.ProjectDir = d:\BC\xiangmu\demo4\demo4\
+build_property.ProjectDir = D:\BC\xiangmu\demo4\demo4\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 
-[d:/BC/xiangmu/demo4/demo4/App.axaml]
+[D:/BC/xiangmu/demo4/demo4/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[d:/BC/xiangmu/demo4/demo4/Views/MainWindow.axaml]
+[D:/BC/xiangmu/demo4/demo4/Views/MainWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/BC/xiangmu/demo4/demo4/Views/SettingsWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

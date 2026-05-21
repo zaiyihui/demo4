@@ -47,9 +47,10 @@
 
             <Border Height="1" Background="#333"/>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16">
-                <TextBlock Text="F1: Toggle Click" FontSize="10" Foreground="#666"/>
-                <TextBlock Text="F2: Game Mode" FontSize="10" Foreground="#666"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+                <TextBlock Text="F1: Toggle" FontSize="10" Foreground="#666"/>
+                <TextBlock Text="F2: Game" FontSize="10" Foreground="#666"/>
+                <TextBlock Text="F3: Settings" FontSize="10" Foreground="#666"/>
                 <TextBlock Text="Esc: Close" FontSize="10" Foreground="#666"/>
             </StackPanel>
         </StackPanel>
