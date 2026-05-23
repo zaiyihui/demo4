@@ -68,6 +68,11 @@ public class HardwareMonitorService : IDisposable
     public float? GpuVramTotal { get; private set; }
 
     /// <summary>
+    /// GPU 时钟频率（MHz）
+    /// </summary>
+    public float? GpuClock { get; private set; }
+
+    /// <summary>
     /// 内存使用量（GB）
     /// </summary>
     public float? MemoryUsed { get; private set; }
@@ -256,6 +261,10 @@ public class HardwareMonitorService : IDisposable
             case SensorType.Power:
                 ProcessPowerSensor(sensor, hardwareType);
                 break;
+
+            case SensorType.Clock:
+                ProcessClockSensor(sensor, hardwareType);
+                break;
         }
     }
 
@@ -326,6 +335,15 @@ public class HardwareMonitorService : IDisposable
     {
         if (hardwareType == HardwareType.Battery && sensor.Name.Contains("Charge"))
             BatteryLevel = sensor.Value;
+    }
+
+    /// <summary>
+    /// 处理时钟频率传感器数据
+    /// </summary>
+    private void ProcessClockSensor(ISensor sensor, HardwareType hardwareType)
+    {
+        if (IsGpuType(hardwareType) && sensor.Name.Contains("GPU Core"))
+            GpuClock = sensor.Value;
     }
 
     /// <summary>

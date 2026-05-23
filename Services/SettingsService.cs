@@ -24,12 +24,32 @@ public class Settings
     
     public int WindowX { get; set; } = 100;
     public int WindowY { get; set; } = 100;
+    
+    // NVIDIA 风格悬浮窗相关配置
+    public bool EnableOverlay { get; set; } = true; // 是否启用悬浮窗
+    public bool OverlayAlwaysOnTop { get; set; } = true; // 悬浮窗是否始终置顶
+    public int OverlayFontSize { get; set; } = 16; // 悬浮窗字体大小
+    public string OverlayTextColor { get; set; } = "#76B900"; // NVIDIA 绿色
+    public OverlayPosition OverlayPosition { get; set; } = OverlayPosition.TopRight; // 悬浮窗位置
+    public bool OverlayShowFPS { get; set; } = true; // 显示 FPS
+    public bool OverlayShowGpu { get; set; } = true; // 显示 GPU
+    public bool OverlayShowCpu { get; set; } = true; // 显示 CPU
+    public bool OverlayShowMemory { get; set; } = true; // 显示内存
+    public bool OverlayShowLatency { get; set; } = true; // 显示延迟
 }
 
 public enum LayoutMode
 {
     Vertical,
     Horizontal
+}
+
+public enum OverlayPosition
+{
+    TopLeft,
+    TopRight,
+    BottomLeft,
+    BottomRight
 }
 
 public class SettingsService
