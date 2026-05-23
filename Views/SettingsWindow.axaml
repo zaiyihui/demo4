@@ -2,19 +2,19 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModels="using:ComputerCompanion.ViewModels"
+        xmlns:vm="using:ComputerCompanion.ViewModels"
         mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500"
         x:Class="ComputerCompanion.Views.SettingsWindow"
+        x:DataType="vm:SettingsViewModel"
         Title="设置"
         Width="400"
         Height="550"
-        ResizeMode="NoResize">
+        CanResize="False">
 
     <Grid Margin="16">
         <StackPanel Spacing="12">
             <!-- 标题 -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 8">
-                <TextBlock Text="⚙️" FontSize="20" Margin="0 0 8 0"/>
                 <TextBlock Text="设置" FontSize="18" FontWeight="Bold" Foreground="White"/>
             </StackPanel>
 
@@ -25,14 +25,6 @@
                 <TextBlock Text="外观" FontSize="14" FontWeight="Bold" Foreground="#4ecdc4"/>
                 
                 <StackPanel Spacing="6">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="布局模式" Width="100" Foreground="#aaa"/>
-                        <ComboBox SelectedIndex="{Binding (int)LayoutMode}" Width="200">
-                            <ComboBoxItem>垂直布局</ComboBoxItem>
-                            <ComboBoxItem>水平布局</ComboBoxItem>
-                        </ComboBox>
-                    </StackPanel>
-
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="文字颜色" Width="100" Foreground="#aaa"/>
                         <TextBox Text="{Binding TextColor}" Width="200"/>
@@ -73,7 +65,7 @@
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="游戏模式间隔(ms)" Width="100" Foreground="#aaa"/>
+                        <TextBlock Text="游戏模式间隔" Width="100" Foreground="#aaa"/>
                         <TextBox Text="{Binding GameModeRefreshInterval}" Width="200"/>
                     </StackPanel>
                 </StackPanel>

@@ -11,50 +11,50 @@ public partial class SettingsViewModel : ObservableObject
     private readonly Action<Settings> _onSave;
 
     [ObservableProperty]
-    private LayoutMode _layoutMode;
+    private LayoutMode _layoutMode = LayoutMode.Vertical;
 
     [ObservableProperty]
-    private string _textColor;
+    private string _textColor = "#FFFFFF";
 
     [ObservableProperty]
-    private string _backgroundColor;
+    private string _backgroundColor = "#1a1a2eea";
 
     [ObservableProperty]
-    private double _backgroundOpacity;
+    private double _backgroundOpacity = 0.9;
 
     [ObservableProperty]
-    private int _fontSize;
+    private int _fontSize = 14;
 
     [ObservableProperty]
-    private int _refreshInterval;
+    private int _refreshInterval = 1000;
 
     [ObservableProperty]
     private bool _gameMode;
 
     [ObservableProperty]
-    private int _gameModeRefreshInterval;
+    private int _gameModeRefreshInterval = 3000;
 
     [ObservableProperty]
-    private bool _showCpu;
+    private bool _showCpu = true;
 
     [ObservableProperty]
-    private bool _showGpu;
+    private bool _showGpu = true;
 
     [ObservableProperty]
-    private bool _showMemory;
+    private bool _showMemory = true;
 
     [ObservableProperty]
-    private bool _showNetwork;
+    private bool _showNetwork = true;
 
     [ObservableProperty]
-    private bool _showDisk;
+    private bool _showDisk = true;
 
     [ObservableProperty]
-    private bool _showBattery;
+    private bool _showBattery = true;
 
     public SettingsViewModel(Settings settings, Action<Settings> onSave)
     {
-        _settings = settings;
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         _onSave = onSave;
 
         LoadSettings();

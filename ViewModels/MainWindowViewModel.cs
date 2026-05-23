@@ -16,16 +16,16 @@ public partial class MainWindowViewModel : ObservableObject
     private string _gpuInfo = "GPU: --";
 
     [ObservableProperty]
-    private string _memoryInfo = "MEM: --";
+    private string _memoryInfo = "内存: --";
 
     [ObservableProperty]
-    private string _networkInfo = "NET: --";
+    private string _networkInfo = "网络: --";
 
     [ObservableProperty]
-    private string _diskInfo = "DISK: --";
+    private string _diskInfo = "磁盘: --";
 
     [ObservableProperty]
-    private string _batteryInfo = "BAT: --";
+    private string _batteryInfo = "电池: --";
 
     [ObservableProperty]
     private bool _showGpu = true;
@@ -87,7 +87,7 @@ public partial class MainWindowViewModel : ObservableObject
         var parts = new System.Collections.Generic.List<string>();
         
         if (_monitor.CpuUsage.HasValue)
-            parts.Add($"CPU {_monitor.CpuUsage.Value:F1}%");
+            parts.Add($"{_monitor.CpuUsage.Value:F1}%");
         
         if (_monitor.CpuTemp.HasValue)
             parts.Add($"{_monitor.CpuTemp.Value:F0}°C");
@@ -103,13 +103,13 @@ public partial class MainWindowViewModel : ObservableObject
         var parts = new System.Collections.Generic.List<string>();
         
         if (_monitor.GpuUsage.HasValue)
-            parts.Add($"GPU {_monitor.GpuUsage.Value:F1}%");
+            parts.Add($"{_monitor.GpuUsage.Value:F1}%");
         
         if (_monitor.GpuTemp.HasValue)
             parts.Add($"{_monitor.GpuTemp.Value:F0}°C");
         
         if (_monitor.GpuVramUsed.HasValue && _monitor.GpuVramTotal.HasValue)
-            parts.Add($"VRAM {_monitor.GpuVramUsed.Value:F1}/{_monitor.GpuVramTotal.Value:F1} GB");
+            parts.Add($"{_monitor.GpuVramUsed.Value:F1}/{_monitor.GpuVramTotal.Value:F1} GB");
         
         if (_monitor.GpuFanSpeed.HasValue && _monitor.GpuFanSpeed.Value > 0)
             parts.Add($"{_monitor.GpuFanSpeed.Value} RPM");
@@ -122,9 +122,9 @@ public partial class MainWindowViewModel : ObservableObject
         if (_monitor.MemoryUsed.HasValue && _monitor.MemoryTotal.HasValue)
         {
             var usagePercent = (_monitor.MemoryUsed.Value / _monitor.MemoryTotal.Value) * 100;
-            return $"MEM {usagePercent:F0}% | {_monitor.MemoryUsed.Value:F1}/{_monitor.MemoryTotal.Value:F1} GB";
+            return $"{usagePercent:F0}% | {_monitor.MemoryUsed.Value:F1}/{_monitor.MemoryTotal.Value:F1} GB";
         }
-        return "MEM: --";
+        return "内存: --";
     }
 
     private string BuildNetworkInfo()
@@ -137,7 +137,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (_monitor.NetworkUpload.HasValue)
             parts.Add($"↑ {_monitor.NetworkUpload.Value:F2} MB/s");
         
-        return string.Join(" ", parts) ?? "NET: --";
+        return string.Join(" ", parts) ?? "网络: --";
     }
 
     private string BuildDiskInfo()
@@ -146,9 +146,9 @@ public partial class MainWindowViewModel : ObservableObject
         {
             var used = _monitor.DiskTotalSpace.Value - _monitor.DiskFreeSpace.Value;
             var usagePercent = (used / _monitor.DiskTotalSpace.Value) * 100;
-            return $"DISK {usagePercent:F0}% | {used:F1}/{_monitor.DiskTotalSpace.Value:F1} GB";
+            return $"{usagePercent:F0}% | {used:F1}/{_monitor.DiskTotalSpace.Value:F1} GB";
         }
-        return "DISK: --";
+        return "磁盘: --";
     }
 
     private string BuildBatteryInfo()
@@ -156,9 +156,9 @@ public partial class MainWindowViewModel : ObservableObject
         if (_monitor.BatteryLevel.HasValue)
         {
             var status = _monitor.IsCharging.HasValue && _monitor.IsCharging.Value ? "⚡" : "";
-            return $"BAT {status}{_monitor.BatteryLevel.Value:F0}%";
+            return $"{status}{_monitor.BatteryLevel.Value:F0}%";
         }
-        return "BAT: --";
+        return "电池: --";
     }
 
     public void ToggleGameMode()
