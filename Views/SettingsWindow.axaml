@@ -8,7 +8,7 @@
         x:DataType="vm:SettingsViewModel"
         Title="设置"
         Width="400"
-        Height="550"
+        Height="750"
         CanResize="False">
 
     <Grid Margin="16">
@@ -106,6 +106,77 @@
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                         <CheckBox IsChecked="{Binding ShowBattery}" Margin="0 0 8 0"/>
                         <TextBlock Text="电池" Foreground="#aaa"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+
+            <Border Height="1" Background="#333"/>
+
+            <!-- 悬浮窗设置 -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="悬浮窗" FontSize="14" FontWeight="Bold" Foreground="#76B900"/>
+                
+                <StackPanel Spacing="6">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="启用悬浮窗" Width="120" Foreground="#aaa"/>
+                        <CheckBox IsChecked="{Binding EnableOverlay}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="始终置顶" Width="120" Foreground="#aaa"/>
+                        <CheckBox IsChecked="{Binding OverlayAlwaysOnTop}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="字体大小" Width="120" Foreground="#aaa"/>
+                        <TextBox Text="{Binding OverlayFontSize}" Width="200"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="文字颜色" Width="120" Foreground="#aaa"/>
+                        <TextBox Text="{Binding OverlayTextColor}" Width="200"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="悬浮窗位置" Width="120" Foreground="#aaa"/>
+                        <TextBlock Text="右上 (默认)" Foreground="#76B900"/>
+                    </StackPanel>
+                </StackPanel>
+                
+                <StackPanel Spacing="4" Margin="0,8,0,0">
+                    <TextBlock Text="显示项" FontSize="12" FontWeight="Bold" Foreground="#aaa"/>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <CheckBox IsChecked="{Binding OverlayShowFPS}" Margin="0 0 8 0"/>
+                        <TextBlock Text="FPS" Foreground="#aaa" Width="60"/>
+                        <CheckBox IsChecked="{Binding OverlayShowGpu}" Margin="0 0 8 0"/>
+                        <TextBlock Text="GPU" Foreground="#aaa" Width="60"/>
+                        <CheckBox IsChecked="{Binding OverlayShowCpu}" Margin="0 0 8 0"/>
+                        <TextBlock Text="CPU" Foreground="#aaa"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <CheckBox IsChecked="{Binding OverlayShowMemory}" Margin="0 0 8 0"/>
+                        <TextBlock Text="内存" Foreground="#aaa" Width="60"/>
+                        <CheckBox IsChecked="{Binding OverlayShowLatency}" Margin="0 0 8 0"/>
+                        <TextBlock Text="延迟" Foreground="#aaa"/>
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+            
+            <Border Height="1" Background="#333"/>
+
+            <!-- 启动设置 -->
+            <StackPanel Spacing="8">
+                <TextBlock Text="启动选项" FontSize="14" FontWeight="Bold" Foreground="#76B900"/>
+                
+                <StackPanel Spacing="6">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="开机自启" Width="120" Foreground="#aaa"/>
+                        <CheckBox IsChecked="{Binding AutoStart}"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="启动最小化" Width="120" Foreground="#aaa"/>
+                        <CheckBox IsChecked="{Binding StartMinimized}"/>
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

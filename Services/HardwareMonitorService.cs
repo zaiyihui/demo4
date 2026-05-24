@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Timers;
+using System.Threading.Tasks;
 
 namespace ComputerCompanion.Services;
 
@@ -22,6 +23,19 @@ public class HardwareMonitorService : IDisposable
     private long _lastBytesReceived = 0;
     private long _lastBytesSent = 0;
     private DateTime _lastNetworkUpdate = DateTime.Now;
+    
+    // FPS 测量相关
+    private long _frameCount = 0;
+    private long _lastFpsUpdateTime = 0;
+    private float _currentFps = 0;
+    private readonly long _ticksPerSecond = TimeSpan.TicksPerSecond;
+    private bool _fpsInitialized = false;
+    
+    // 网络延迟测量相关
+    private int _pingLatencyMs = -1;
+    private System.Timers.Timer? _pingTimer;
+    private readonly string[] _pingHosts = { "223.5.5.5", "119.29.29.29", "8.8.8.8", "1.1.1.1" };
+    private int _currentHostIndex = 0;
 
     #endregion
 
@@ -122,6 +136,16 @@ public class HardwareMonitorService : IDisposable
     /// </summary>
     public bool HasBattery => BatteryLevel.HasValue;
 
+    /// <summary>
+    /// 当前帧率（FPS）
+    /// </summary>
+    public float? Fps { get; private set; }
+
+    /// <summary>
+    /// 网络延迟（毫秒）
+    /// </summary>
+    public int? NetworkLatency { get; private set; }
+
     #endregion
 
     #region 事件
@@ -159,6 +183,9 @@ public class HardwareMonitorService : IDisposable
         _timer.Elapsed += (_, _) => UpdateData();
         _timer.AutoReset = true;
         _timer.Start();
+
+        // 启动网络延迟测量
+        StartPingMonitor();
     }
 
     /// <summary>
@@ -168,6 +195,8 @@ public class HardwareMonitorService : IDisposable
     {
         _timer?.Stop();
         _timer?.Dispose();
+        _pingTimer?.Stop();
+        _pingTimer?.Dispose();
         _computer?.Close();
     }
 
@@ -179,6 +208,97 @@ public class HardwareMonitorService : IDisposable
         Stop();
         GC.SuppressFinalize(this);
     }
+
+    #region FPS 测量方法
+
+    /// <summary>
+    /// 标记一个帧（用于FPS计算）
+    /// 在渲染循环中调用此方法
+    /// </summary>
+    public void MarkFrame()
+    {
+        if (!_fpsInitialized)
+        {
+            _lastFpsUpdateTime = DateTime.UtcNow.Ticks;
+            _fpsInitialized = true;
+            return;
+        }
+
+        _frameCount++;
+        var currentTime = DateTime.UtcNow.Ticks;
+        var elapsedTicks = currentTime - _lastFpsUpdateTime;
+
+        if (elapsedTicks >= _ticksPerSecond)
+        {
+            _currentFps = (float)(_frameCount * _ticksPerSecond) / elapsedTicks;
+            Fps = _currentFps;
+            _frameCount = 0;
+            _lastFpsUpdateTime = currentTime;
+        }
+    }
+
+    /// <summary>
+    /// 获取当前平滑后的FPS值
+    /// </summary>
+    /// <returns>FPS值</returns>
+    public float? GetSmoothedFps()
+    {
+        return Fps;
+    }
+
+    #endregion
+
+    #region 网络延迟测量方法
+
+    /// <summary>
+    /// 启动网络延迟测量
+    /// </summary>
+    private void StartPingMonitor()
+    {
+        _pingTimer = new Timer(3000); // 每3秒测量一次
+        _pingTimer.Elapsed += (_, _) => _ = MeasureLatencyAsync();
+        _pingTimer.AutoReset = true;
+        _pingTimer.Start();
+        
+        // 立即执行第一次测量
+        _ = MeasureLatencyAsync();
+    }
+
+    /// <summary>
+    /// 异步测量网络延迟
+    /// </summary>
+    private async Task MeasureLatencyAsync()
+    {
+        try
+        {
+            var host = _pingHosts[_currentHostIndex];
+            _currentHostIndex = (_currentHostIndex + 1) % _pingHosts.Length;
+
+            using var ping = new Ping();
+            var reply = await ping.SendPingAsync(host, 1000);
+
+            if (reply.Status == IPStatus.Success)
+            {
+                _pingLatencyMs = (int)reply.RoundtripTime;
+                NetworkLatency = _pingLatencyMs;
+            }
+            else
+            {
+                // 尝试下一个主机
+                await MeasureLatencyAsync();
+            }
+        }
+        catch
+        {
+            // Ping 失败，保持上次值或标记为不可用
+            if (_pingLatencyMs < 0)
+            {
+                NetworkLatency = null;
+            }
+        }
+    }
+
+    #endregion
 
     #endregion
 
@@ -381,8 +501,14 @@ public class HardwareMonitorService : IDisposable
 
         if (elapsed > 0 && _lastBytesReceived > 0)
         {
-            NetworkDownload = (float)((totalBytesReceived - _lastBytesReceived) / elapsed / 1024 / 1024);
-            NetworkUpload = (float)((totalBytesSent - _lastBytesSent) / elapsed / 1024 / 1024);
+            var downloadDiff = totalBytesReceived - _lastBytesReceived;
+            var uploadDiff = totalBytesSent - _lastBytesSent;
+            
+            if (downloadDiff >= 0 && uploadDiff >= 0)
+            {
+                NetworkDownload = Math.Max(0, (float)(downloadDiff / elapsed / 1024 / 1024));
+                NetworkUpload = Math.Max(0, (float)(uploadDiff / elapsed / 1024 / 1024));
+            }
         }
 
         _lastBytesReceived = totalBytesReceived;

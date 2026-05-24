@@ -36,6 +36,10 @@ public class Settings
     public bool OverlayShowCpu { get; set; } = true; // 显示 CPU
     public bool OverlayShowMemory { get; set; } = true; // 显示内存
     public bool OverlayShowLatency { get; set; } = true; // 显示延迟
+    
+    // 启动设置
+    public bool AutoStart { get; set; } = false; // 开机自启
+    public bool StartMinimized { get; set; } = false; // 启动时最小化到托盘
 }
 
 public enum LayoutMode

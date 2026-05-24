@@ -26,7 +26,7 @@ public partial class OverlayWindow : Window
         // 设置鼠标穿透
         SetWindowTransparent();
         
-        // 启动帧计数器模拟定时器
+        // 启动帧计数器用于FPS测量
         _frameTimer = new DispatcherTimer();
         _frameTimer.Interval = TimeSpan.FromMilliseconds(16); // 约 60 FPS
         _frameTimer.Tick += OnFrameTick;
@@ -35,7 +35,7 @@ public partial class OverlayWindow : Window
 
     private void OnFrameTick(object? sender, EventArgs e)
     {
-        _viewModel?.IncrementFrameCount();
+        _viewModel?.MarkFrame();
     }
 
     private void SetWindowTransparent()

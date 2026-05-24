@@ -15,9 +15,6 @@ public partial class OverlayViewModel : ObservableObject
 
     private readonly HardwareMonitorService _monitor;
     private readonly Settings _settings;
-    private DateTime _lastUpdateTime;
-    private int _frameCount;
-    private float _lastFps;
 
     #endregion
 
@@ -30,8 +27,6 @@ public partial class OverlayViewModel : ObservableObject
         
         // 订阅数据更新事件
         _monitor.DataUpdated += OnDataUpdated;
-        _lastUpdateTime = DateTime.Now;
-        _frameCount = 0;
         
         // 初始化默认值
         _fpsText = "N/A";
@@ -87,21 +82,15 @@ public partial class OverlayViewModel : ObservableObject
     #region 公共方法
 
     /// <summary>
-    /// 帧计数器增加（模拟 FPS 测量）
+    /// 标记一个帧（用于真实FPS测量）
     /// </summary>
-    public void IncrementFrameCount()
+    public void MarkFrame()
     {
-        _frameCount++;
+        _monitor.MarkFrame();
         
-        var now = DateTime.Now;
-        var elapsed = (now - _lastUpdateTime).TotalSeconds;
-        
-        if (elapsed >= 1.0)
+        if (_monitor.Fps.HasValue)
         {
-            _lastFps = _frameCount / (float)elapsed;
-            FpsText = _lastFps > 0 ? _lastFps.ToString("0") : "N/A";
-            _frameCount = 0;
-            _lastUpdateTime = now;
+            FpsText = _monitor.Fps.Value > 0 ? _monitor.Fps.Value.ToString("0") : "N/A";
         }
     }
 
@@ -164,8 +153,23 @@ public partial class OverlayViewModel : ObservableObject
             MemoryText = "MEM: --";
         }
 
-        // 延迟（暂时显示为 N/A）
-        LatencyText = "N/A";
+        // 延迟
+        if (_settings.OverlayShowLatency)
+        {
+            if (_monitor.NetworkLatency.HasValue)
+            {
+                var latency = _monitor.NetworkLatency.Value;
+                LatencyText = $"LAT {latency}ms";
+            }
+            else
+            {
+                LatencyText = "LAT: --";
+            }
+        }
+        else
+        {
+            LatencyText = "LAT: --";
+        }
     }
 
     #endregion

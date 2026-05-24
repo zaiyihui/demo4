@@ -48,6 +48,17 @@ public partial class MainWindowViewModel : ObservableObject
         ShowGpu = _monitor.HasGpu && _settings.ShowGpu;
         ShowBattery = _monitor.HasBattery && _settings.ShowBattery;
     }
+    
+    public MainWindowViewModel(HardwareMonitorService monitor, Settings settings)
+    {
+        _settings = settings;
+        _settingsService = App.SettingsService ?? new SettingsService();
+        _monitor = monitor;
+        _monitor.DataUpdated += OnDataUpdated;
+        
+        ShowGpu = _monitor.HasGpu && _settings.ShowGpu;
+        ShowBattery = _monitor.HasBattery && _settings.ShowBattery;
+    }
 
     private void OnDataUpdated()
     {

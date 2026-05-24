@@ -7,8 +7,8 @@
         x:Class="ComputerCompanion.Views.OverlayWindow"
         x:DataType="vm:OverlayViewModel"
         Title="Computer Companion Overlay"
-        Width="300"
-        Height="200"
+        Width="280"
+        Height="180"
         Background="Transparent"
         TransparencyLevelHint="AcrylicBlur"
         SystemDecorations="None"
@@ -27,35 +27,35 @@
                     Text="{Binding FpsText}"
                     FontSize="16"
                     FontWeight="Bold"
-                    Foreground="{Binding OverlayTextColor, Mode=OneTime}"/>
+                    Foreground="#76B900"/>
                 
                 <!-- GPU -->
                 <TextBlock 
                     x:Name="GpuText"
                     Text="{Binding GpuText}"
                     FontSize="14"
-                    Foreground="{Binding OverlayTextColor, Mode=OneTime}"/>
+                    Foreground="#76B900"/>
                 
                 <!-- CPU -->
                 <TextBlock 
                     x:Name="CpuText"
                     Text="{Binding CpuText}"
                     FontSize="14"
-                    Foreground="{Binding OverlayTextColor, Mode=OneTime}"/>
+                    Foreground="#76B900"/>
                 
                 <!-- Memory -->
                 <TextBlock 
                     x:Name="MemoryText"
                     Text="{Binding MemoryText}"
                     FontSize="14"
-                    Foreground="{Binding OverlayTextColor, Mode=OneTime}"/>
+                    Foreground="#76B900"/>
                 
                 <!-- Latency -->
                 <TextBlock 
                     x:Name="LatencyText"
                     Text="{Binding LatencyText}"
                     FontSize="14"
-                    Foreground="{Binding OverlayTextColor, Mode=OneTime}"/>
+                    Foreground="#76B900"/>
             </StackPanel>
         </Border>
     </Grid>
