@@ -5,6 +5,7 @@ namespace ComputerCompanion.Services;
 public class TrayIconService : IDisposable
 {
     private readonly SettingsService _settingsService;
+    private bool _isDisposed;
 
     public TrayIconService(SettingsService settingsService)
     {
@@ -17,5 +18,9 @@ public class TrayIconService : IDisposable
 
     public void Dispose()
     {
+        _isDisposed = true;
     }
+
+    public event EventHandler? ShowMainWindow;
+    public event EventHandler? ExitApplication;
 }

@@ -3,56 +3,370 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="using:ComputerCompanion.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="320" d:DesignHeight="280"
+        mc:Ignorable="d" d:DesignWidth="380" d:DesignHeight="480"
         x:Class="ComputerCompanion.Views.MainWindow"
         Title="电脑伴侣"
         Background="Transparent"
         Topmost="True"
-        Width="320"
-        Height="280"
-        CanResize="False">
+        Width="380"
+        Height="480"
+        MinWidth="350"
+        MinHeight="400"
+        CanResize="True"
+        TransparencyLevelHint="Blur"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHintsHint="NoChrome">
+
     <Window.Styles>
-        <Style>
-            <Setter Property="TextBlock.FontFamily" Value="Segoe UI, sans-serif"/>
-            <Setter Property="TextBlock.FontSize" Value="12"/>
-            <Setter Property="TextBlock.Foreground" Value="White"/>
-            <Setter Property="TextBlock.Margin" Value="0 2"/>
+        <!-- 全局样式 -->
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei UI, sans-serif"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        
+        <Style Selector="TextBlock.title">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground" Value="#808080"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+        
+        <Style Selector="TextBlock.value">
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        
+        <Style Selector="TextBlock.shortcut">
+            <Setter Property="Foreground" Value="#666666"/>
+            <Setter Property="FontSize" Value="10"/>
+        </Style>
+        
+        <!-- 进度条样式 -->
+        <Style Selector="ProgressBar">
+            <Setter Property="Height" Value="6"/>
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Minimum" Value="0"/>
+            <Setter Property="Maximum" Value="100"/>
+        </Style>
+        
+        <!-- 按钮悬停效果 -->
+        <Style Selector="Button.action-button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Foreground" Value="#808080"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+        
+        <Style Selector="Button.action-button:pointerover">
+            <Setter Property="Background" Value="#2a2a4a"/>
+            <Setter Property="Foreground" Value="#ffffff"/>
         </Style>
     </Window.Styles>
 
-    <Border CornerRadius="12" Background="#1a1a2eea" Padding="16">
-        <StackPanel Spacing="8">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <TextBlock Text="⚡" FontSize="20" Margin="0 0 8 0"/>
-                <TextBlock Text="电脑伴侣" FontSize="14" FontWeight="Bold"/>
-            </StackPanel>
-
-            <Border Height="1" Background="#333"/>
-
-            <StackPanel Spacing="4">
-                <TextBlock x:DataType="viewModels:MainWindowViewModel" Text="{Binding CpuInfo}" Foreground="#4ecdc4"/>
-                
-                <TextBlock x:DataType="viewModels:MainWindowViewModel" Text="{Binding GpuInfo}" Foreground="#a29bfe" 
-                           IsVisible="{Binding ShowGpu}"/>
-                
-                <TextBlock x:DataType="viewModels:MainWindowViewModel" Text="{Binding MemoryInfo}" Foreground="#fd79a8"/>
-                
-                <TextBlock x:DataType="viewModels:MainWindowViewModel" Text="{Binding NetworkInfo}" Foreground="#ffeaa7"/>
-                
-                <TextBlock x:DataType="viewModels:MainWindowViewModel" Text="{Binding DiskInfo}" Foreground="#dfe6e9"/>
-                
-                <TextBlock x:DataType="viewModels:MainWindowViewModel" Text="{Binding BatteryInfo}" Foreground="#00b894"
-                           IsVisible="{Binding ShowBattery}"/>
-            </StackPanel>
-
-            <Border Height="1" Background="#333"/>
-
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
-                <TextBlock Text="F1: 切换穿透" FontSize="10" Foreground="#666"/>
-                <TextBlock Text="F2: 游戏模式" FontSize="10" Foreground="#666"/>
-                <TextBlock Text="F3: 设置" FontSize="10" Foreground="#666"/>
-                <TextBlock Text="Esc: 关闭" FontSize="10" Foreground="#666"/>
-            </StackPanel>
-        </StackPanel>
+    <!-- 主容器 -->
+    <Border 
+        CornerRadius="18"
+        BorderBrush="#333344"
+        BorderThickness="1"
+        BoxShadow="0 10 40 0 #40000000">
+        <Border.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Color="#1a1a2e" Offset="0"/>
+                <GradientStop Color="#151525" Offset="1"/>
+            </LinearGradientBrush>
+        </Border.Background>
+        
+        <Grid RowDefinitions="Auto,*,Auto">
+            
+            <!-- 顶部区域 -->
+            <Border 
+                Grid.Row="0"
+                CornerRadius="18,18,0,0"
+                Background="#252540"
+                Padding="16,14">
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <!-- Logo 和标题 -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
+                        <Border 
+                            Width="36" Height="36" 
+                            CornerRadius="10"
+                            Background="LinearGradient(135, #4ecdc4, #2a9d8f)">
+                            <TextBlock 
+                                Text="⚡" 
+                                FontSize="18" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center"
+                                Margin="0,0,0,2"/>
+                        </Border>
+                        
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="电脑伴侣" Classes="title" Foreground="White"/>
+                            <TextBlock Text="实时性能监控" Classes="label" Foreground="#666" Margin="0,2,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                    
+                    <!-- 游戏模式指示器 -->
+                    <Border Grid.Column="2" x:DataType="viewModels:MainWindowViewModel"
+                        IsVisible="{Binding GameMode}"
+                        Background="#76B900"
+                        CornerRadius="8"
+                        Padding="12,6">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <TextBlock Text="🎮" FontSize="14"/>
+                            <TextBlock Text="游戏模式" FontSize="11" FontWeight="SemiBold" Foreground="#1a1a2e" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+            
+            <!-- 中间区域 -->
+            <ScrollViewer 
+                Grid.Row="1" 
+                HorizontalScrollBarVisibility="Disabled"
+                VerticalScrollBarVisibility="Auto"
+                Padding="0">
+                <StackPanel Spacing="10" Margin="16,14">
+                    
+                    <!-- CPU 监控卡片 -->
+                    <Border 
+                        CornerRadius="14" 
+                        Background="#252540"
+                        Padding="14">
+                        <Grid ColumnDefinitions="36,*">
+                            <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
+                                Background="LinearGradient(135, #4ecdc4, #3ba69d)"
+                                VerticalAlignment="Top">
+                                <TextBlock Text="C" FontSize="15" FontWeight="Bold" 
+                                    Foreground="#1a1a2e" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"/>
+                            </Border>
+                            
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="CPU" Classes="label" Foreground="#4ecdc4" FontSize="12" FontWeight="Medium"/>
+                                    <TextBlock x:DataType="viewModels:MainWindowViewModel" 
+                                        Text="{Binding CpuInfo}" 
+                                        Classes="value" 
+                                        Foreground="White"/>
+                                </StackPanel>
+                                
+                                <ProgressBar 
+                                    x:DataType="viewModels:MainWindowViewModel"
+                                    Value="{Binding CpuUsagePercent}"
+                                    Foreground="LinearGradient(90, #4ecdc4, #3ba69d)"
+                                    Background="#1a1a30"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- GPU 监控卡片 -->
+                    <Border 
+                        x:DataType="viewModels:MainWindowViewModel"
+                        IsVisible="{Binding ShowGpu}"
+                        CornerRadius="14" 
+                        Background="#252540"
+                        Padding="14">
+                        <Grid ColumnDefinitions="36,*">
+                            <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
+                                Background="LinearGradient(135, #a29bfe, #6c5ce7)"
+                                VerticalAlignment="Top">
+                                <TextBlock Text="G" FontSize="15" FontWeight="Bold" 
+                                    Foreground="#1a1a2e" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"/>
+                            </Border>
+                            
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="GPU" Classes="label" Foreground="#a29bfe" FontSize="12" FontWeight="Medium"/>
+                                    <TextBlock Text="{Binding GpuInfo}" Classes="value" Foreground="White"/>
+                                </StackPanel>
+                                
+                                <ProgressBar 
+                                    Value="{Binding GpuUsagePercent}"
+                                    Foreground="LinearGradient(90, #a29bfe, #6c5ce7)"
+                                    Background="#1a1a30"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- 内存监控卡片 -->
+                    <Border 
+                        CornerRadius="14" 
+                        Background="#252540"
+                        Padding="14">
+                        <Grid ColumnDefinitions="36,*">
+                            <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
+                                Background="LinearGradient(135, #fd79a8, #e84393)"
+                                VerticalAlignment="Top">
+                                <TextBlock Text="M" FontSize="15" FontWeight="Bold" 
+                                    Foreground="#1a1a2e" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"/>
+                            </Border>
+                            
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="内存" Classes="label" Foreground="#fd79a8" FontSize="12" FontWeight="Medium"/>
+                                    <TextBlock x:DataType="viewModels:MainWindowViewModel" 
+                                        Text="{Binding MemoryInfo}" 
+                                        Classes="value" 
+                                        Foreground="White"/>
+                                </StackPanel>
+                                
+                                <ProgressBar 
+                                    x:DataType="viewModels:MainWindowViewModel"
+                                    Value="{Binding MemoryUsagePercent}"
+                                    Foreground="LinearGradient(90, #fd79a8, #e84393)"
+                                    Background="#1a1a30"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- 网络监控卡片 -->
+                    <Border 
+                        CornerRadius="14" 
+                        Background="#252540"
+                        Padding="14">
+                        <Grid ColumnDefinitions="36,*">
+                            <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
+                                Background="LinearGradient(135, #ffeaa7, #fdcb6e)"
+                                VerticalAlignment="Top">
+                                <TextBlock Text="N" FontSize="15" FontWeight="Bold" 
+                                    Foreground="#1a1a2e" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"/>
+                            </Border>
+                            
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="4">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="网络" Classes="label" Foreground="#ffeaa7" FontSize="12" FontWeight="Medium"/>
+                                    <TextBlock x:DataType="viewModels:MainWindowViewModel" 
+                                        Text="{Binding NetworkInfo}" 
+                                        Classes="value" 
+                                        Foreground="White"/>
+                                </StackPanel>
+                                <TextBlock x:DataType="viewModels:MainWindowViewModel" 
+                                    Text="{Binding LatencyInfo}" 
+                                    Classes="label" 
+                                    Foreground="#888"
+                                    FontSize="10"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- 磁盘监控卡片 -->
+                    <Border 
+                        CornerRadius="14" 
+                        Background="#252540"
+                        Padding="14">
+                        <Grid ColumnDefinitions="36,*">
+                            <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
+                                Background="LinearGradient(135, #dfe6e9, #b2bec3)"
+                                VerticalAlignment="Top">
+                                <TextBlock Text="D" FontSize="15" FontWeight="Bold" 
+                                    Foreground="#1a1a2e" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"/>
+                            </Border>
+                            
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="存储" Classes="label" Foreground="#dfe6e9" FontSize="12" FontWeight="Medium"/>
+                                    <TextBlock x:DataType="viewModels:MainWindowViewModel" 
+                                        Text="{Binding DiskInfo}" 
+                                        Classes="value" 
+                                        Foreground="White"/>
+                                </StackPanel>
+                                
+                                <ProgressBar 
+                                    x:DataType="viewModels:MainWindowViewModel"
+                                    Value="{Binding DiskUsagePercent}"
+                                    Foreground="LinearGradient(90, #dfe6e9, #b2bec3)"
+                                    Background="#1a1a30"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- 电池监控卡片 -->
+                    <Border 
+                        x:DataType="viewModels:MainWindowViewModel"
+                        IsVisible="{Binding ShowBattery}"
+                        CornerRadius="14" 
+                        Background="#252540"
+                        Padding="14">
+                        <Grid ColumnDefinitions="36,*">
+                            <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
+                                Background="LinearGradient(135, #00b894, #00a085)"
+                                VerticalAlignment="Top">
+                                <TextBlock Text="B" FontSize="15" FontWeight="Bold" 
+                                    Foreground="#1a1a2e" 
+                                    HorizontalAlignment="Center" 
+                                    VerticalAlignment="Center"/>
+                            </Border>
+                            
+                            <StackPanel Grid.Column="1" Margin="12,0,0,0" Spacing="6">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBlock Text="电池" Classes="label" Foreground="#00b894" FontSize="12" FontWeight="Medium"/>
+                                    <TextBlock Text="{Binding BatteryInfo}" Classes="value" Foreground="White"/>
+                                </StackPanel>
+                                
+                                <ProgressBar 
+                                    Value="{Binding BatteryLevelPercent}"
+                                    Foreground="LinearGradient(90, #00b894, #00a085)"
+                                    Background="#1a1a30"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    
+                </StackPanel>
+            </ScrollViewer>
+            
+            <!-- 底部区域 -->
+            <Border 
+                Grid.Row="2"
+                CornerRadius="0,0,18,18"
+                Background="#1e1e32"
+                Padding="16,12">
+                <Grid ColumnDefinitions="*,Auto">
+                    <!-- 快捷键提示 -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <Border Background="#252540" CornerRadius="6" Padding="8,5">
+                            <TextBlock Text="F1" FontSize="10" Foreground="#4ecdc4" FontWeight="SemiBold"/>
+                        </Border>
+                        <TextBlock Text="鼠标穿透" Classes="shortcut" VerticalAlignment="Center"/>
+                        
+                        <Border Background="#252540" CornerRadius="6" Padding="8,5">
+                            <TextBlock Text="F2" FontSize="10" Foreground="#76B900" FontWeight="SemiBold"/>
+                        </Border>
+                        <TextBlock Text="游戏" Classes="shortcut" VerticalAlignment="Center"/>
+                        
+                        <Border Background="#252540" CornerRadius="6" Padding="8,5">
+                            <TextBlock Text="F3" FontSize="10" Foreground="#a29bfe" FontWeight="SemiBold"/>
+                        </Border>
+                        <TextBlock Text="设置" Classes="shortcut" VerticalAlignment="Center"/>
+                        
+                        <Border Background="#252540" CornerRadius="6" Padding="8,5">
+                            <TextBlock Text="Esc" FontSize="10" Foreground="#fd79a8" FontWeight="SemiBold"/>
+                        </Border>
+                        <TextBlock Text="隐藏" Classes="shortcut" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <!-- 操作按钮 -->
+                    <Button Grid.Column="1" 
+                        Classes="action-button"
+                        ToolTip.Tip="最小化到托盘"
+                        Click="OnMinimizeToTrayClick">
+                        <TextBlock Text="▼" FontSize="14" Margin="0,-2,0,0"/>
+                    </Button>
+                </Grid>
+            </Border>
+        </Grid>
     </Border>
 </Window>

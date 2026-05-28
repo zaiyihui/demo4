@@ -1,3 +1,4 @@
+using ComputerCompanion.Models;
 using ComputerCompanion.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -28,6 +29,9 @@ public partial class MainWindowViewModel : ObservableObject
     private string _batteryInfo = "电池: --";
 
     [ObservableProperty]
+    private string _latencyInfo = "延迟: --";
+
+    [ObservableProperty]
     private bool _showGpu = true;
 
     [ObservableProperty]
@@ -35,6 +39,21 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _gameMode = false;
+
+    [ObservableProperty]
+    private double _cpuUsagePercent = 0;
+
+    [ObservableProperty]
+    private double _gpuUsagePercent = 0;
+
+    [ObservableProperty]
+    private double _memoryUsagePercent = 0;
+
+    [ObservableProperty]
+    private double _diskUsagePercent = 0;
+
+    [ObservableProperty]
+    private double _batteryLevelPercent = 0;
 
     public MainWindowViewModel()
     {
@@ -65,31 +84,51 @@ public partial class MainWindowViewModel : ObservableObject
         if (_settings.ShowCpu)
         {
             CpuInfo = BuildCpuInfo();
+            CpuUsagePercent = _monitor.CpuUsage ?? 0;
         }
 
         if (_settings.ShowGpu && _monitor.HasGpu)
         {
             GpuInfo = BuildGpuInfo();
+            GpuUsagePercent = _monitor.GpuUsage ?? 0;
         }
 
         if (_settings.ShowMemory)
         {
             MemoryInfo = BuildMemoryInfo();
+            if (_monitor.MemoryUsed.HasValue && _monitor.MemoryTotal.HasValue)
+            {
+                MemoryUsagePercent = (_monitor.MemoryUsed.Value / _monitor.MemoryTotal.Value) * 100;
+            }
         }
 
         if (_settings.ShowNetwork)
         {
             NetworkInfo = BuildNetworkInfo();
+            if (_monitor.NetworkLatency.HasValue)
+            {
+                LatencyInfo = $"{_monitor.NetworkLatency.Value}ms";
+            }
+            else
+            {
+                LatencyInfo = "延迟: --";
+            }
         }
 
         if (_settings.ShowDisk)
         {
             DiskInfo = BuildDiskInfo();
+            if (_monitor.DiskFreeSpace.HasValue && _monitor.DiskTotalSpace.HasValue)
+            {
+                var used = _monitor.DiskTotalSpace.Value - _monitor.DiskFreeSpace.Value;
+                DiskUsagePercent = (used / _monitor.DiskTotalSpace.Value) * 100;
+            }
         }
 
         if (_settings.ShowBattery && _monitor.HasBattery)
         {
             BatteryInfo = BuildBatteryInfo();
+            BatteryLevelPercent = _monitor.BatteryLevel ?? 0;
         }
     }
 

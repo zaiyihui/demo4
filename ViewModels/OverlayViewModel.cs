@@ -1,3 +1,4 @@
+using ComputerCompanion.Models;
 using ComputerCompanion.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
@@ -29,11 +30,11 @@ public partial class OverlayViewModel : ObservableObject
         _monitor.DataUpdated += OnDataUpdated;
         
         // 初始化默认值
-        _fpsText = "N/A";
-        _gpuText = "GPU: --";
-        _cpuText = "CPU: --";
-        _memoryText = "MEM: --";
-        _latencyText = "N/A";
+        _fpsText = "--";
+        _gpuText = "显示: --";
+        _cpuText = "处理: --";
+        _memoryText = "内存: --";
+        _latencyText = "延迟: --";
         _overlayTextColor = settings.OverlayTextColor;
     }
 
@@ -90,7 +91,7 @@ public partial class OverlayViewModel : ObservableObject
         
         if (_monitor.Fps.HasValue)
         {
-            FpsText = _monitor.Fps.Value > 0 ? _monitor.Fps.Value.ToString("0") : "N/A";
+            FpsText = _monitor.Fps.Value > 0 ? _monitor.Fps.Value.ToString("0") : "--";
         }
     }
 

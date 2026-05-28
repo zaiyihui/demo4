@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using ComputerCompanion.Models;
 using ComputerCompanion.Services;
 using ComputerCompanion.ViewModels;
 using System;

@@ -1,3 +1,4 @@
+using ComputerCompanion.Models;
 using ComputerCompanion.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;

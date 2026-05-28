@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Platform;
+using ComputerCompanion.Models;
 using ComputerCompanion.Services;
 using ComputerCompanion.ViewModels;
 using System;
@@ -61,6 +61,7 @@ public partial class MainWindow : Window
         
         Opened += OnWindowOpened;
         KeyDown += OnKeyDown;
+        Deactivated += OnDeactivated;
     }
 
     #endregion
@@ -70,6 +71,15 @@ public partial class MainWindow : Window
     private void OnWindowOpened(object? sender, EventArgs e)
     {
         SetClickThrough(_isClickThroughEnabled);
+    }
+
+    private void OnDeactivated(object? sender, EventArgs e)
+    {
+        // 窗口失去焦点时自动启用穿透
+        if (_isClickThroughEnabled)
+        {
+            SetClickThrough(true);
+        }
     }
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -93,7 +103,7 @@ public partial class MainWindow : Window
 
     private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
-        SetClickThrough(true);
+        SetClickThrough(_isClickThroughEnabled);
     }
 
     private void OnKeyDown(object? sender, KeyEventArgs e)
@@ -101,11 +111,12 @@ public partial class MainWindow : Window
         switch (e.Key)
         {
             case Key.Escape:
-                Close();
+                Hide();
                 break;
             case Key.F1:
                 _isClickThroughEnabled = !_isClickThroughEnabled;
                 SetClickThrough(_isClickThroughEnabled);
+                UpdateStatusText();
                 break;
             case Key.F2:
                 ToggleGameMode();
@@ -140,7 +151,7 @@ public partial class MainWindow : Window
 
         if (settings.EnableOverlay)
         {
-            _ = App.SendIpcMessageAsync(IpcMessageTypes.SettingsChanged);
+            App.RestartOverlayProcess();
         }
         else
         {
@@ -149,7 +160,7 @@ public partial class MainWindow : Window
 
         HandleAutoStart(settings.AutoStart);
 
-        SetClickThrough(true);
+        SetClickThrough(_isClickThroughEnabled);
     }
     
     private void HandleAutoStart(bool enable)
@@ -196,7 +207,13 @@ public partial class MainWindow : Window
         if (DataContext is MainWindowViewModel viewModel)
         {
             viewModel.ToggleGameMode();
+            UpdateStatusText();
         }
+    }
+
+    private void UpdateStatusText()
+    {
+        // 状态更新由 ViewModel 处理
     }
 
     private void SetClickThrough(bool enable)
@@ -216,6 +233,11 @@ public partial class MainWindow : Window
 
             SetWindowLong(handle.Handle, GWL_EXSTYLE, style);
         }
+    }
+
+    private void OnMinimizeToTrayClick(object? sender, RoutedEventArgs e)
+    {
+        Hide();
     }
 
     #endregion
