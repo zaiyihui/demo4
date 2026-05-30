@@ -107,6 +107,8 @@ public partial class App : Application
 
             // 初始化系统托盘
             _trayIconService = new TrayIconService(_settingsService ?? throw new InvalidOperationException("设置服务未初始化"));
+            _trayIconService.ShowMainWindow += (s, e) => ShowMainWindow();
+            _trayIconService.ExitApplication += (s, e) => ExitApplication();
             _trayIconService.Initialize();
 
             // 如果启用了悬浮窗，启动悬浮窗进程

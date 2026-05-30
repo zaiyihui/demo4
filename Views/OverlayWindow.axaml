@@ -11,11 +11,9 @@
         Height="180"
         Background="Transparent"
         TransparencyLevelHint="Transparent"
-        SystemDecorations="None"
         ShowInTaskbar="False"
         Topmost="True"
-        ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHintsHint="NoChrome">
+        ExtendClientAreaToDecorationsHint="True">
 
     <Window.Styles>
         <Style Selector="TextBlock">

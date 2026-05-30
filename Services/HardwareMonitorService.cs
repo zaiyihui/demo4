@@ -226,12 +226,19 @@ public class HardwareMonitorService : IDisposable
 
     private void UpdateData()
     {
-        UpdateHardwareData();
-        UpdateNetworkData();
-        UpdateDiskData();
-        UpdateBatteryData();
-        
-        DataUpdated?.Invoke();
+        try
+        {
+            UpdateHardwareData();
+            UpdateNetworkData();
+            UpdateDiskData();
+            UpdateBatteryData();
+            
+            DataUpdated?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"更新数据失败: {ex.Message}");
+        }
     }
 
     private void UpdateHardwareData()
@@ -268,6 +275,11 @@ public class HardwareMonitorService : IDisposable
 
     private void ProcessSensor(ISensor sensor, HardwareType hardwareType)
     {
+        if (sensor.Value == null)
+        {
+            return;
+        }
+        
         switch (sensor.SensorType)
         {
             case SensorType.Load:

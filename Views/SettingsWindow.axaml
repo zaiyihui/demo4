@@ -3,191 +3,460 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:ComputerCompanion.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="500"
+        xmlns:converters="using:ComputerCompanion.Converters"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="ComputerCompanion.Views.SettingsWindow"
         x:DataType="vm:SettingsViewModel"
-        Title="设置"
-        Width="400"
-        Height="750"
-        CanResize="False">
+        Title="Computer Companion - 悬浮窗设置"
+        Width="850"
+        Height="650"
+        Background="#1a1a1a"
+        CanResize="False"
+        WindowStartupLocation="CenterScreen">
 
-    <Grid Margin="16">
-        <StackPanel Spacing="12">
-            <!-- 标题 -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 0 0 8">
-                <TextBlock Text="设置" FontSize="18" FontWeight="Bold" Foreground="White"/>
-            </StackPanel>
+    <Window.Resources>
+        <converters:StringToColorConverter x:Key="StringToColorConverter"/>
+        <converters:StringToColorConverterStatic x:Key="StringToColorConverterStatic"/>
+    </Window.Resources>
 
-            <Border Height="1" Background="#333"/>
-
-            <!-- 外观设置 -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="外观" FontSize="14" FontWeight="Bold" Foreground="#4ecdc4"/>
-                
-                <StackPanel Spacing="6">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="文字颜色" Width="100" Foreground="#aaa"/>
-                        <TextBox Text="{Binding TextColor}" Width="200"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="背景颜色" Width="100" Foreground="#aaa"/>
-                        <TextBox Text="{Binding BackgroundColor}" Width="200"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="背景透明度" Width="100" Foreground="#aaa"/>
-                        <Slider Minimum="0.1" Maximum="1" Value="{Binding BackgroundOpacity}" Width="200"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="字体大小" Width="100" Foreground="#aaa"/>
-                        <TextBox Text="{Binding FontSize}" Width="200"/>
-                    </StackPanel>
+    <Grid RowDefinitions="Auto,*,Auto">
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" Background="#0d0d0d" Height="50">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <!-- Logo区域 -->
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Margin="20,0">
+                    <Border Background="#76B900" CornerRadius="4" Padding="8,4" VerticalAlignment="Center">
+                        <TextBlock Text="CC" FontSize="14" FontWeight="Bold" Foreground="Black"/>
+                    </Border>
+                    <TextBlock Text="Computer Companion" FontSize="16" Foreground="White" 
+                               VerticalAlignment="Center" Margin="15,0,0,0" FontWeight="SemiBold"/>
                 </StackPanel>
-            </StackPanel>
 
-            <Border Height="1" Background="#333"/>
-
-            <!-- 性能设置 -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="性能" FontSize="14" FontWeight="Bold" Foreground="#a29bfe"/>
-                
-                <StackPanel Spacing="6">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="刷新间隔(ms)" Width="100" Foreground="#aaa"/>
-                        <TextBox Text="{Binding RefreshInterval}" Width="200"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="游戏模式" Width="100" Foreground="#aaa"/>
-                        <CheckBox IsChecked="{Binding GameMode}"/>
-                    </StackPanel>
-
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="游戏模式间隔" Width="100" Foreground="#aaa"/>
-                        <TextBox Text="{Binding GameModeRefreshInterval}" Width="200"/>
-                    </StackPanel>
+                <!-- 窗口控制按钮 -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="5" Margin="0,0,15,0">
+                    <Button Classes="windowButton" Click="MinimizeWindow" ToolTip.Tip="最小化">
+                        <Border Width="12" Height="12" Background="#666" CornerRadius="2"/>
+                    </Button>
+                    <Button Classes="windowButton" Click="MaximizeWindow" ToolTip.Tip="最大化">
+                        <Border Width="12" Height="12" BorderBrush="#666" BorderThickness="1" CornerRadius="2"/>
+                    </Button>
+                    <Button Classes="windowButton closeButton" Click="CloseWindow" ToolTip.Tip="关闭">
+                        <Border Width="12" Height="12" Background="#e74c3c" CornerRadius="2"/>
+                    </Button>
                 </StackPanel>
-            </StackPanel>
+            </Grid>
+        </Border>
 
-            <Border Height="1" Background="#333"/>
+        <!-- 主内容区域 -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- 显示设置 -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="显示项" FontSize="14" FontWeight="Bold" Foreground="#fd79a8"/>
-                
-                <StackPanel Spacing="4">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox IsChecked="{Binding ShowCpu}" Margin="0 0 8 0"/>
-                        <TextBlock Text="CPU" Foreground="#aaa"/>
+            <!-- 左侧导航栏 -->
+            <Border Grid.Column="0" Background="#141414">
+                <ScrollViewer>
+                    <StackPanel Margin="10">
+                        <!-- 导航项 -->
+                        <RadioButton x:Name="OverviewNav" GroupName="SettingsNav" 
+                                     IsChecked="True" Classes="navItem"
+                                     Click="NavItem_Checked" Tag="overview">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z" 
+                                          Width="20" Height="20" Foreground="#76B900"/>
+                                <TextBlock Text="概览" Foreground="White" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <RadioButton GroupName="SettingsNav" Classes="navItem"
+                                     Click="NavItem_Checked" Tag="display">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M21,16.5C21,16.88 20.79,17.21 20.47,17.38L12.57,21.82C12.41,21.94 12.21,22 12,22C11.79,22 11.59,21.94 11.43,21.82L3.53,17.38C3.21,17.21 3,16.88 3,16.5V7.5C3,7.12 3.21,6.79 3.53,6.62L11.43,2.18C11.59,2.06 11.79,2 12,2C12.21,2 12.41,2.06 12.57,2.18L20.47,6.62C20.79,6.79 21,7.12 21,7.5V16.5Z" 
+                                          Width="20" Height="20" Foreground="#76B900"/>
+                                <TextBlock Text="显示设置" Foreground="White" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <RadioButton GroupName="SettingsNav" Classes="navItem"
+                                     Click="NavItem_Checked" Tag="appearance">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M12,3A9,9 0 0,0 3,12A9,9 0 0,0 12,21A9,9 0 0,0 21,12A9,9 0 0,0 12,3M12,8L14,10.5L16.5,10.5L17.5,13L19,13L17,16L18.5,19L16.5,19L15,16L12,17L9,16L7,19L5,19L6.5,16L5,13L6.5,13L7.5,10.5L10,10.5L12,8Z" 
+                                          Width="20" Height="20" Foreground="#76B900"/>
+                                <TextBlock Text="外观" Foreground="White" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <RadioButton GroupName="SettingsNav" Classes="navItem"
+                                     Click="NavItem_Checked" Tag="content">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M3,3H21V7H3V3M4,8H20V21H4V8M9.5,10A1.5,1.5 0 0,0 8,11.5A1.5,1.5 0 0,0 9.5,13A1.5,1.5 0 0,0 11,11.5A1.5,1.5 0 0,0 9.5,10Z" 
+                                          Width="20" Height="20" Foreground="#76B900"/>
+                                <TextBlock Text="显示内容" Foreground="White" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <RadioButton GroupName="SettingsNav" Classes="navItem"
+                                     Click="NavItem_Checked" Tag="performance">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" 
+                                          Width="20" Height="20" Foreground="#76B900"/>
+                                <TextBlock Text="性能" Foreground="White" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <RadioButton GroupName="SettingsNav" Classes="navItem"
+                                     Click="NavItem_Checked" Tag="startup">
+                            <StackPanel Orientation="Horizontal" Spacing="12">
+                                <PathIcon Data="M12,4V1L8,5L12,9V6C15.31,6 18,8.69 18,12C18,13.01 17.75,13.97 17.3,14.8L18.76,16.26C19.54,15.03 20,13.57 20,12C20,7.58 16.42,4 12,4M12,18C8.69,18 6,15.31 6,12C6,10.99 6.25,10.03 6.7,9.2L5.24,7.74C4.46,8.97 4,10.43 4,12C4,16.42 7.58,20 12,20V23L16,19L12,15V18M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" 
+                                          Width="20" Height="20" Foreground="#76B900"/>
+                                <TextBlock Text="启动选项" Foreground="White" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </RadioButton>
                     </StackPanel>
+                </ScrollViewer>
+            </Border>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox IsChecked="{Binding ShowGpu}" Margin="0 0 8 0"/>
-                        <TextBlock Text="GPU" Foreground="#aaa"/>
-                    </StackPanel>
+            <!-- 右侧内容区 -->
+            <Border Grid.Column="1" Background="#1e1e1e" Padding="25">
+                <ScrollViewer>
+                    <StackPanel Spacing="20">
+                        <!-- 概览面板 -->
+                        <StackPanel x:Name="OverviewPanel" IsVisible="True">
+                            <TextBlock Text="概览" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20">
+                                <StackPanel>
+                                    <TextBlock Text="悬浮窗状态" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    
+                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="150,*">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="启用状态" Foreground="#aaa" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                            <Border Background="{Binding EnableOverlay, Converter={x:Static converters:BoolConverters.ToEnabledColor}}" 
+                                                    CornerRadius="4" Padding="10,5">
+                                                <TextBlock Text="{Binding EnableOverlay, Converter={x:Static converters:BoolConverters.ToEnabledText}}" 
+                                                           Foreground="White" FontWeight="SemiBold"/>
+                                            </Border>
+                                        </StackPanel>
+                                        
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="位置" Foreground="#aaa" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.ToDisplayName}}" 
+                                                   Foreground="#fff" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                        
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="透明度" Foreground="#aaa" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}" 
+                                                   Foreground="#fff" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                        
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="显示内容数" Foreground="#aaa" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Foreground="#fff" VerticalAlignment="Center" Margin="0,12,0,0">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="{}{0} / {1} / {2} / {3} / {4}">
+                                                    <Binding Path="OverlayShowFPS"/>
+                                                    <Binding Path="OverlayShowCpu"/>
+                                                    <Binding Path="OverlayShowGpu"/>
+                                                    <Binding Path="OverlayShowMemory"/>
+                                                    <Binding Path="OverlayShowLatency"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20" Margin="0,15,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="快捷操作" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    
+                                    <WrapPanel Orientation="Horizontal">
+                                        <Button Content="应用默认设置" Classes="actionButton" Command="{Binding ResetToDefaults}" Margin="0,0,10,10"/>
+                                        <Button Content="保存并关闭" Classes="applyButton" Click="OnSaveClick" Margin="0,0,10,10"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox IsChecked="{Binding ShowMemory}" Margin="0 0 8 0"/>
-                        <TextBlock Text="内存" Foreground="#aaa"/>
-                    </StackPanel>
+                        <!-- 显示设置面板 -->
+                        <StackPanel x:Name="DisplayPanel" IsVisible="False">
+                            <TextBlock Text="显示设置" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20">
+                                <StackPanel>
+                                    <TextBlock Text="基础显示控制" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    
+                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="150,*" Margin="0,0,0,15">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="启用悬浮窗" Foreground="#aaa" VerticalAlignment="Center"/>
+                                        <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding EnableOverlay}" Margin="0,0,0,10"/>
+                                        
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="窗口置顶" Foreground="#aaa" VerticalAlignment="Center" Margin="0,0,0,10"/>
+                                        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding OverlayAlwaysOnTop}" Margin="0,0,0,10"/>
+                                    </Grid>
+                                    
+                                    <TextBlock Text="悬浮窗位置" FontSize="14" FontWeight="SemiBold" Foreground="White" Margin="0,10,0,10"/>
+                                    
+                                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*,*">
+                                        <RadioButton Grid.Row="0" Grid.Column="0" GroupName="Position" 
+                                                     IsChecked="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.IsTopLeft}, ConverterParameter=TopLeft}"
+                                                     Classes="positionButton">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <Border Width="40" Height="30" BorderBrush="#76B900" BorderThickness="1" CornerRadius="2">
+                                                    <Ellipse Width="8" Height="8" Fill="#76B900" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4"/>
+                                                </Border>
+                                                <TextBlock Text="左上" Foreground="#aaa" FontSize="11" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </RadioButton>
+                                        
+                                        <RadioButton Grid.Row="0" Grid.Column="1" GroupName="Position"
+                                                     IsChecked="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.IsTopRight}, ConverterParameter=TopRight}"
+                                                     Classes="positionButton">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <Border Width="40" Height="30" BorderBrush="#76B900" BorderThickness="1" CornerRadius="2">
+                                                    <Ellipse Width="8" Height="8" Fill="#76B900" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4"/>
+                                                </Border>
+                                                <TextBlock Text="右上" Foreground="#aaa" FontSize="11" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </RadioButton>
+                                        
+                                        <RadioButton Grid.Row="0" Grid.Column="2" GroupName="Position"
+                                                     IsChecked="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.IsBottomLeft}, ConverterParameter=BottomLeft}"
+                                                     Classes="positionButton">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <Border Width="40" Height="30" BorderBrush="#76B900" BorderThickness="1" CornerRadius="2">
+                                                    <Ellipse Width="8" Height="8" Fill="#76B900" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4"/>
+                                                </Border>
+                                                <TextBlock Text="左下" Foreground="#aaa" FontSize="11" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </RadioButton>
+                                        
+                                        <RadioButton Grid.Row="0" Grid.Column="3" GroupName="Position"
+                                                     IsChecked="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.IsBottomRight}, ConverterParameter=BottomRight}"
+                                                     Classes="positionButton">
+                                            <StackPanel HorizontalAlignment="Center">
+                                                <Border Width="40" Height="30" BorderBrush="#76B900" BorderThickness="1" CornerRadius="2">
+                                                    <Ellipse Width="8" Height="8" Fill="#76B900" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="4"/>
+                                                </Border>
+                                                <TextBlock Text="右下" Foreground="#aaa" FontSize="11" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                                            </StackPanel>
+                                        </RadioButton>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox IsChecked="{Binding ShowNetwork}" Margin="0 0 8 0"/>
-                        <TextBlock Text="网络" Foreground="#aaa"/>
-                    </StackPanel>
+                        <!-- 外观面板 -->
+                        <StackPanel x:Name="AppearancePanel" IsVisible="False">
+                            <TextBlock Text="外观设置" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20">
+                                <StackPanel>
+                                    <TextBlock Text="透明度与尺寸" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    
+                                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="150,*" Margin="0,0,0,15">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="背景透明度" Foreground="#aaa" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Spacing="10">
+                                            <Slider Minimum="0.1" Maximum="1" Value="{Binding BackgroundOpacity}" 
+                                                    IsSnapToTickEnabled="False" TickFrequency="0.1"/>
+                                            <TextBlock Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}" Foreground="#fff"/>
+                                        </StackPanel>
+                                        
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="字体大小" Foreground="#aaa" VerticalAlignment="Center" Margin="0,15,0,0"/>
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,15,0,0">
+                                            <Slider Minimum="10" Maximum="24" Value="{Binding OverlayFontSize}" 
+                                                    Width="200" IsSnapToTickEnabled="True" TickFrequency="1"/>
+                                            <TextBlock Text="{Binding OverlayFontSize, StringFormat='{}{0} px'}" Foreground="#fff" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20" Margin="0,15,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="颜色设置" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    
+                                    <Grid RowDefinitions="Auto" ColumnDefinitions="150,*">
+                                        <TextBlock Grid.Column="0" Text="文字颜色" Foreground="#aaa" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                            <Border Width="30" Height="30" CornerRadius="4" 
+                                                    Background="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverter}}" 
+                                                    BorderBrush="#444" BorderThickness="1"/>
+                                            <TextBox Text="{Binding OverlayTextColor}" Width="120" PlaceholderText="如: #76B900"/>
+                                            <Button Content="预设" Classes="presetButton" Click="ShowColorPresets"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    
+                                    <StackPanel Orientation="Horizontal" Spacing="5" Margin="150,10,0,0">
+                                        <Border Classes="colorPreset" Background="#76B900" PointerPressed="ColorPreset_Clicked" Tag="#76B900"/>
+                                        <Border Classes="colorPreset" Background="#00FF00" PointerPressed="ColorPreset_Clicked" Tag="#00FF00"/>
+                                        <Border Classes="colorPreset" Background="#00BFFF" PointerPressed="ColorPreset_Clicked" Tag="#00BFFF"/>
+                                        <Border Classes="colorPreset" Background="#FF6B6B" PointerPressed="ColorPreset_Clicked" Tag="#FF6B6B"/>
+                                        <Border Classes="colorPreset" Background="#FFD93D" PointerPressed="ColorPreset_Clicked" Tag="#FFD93D"/>
+                                        <Border Classes="colorPreset" Background="#FFFFFF" PointerPressed="ColorPreset_Clicked" Tag="#FFFFFF"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox IsChecked="{Binding ShowDisk}" Margin="0 0 8 0"/>
-                        <TextBlock Text="磁盘" Foreground="#aaa"/>
-                    </StackPanel>
+                        <!-- 显示内容面板 -->
+                        <StackPanel x:Name="ContentPanel" IsVisible="False">
+                            <TextBlock Text="显示内容" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20">
+                                <StackPanel>
+                                    <TextBlock Text="监控指标选择" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="选择要在悬浮窗中显示的监控指标" Foreground="#888" Margin="0,0,0,15"/>
+                                    
+                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" Margin="0,0,0,10">
+                                        <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding OverlayShowFPS}" Margin="0,0,15,8"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="1">
+                                            <TextBlock Text="FPS (帧率)" Foreground="White" FontWeight="SemiBold"/>
+                                            <TextBlock Text="实时显示游戏帧率" Foreground="#888" FontSize="12"/>
+                                        </StackPanel>
+                                        
+                                        <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding OverlayShowCpu}" Margin="0,0,15,8"/>
+                                        <StackPanel Grid.Row="1" Grid.Column="1">
+                                            <TextBlock Text="CPU (处理器)" Foreground="White" FontWeight="SemiBold"/>
+                                            <TextBlock Text="显示处理器使用率和温度" Foreground="#888" FontSize="12"/>
+                                        </StackPanel>
+                                        
+                                        <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding OverlayShowGpu}" Margin="0,0,15,8"/>
+                                        <StackPanel Grid.Row="2" Grid.Column="1">
+                                            <TextBlock Text="GPU (显卡)" Foreground="White" FontWeight="SemiBold"/>
+                                            <TextBlock Text="显示显卡使用率、温度和显存" Foreground="#888" FontSize="12"/>
+                                        </StackPanel>
+                                        
+                                        <CheckBox Grid.Row="3" Grid.Column="0" IsChecked="{Binding OverlayShowMemory}" Margin="0,0,15,8"/>
+                                        <StackPanel Grid.Row="3" Grid.Column="1">
+                                            <TextBlock Text="内存" Foreground="White" FontWeight="SemiBold"/>
+                                            <TextBlock Text="显示内存使用情况" Foreground="#888" FontSize="12"/>
+                                        </StackPanel>
+                                        
+                                        <CheckBox Grid.Row="4" Grid.Column="0" IsChecked="{Binding OverlayShowLatency}" Margin="0,0,15,0"/>
+                                        <StackPanel Grid.Row="4" Grid.Column="1">
+                                            <TextBlock Text="延迟 (LAT)" Foreground="White" FontWeight="SemiBold"/>
+                                            <TextBlock Text="显示网络延迟" Foreground="#888" FontSize="12"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20" Margin="0,15,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="显示预览" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    
+                                    <Border Background="{Binding BackgroundColor, Converter={StaticResource StringToColorConverter}}" 
+                                            CornerRadius="6" Padding="15" 
+                                            HorizontalAlignment="Left" Opacity="{Binding BackgroundOpacity}">
+                                        <StackPanel Spacing="5">
+                                            <StackPanel Orientation="Horizontal" IsVisible="{Binding OverlayShowFPS}" Spacing="8">
+                                                <TextBlock Text="FPS" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontWeight="Bold" FontSize="{Binding OverlayFontSize}"/>
+                                                <TextBlock Text="60" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontSize="{Binding OverlayFontSize}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" IsVisible="{Binding OverlayShowCpu}" Spacing="8">
+                                                <TextBlock Text="CPU" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontWeight="Bold" FontSize="{Binding OverlayFontSize}"/>
+                                                <TextBlock Text="45%" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontSize="{Binding OverlayFontSize}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" IsVisible="{Binding OverlayShowGpu}" Spacing="8">
+                                                <TextBlock Text="GPU" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontWeight="Bold" FontSize="{Binding OverlayFontSize}"/>
+                                                <TextBlock Text="72%" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontSize="{Binding OverlayFontSize}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" IsVisible="{Binding OverlayShowMemory}" Spacing="8">
+                                                <TextBlock Text="MEM" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontWeight="Bold" FontSize="{Binding OverlayFontSize}"/>
+                                                <TextBlock Text="67%" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontSize="{Binding OverlayFontSize}"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" IsVisible="{Binding OverlayShowLatency}" Spacing="8">
+                                                <TextBlock Text="LAT" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontWeight="Bold" FontSize="{Binding OverlayFontSize}"/>
+                                                <TextBlock Text="12ms" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontSize="{Binding OverlayFontSize}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox IsChecked="{Binding ShowBattery}" Margin="0 0 8 0"/>
-                        <TextBlock Text="电池" Foreground="#aaa"/>
+                        <!-- 性能面板 -->
+                        <StackPanel x:Name="PerformancePanel" IsVisible="False">
+                            <TextBlock Text="性能设置" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20">
+                                <StackPanel>
+                                    <TextBlock Text="刷新频率" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    
+                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="150,*" Margin="0,0,0,15">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="标准模式间隔" Foreground="#aaa" VerticalAlignment="Center"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Spacing="10">
+                                            <Slider Minimum="500" Maximum="5000" Value="{Binding RefreshInterval}" 
+                                                    IsSnapToTickEnabled="True" TickFrequency="500"/>
+                                            <TextBlock Text="{Binding RefreshInterval, StringFormat='{}{0} ms'}" Foreground="#fff"/>
+                                        </StackPanel>
+                                        
+                                        <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                                                  IsChecked="{Binding GameMode}" Content="启用游戏模式" 
+                                                  Margin="0,15,0,10"/>
+                                        
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="游戏模式间隔" Foreground="#aaa" VerticalAlignment="Center"
+                                                   IsVisible="{Binding GameMode}"/>
+                                        <StackPanel Grid.Row="2" Grid.Column="1" Spacing="10" IsVisible="{Binding GameMode}">
+                                            <Slider Minimum="1000" Maximum="10000" Value="{Binding GameModeRefreshInterval}" 
+                                                    IsSnapToTickEnabled="True" TickFrequency="1000"/>
+                                            <TextBlock Text="{Binding GameModeRefreshInterval, StringFormat='{}{0} ms'}" Foreground="#fff"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    
+                                    <TextBlock Text="提示：降低刷新间隔会增加 CPU 占用，但数据更新更及时。" 
+                                               Foreground="#888" FontSize="12" FontStyle="Italic" Margin="0,10,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- 启动选项面板 -->
+                        <StackPanel x:Name="StartupPanel" IsVisible="False">
+                            <TextBlock Text="启动选项" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20">
+                                <StackPanel>
+                                    <TextBlock Text="系统启动" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    
+                                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="150,*" Margin="0,0,0,15">
+                                        <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                                                  IsChecked="{Binding AutoStart}" Content="开机自动启动" Margin="0,0,0,10"/>
+                                        
+                                        <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                                                  IsChecked="{Binding StartMinimized}" Content="启动时最小化到系统托盘"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            
+                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20" Margin="0,15,0,0">
+                                <StackPanel>
+                                    <TextBlock Text="关于" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    
+                                    <TextBlock Foreground="#aaa" Margin="0,0,0,5">
+                                        <Run Text="Computer Companion"/>
+                                        <Run Text=" v1.0"/>
+                                    </TextBlock>
+                                    <TextBlock Text="硬件监控与游戏悬浮窗工具" Foreground="#666"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
                     </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- 底部按钮栏 -->
+        <Border Grid.Row="2" Background="#0d0d0d" Height="60" Padding="20,0">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="状态: " Foreground="#888" VerticalAlignment="Center"/>
+                    <TextBlock Text="就绪" Foreground="#76B900" VerticalAlignment="Center"/>
                 </StackPanel>
-            </StackPanel>
-
-            <Border Height="1" Background="#333"/>
-
-            <!-- 悬浮窗设置 -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="悬浮窗" FontSize="14" FontWeight="Bold" Foreground="#76B900"/>
                 
-                <StackPanel Spacing="6">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="启用悬浮窗" Width="120" Foreground="#aaa"/>
-                        <CheckBox IsChecked="{Binding EnableOverlay}"/>
-                    </StackPanel>
-                    
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="始终置顶" Width="120" Foreground="#aaa"/>
-                        <CheckBox IsChecked="{Binding OverlayAlwaysOnTop}"/>
-                    </StackPanel>
-                    
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="字体大小" Width="120" Foreground="#aaa"/>
-                        <TextBox Text="{Binding OverlayFontSize}" Width="200"/>
-                    </StackPanel>
-                    
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="文字颜色" Width="120" Foreground="#aaa"/>
-                        <TextBox Text="{Binding OverlayTextColor}" Width="200"/>
-                    </StackPanel>
-                    
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="悬浮窗位置" Width="120" Foreground="#aaa"/>
-                        <TextBlock Text="右上 (默认)" Foreground="#76B900"/>
-                    </StackPanel>
-                </StackPanel>
-                
-                <StackPanel Spacing="4" Margin="0,8,0,0">
-                    <TextBlock Text="显示项" FontSize="12" FontWeight="Bold" Foreground="#aaa"/>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox IsChecked="{Binding OverlayShowFPS}" Margin="0 0 8 0"/>
-                        <TextBlock Text="FPS" Foreground="#aaa" Width="60"/>
-                        <CheckBox IsChecked="{Binding OverlayShowGpu}" Margin="0 0 8 0"/>
-                        <TextBlock Text="GPU" Foreground="#aaa" Width="60"/>
-                        <CheckBox IsChecked="{Binding OverlayShowCpu}" Margin="0 0 8 0"/>
-                        <TextBlock Text="CPU" Foreground="#aaa"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <CheckBox IsChecked="{Binding OverlayShowMemory}" Margin="0 0 8 0"/>
-                        <TextBlock Text="内存" Foreground="#aaa" Width="60"/>
-                        <CheckBox IsChecked="{Binding OverlayShowLatency}" Margin="0 0 8 0"/>
-                        <TextBlock Text="延迟" Foreground="#aaa"/>
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
-            
-            <Border Height="1" Background="#333"/>
-
-            <!-- 启动设置 -->
-            <StackPanel Spacing="8">
-                <TextBlock Text="启动选项" FontSize="14" FontWeight="Bold" Foreground="#76B900"/>
-                
-                <StackPanel Spacing="6">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="开机自启" Width="120" Foreground="#aaa"/>
-                        <CheckBox IsChecked="{Binding AutoStart}"/>
-                    </StackPanel>
-                    
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="启动最小化" Width="120" Foreground="#aaa"/>
-                        <CheckBox IsChecked="{Binding StartMinimized}"/>
-                    </StackPanel>
-                </StackPanel>
-            </StackPanel>
-
-            <Border Height="1" Background="#333"/>
-
-            <!-- 按钮 -->
-            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
-                <Button Content="重置" Command="{Binding ResetToDefaults}" Width="80" Background="#444" Foreground="White"/>
-                <Button Content="保存" Command="{Binding Save}" Width="80" Background="#4ecdc4" Foreground="Black" FontWeight="Bold" Click="OnSaveClick"/>
-            </StackPanel>
-        </StackPanel>
+                <Button Grid.Column="1" Content="恢复默认" Classes="resetButton" 
+                        Command="{Binding ResetToDefaults}" Margin="0,0,10,0"/>
+                <Button Grid.Column="2" Content="取消" Classes="cancelButton" 
+                        Click="CancelWindow" Margin="0,0,10,0"/>
+                <Button Grid.Column="3" Content="应用" Classes="applyButton" 
+                        Click="OnSaveClick"/>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

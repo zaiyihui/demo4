@@ -3,14 +3,49 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <EnableDefaultAvaloniaXamlItems>true</EnableDefaultAvaloniaXamlItems>
     <DefaultItemExcludes>$(DefaultItemExcludes);Tests/**/*</DefaultItemExcludes>
+    
+    <!-- 中文本地化和编码配置 -->
+    <NeutralLanguage>zh-CN</NeutralLanguage>
+    <SatelliteResourceLanguages>zh-CN;zh-TW;en-US</SatelliteResourceLanguages>
+    <LangVersion>latest</LangVersion>
+    
+    <!-- 编码和字符集配置 -->
+    <AssemblyName>电脑伴侣</AssemblyName>
+    <AssemblyTitle>电脑伴侣 - 硬件监控工具</AssemblyTitle>
+    <AssemblyDescription>高性能硬件监控和游戏性能显示工具</AssemblyDescription>
+    <Company>开源社区</Company>
+    <Product>电脑伴侣</Product>
+    <Copyright>Copyright © 2024</Copyright>
+    <Version>1.0.0</Version>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Authors>开源社区</Authors>
+    <Description>实时硬件监控、游戏性能显示、系统状态追踪工具</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>icon.png</PackageIcon>
+    <Tags>硬件监控;性能监控;游戏性能;系统工具;GPU;CPU</Tags>
   </PropertyGroup>
 
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
+
+  <!-- 资源文件 - 确保 UTF-8 编码 -->
+  <ItemGroup>
+    <None Include="**/*.md" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- 确保所有源文件使用 UTF-8 编码 -->
+  <ItemGroup>
+    <Compile Update="**/*.cs">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
@@ -24,5 +59,12 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\avalonia-logo.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

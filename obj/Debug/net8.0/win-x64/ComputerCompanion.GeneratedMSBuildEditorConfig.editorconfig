@@ -27,6 +27,12 @@ build_property.EnableGeneratedComInterfaceComImportInterop =
 [D:/BC/xiangmu/demo4/demo4/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
+[D:/BC/xiangmu/demo4/demo4/Styles/GlobalStyles.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[D:/BC/xiangmu/demo4/demo4/Styles/SettingsStyles.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
 [D:/BC/xiangmu/demo4/demo4/Views/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 

@@ -215,11 +215,20 @@ public class IpcService : IDisposable
             }
 
             var lengthBytes = BitConverter.GetBytes(bytes.Length);
-            var token = _cancellationTokenSource?.Token ?? CancellationToken.None;
             
-            await pipeStream.WriteAsync(lengthBytes, 0, 4, token);
-            await pipeStream.WriteAsync(bytes, 0, bytes.Length, token);
+            CancellationToken token = _cancellationTokenSource?.Token ?? CancellationToken.None;
+            
+            await pipeStream.WriteAsync(lengthBytes.AsMemory(0, 4), token);
+            await pipeStream.WriteAsync(bytes.AsMemory(0, bytes.Length), token);
             await pipeStream.FlushAsync(token);
+        }
+        catch (ObjectDisposedException)
+        {
+            Console.WriteLine("IPC pipe disposed");
+        }
+        catch (IOException ex)
+        {
+            Console.WriteLine($"IPC IO error: {ex.Message}");
         }
         catch (Exception ex)
         {

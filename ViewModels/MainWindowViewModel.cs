@@ -57,12 +57,17 @@ public partial class MainWindowViewModel : ObservableObject
 
     public MainWindowViewModel()
     {
-        _settingsService = new SettingsService();
+        _settingsService = App.SettingsService ?? new SettingsService();
         _settings = _settingsService.GetSettings();
         
-        _monitor = new HardwareMonitorService();
+        _monitor = App.HardwareMonitor ?? new HardwareMonitorService();
+        
+        if (App.HardwareMonitor == null)
+        {
+            _monitor.Start(_settings.GameMode ? _settings.GameModeRefreshInterval : _settings.RefreshInterval);
+        }
+        
         _monitor.DataUpdated += OnDataUpdated;
-        _monitor.Start(_settings.GameMode ? _settings.GameModeRefreshInterval : _settings.RefreshInterval);
         
         ShowGpu = _monitor.HasGpu && _settings.ShowGpu;
         ShowBattery = _monitor.HasBattery && _settings.ShowBattery;

@@ -1,0 +1,153 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style Selector="RadioButton.navItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="CornerRadius" Value="6"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+    </Style>
+
+    <Style Selector="RadioButton.navItem:pointerover">
+        <Setter Property="Background" Value="#2d2d2d"/>
+    </Style>
+
+    <Style Selector="RadioButton.navItem:checked">
+        <Setter Property="Background" Value="#2d2d2d"/>
+    </Style>
+
+    <Style Selector="Button.windowButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="CornerRadius" Value="4"/>
+    </Style>
+
+    <Style Selector="Button.windowButton:pointerover">
+        <Setter Property="Background" Value="#333"/>
+    </Style>
+
+    <Style Selector="Button.closeButton:pointerover">
+        <Setter Property="Background" Value="#e74c3c"/>
+    </Style>
+
+    <Style Selector="Button.actionButton">
+        <Setter Property="Background" Value="#2d2d2d"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="15,8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <Style Selector="Button.actionButton:pointerover">
+        <Setter Property="Background" Value="#3d3d3d"/>
+    </Style>
+
+    <Style Selector="Button.applyButton">
+        <Setter Property="Background" Value="#76B900"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="20,8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <Style Selector="Button.applyButton:pointerover">
+        <Setter Property="Background" Value="#8BC34A"/>
+    </Style>
+
+    <Style Selector="Button.cancelButton">
+        <Setter Property="Background" Value="#2d2d2d"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="20,8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <Style Selector="Button.cancelButton:pointerover">
+        <Setter Property="Background" Value="#3d3d3d"/>
+    </Style>
+
+    <Style Selector="Button.resetButton">
+        <Setter Property="Background" Value="#2d2d2d"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Padding" Value="15,8"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <Style Selector="Button.resetButton:pointerover">
+        <Setter Property="Background" Value="#3d3d3d"/>
+    </Style>
+
+    <Style Selector="Button.presetButton">
+        <Setter Property="Background" Value="#2d2d2d"/>
+        <Setter Property="Foreground" Value="#aaa"/>
+        <Setter Property="Padding" Value="12,6"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+
+    <Style Selector="Button.presetButton:pointerover">
+        <Setter Property="Background" Value="#3d3d3d"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="RadioButton.positionButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="8"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+    </Style>
+
+    <Style Selector="RadioButton.positionButton:pointerover">
+        <Setter Property="Background" Value="#2d2d2d"/>
+    </Style>
+
+    <Style Selector="RadioButton.positionButton:checked">
+        <Setter Property="Background" Value="#2d2d2d"/>
+    </Style>
+
+    <Style Selector="Border.colorPreset">
+        <Setter Property="Width" Value="25"/>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="BorderBrush" Value="#444"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style Selector="Border.colorPreset:pointerover">
+        <Setter Property="BorderBrush" Value="#76B900"/>
+        <Setter Property="BorderThickness" Value="2"/>
+    </Style>
+
+    <Style Selector="CheckBox">
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="Slider">
+        <Setter Property="Foreground" Value="#76B900"/>
+    </Style>
+
+    <Style Selector="TextBox">
+        <Setter Property="Background" Value="#1a1a1a"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="BorderBrush" Value="#444"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="4"/>
+        <Setter Property="Padding" Value="8,6"/>
+    </Style>
+
+    <Style Selector="TextBox:focus">
+        <Setter Property="BorderBrush" Value="#76B900"/>
+    </Style>
+
+    <Style Selector="ScrollViewer">
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto"/>
+    </Style>
+</Styles>

@@ -1,0 +1,41 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# 通用配置
+[*]
+charset = utf-8
+end_of_line = crlf
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C# 文件
+[*.cs]
+indent_size = 4
+dotnet_style_qualification_for_field = false:silent
+dotnet_style_qualification_for_property = false:silent
+dotnet_style_qualification_for_method = false:silent
+dotnet_style_qualification_for_event = false:silent
+
+# XAML/AXAML 文件
+[*.axaml]
+indent_size = 4
+
+# XML 文件
+[*.xml]
+indent_size = 2
+
+# JSON 文件
+[*.json]
+indent_size = 2
+
+# Markdown 文件
+[*.md]
+trim_trailing_whitespace = false
+
+# CSPROJ 文件
+[*.csproj]
+indent_size = 2

@@ -14,8 +14,7 @@
         MinHeight="400"
         CanResize="True"
         TransparencyLevelHint="Blur"
-        ExtendClientAreaToDecorationsHint="True"
-        ExtendClientAreaChromeHintsHint="NoChrome">
+        ExtendClientAreaToDecorationsHint="True">
 
     <Window.Styles>
         <!-- 全局样式 -->

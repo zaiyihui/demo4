@@ -1,0 +1,83 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- 全局默认字体 - 确保中文在所有平台上正确显示 -->
+
+    <!-- TextBlock 基础样式 -->
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="TextWrapping" Value="NoWrap"/>
+    </Style>
+
+    <!-- 标题文字样式 -->
+    <Style Selector="TextBlock.Title">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Foreground" Value="White"/>
+    </Style>
+
+    <Style Selector="TextBlock.Subtitle">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Foreground" Value="#cccccc"/>
+    </Style>
+
+    <!-- 正文文字样式 -->
+    <Style Selector="TextBlock.Body">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="#aaaaaa"/>
+    </Style>
+
+    <!-- 按钮样式 -->
+    <Style Selector="Button">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <!-- 文本框样式 -->
+    <Style Selector="TextBox">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="CaretBrush" Value="#76B900"/>
+        <Setter Property="SelectionBrush" Value="#76B900"/>
+        <Setter Property="SelectionForegroundBrush" Value="White"/>
+    </Style>
+
+    <!-- 复选框样式 -->
+    <Style Selector="CheckBox">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <!-- 单选按钮样式 -->
+    <Style Selector="RadioButton">
+        <Setter Property="FontFamily" Value="{StaticResource DefaultFontFamily}"/>
+        <Setter Property="FontSize" Value="12"/>
+    </Style>
+
+    <!-- 标签样式 -->
+    <Style Selector="TextBlock.Label">
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Foreground" Value="#888888"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <!-- 数值显示样式 -->
+    <Style Selector="TextBlock.Value">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+    </Style>
+
+    <!-- 提示文字样式 -->
+    <Style Selector="TextBlock.Hint">
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="Foreground" Value="#666666"/>
+    </Style>
+
+    <!-- 滚动条样式优化 -->
+    <Style Selector="ScrollViewer">
+        <Setter Property="Padding" Value="0"/>
+    </Style>
+
+</Styles>

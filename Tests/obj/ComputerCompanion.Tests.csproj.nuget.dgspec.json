@@ -8,7 +8,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj",
-        "projectName": "ComputerCompanion",
+        "projectName": "电脑伴侣",
         "projectPath": "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj",
         "packagesPath": "C:\\Users\\17819\\.nuget\\packages\\",
         "outputPath": "D:\\BC\\xiangmu\\demo4\\demo4\\obj\\",
@@ -87,9 +87,26 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
+              "version": "[8.0.27, 8.0.27]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Runtime.win-x64",
+              "version": "[8.0.27, 8.0.27]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
+              "version": "[8.0.27, 8.0.27]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App": {
+              "privateAssets": "none"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.421/PortableRuntimeIdentifierGraph.json"
@@ -114,14 +131,14 @@
           "C:\\Users\\17819\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net8.0"
+          "net8.0-windows"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
+          "net8.0-windows7.0": {
+            "targetAlias": "net8.0-windows",
             "projectReferences": {
               "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj": {
                 "projectPath": "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj"
@@ -141,8 +158,8 @@
         }
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
           "dependencies": {
             "Microsoft.NET.Test.Sdk": {
               "target": "Package",

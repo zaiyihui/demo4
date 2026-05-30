@@ -1,7 +1,7 @@
 {
   "version": 3,
   "targets": {
-    "net8.0": {
+    "net8.0-windows7.0": {
       "Avalonia/12.0.3": {
         "type": "package",
         "dependencies": {
@@ -3864,7 +3864,7 @@
           "build/net6.0/xunit.runner.visualstudio.props": {}
         }
       },
-      "ComputerCompanion/1.0.0": {
+      "电脑伴侣/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v8.0",
         "dependencies": {
@@ -3878,11 +3878,14 @@
           "Newtonsoft.Json": "13.0.4"
         },
         "compile": {
-          "bin/placeholder/ComputerCompanion.dll": {}
+          "bin/placeholder/电脑伴侣.dll": {}
         },
         "runtime": {
-          "bin/placeholder/ComputerCompanion.dll": {}
-        }
+          "bin/placeholder/电脑伴侣.dll": {}
+        },
+        "frameworkReferences": [
+          "Microsoft.WindowsDesktop.App"
+        ]
       }
     }
   },
@@ -9560,20 +9563,20 @@
         "xunit.runner.visualstudio.nuspec"
       ]
     },
-    "ComputerCompanion/1.0.0": {
+    "电脑伴侣/1.0.0": {
       "type": "project",
       "path": "../ComputerCompanion.csproj",
       "msbuildProject": "../ComputerCompanion.csproj"
     }
   },
   "projectFileDependencyGroups": {
-    "net8.0": [
-      "ComputerCompanion >= 1.0.0",
+    "net8.0-windows7.0": [
       "Microsoft.NET.Test.Sdk >= 17.8.0",
       "Moq >= 4.20.69",
       "coverlet.collector >= 6.0.0",
       "xunit >= 2.5.3",
-      "xunit.runner.visualstudio >= 2.5.3"
+      "xunit.runner.visualstudio >= 2.5.3",
+      "电脑伴侣 >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -9592,14 +9595,14 @@
         "C:\\Users\\17819\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
-        "net8.0"
+        "net8.0-windows"
       ],
       "sources": {
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
           "projectReferences": {
             "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj": {
               "projectPath": "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj"
@@ -9619,8 +9622,8 @@
       }
     },
     "frameworks": {
-      "net8.0": {
-        "targetAlias": "net8.0",
+      "net8.0-windows7.0": {
+        "targetAlias": "net8.0-windows",
         "dependencies": {
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
