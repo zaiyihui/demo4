@@ -166,35 +166,44 @@ public partial class MainWindow : Window
     private void HandleAutoStart(bool enable)
     {
         if (!OperatingSystem.IsWindows()) return;
-        
+
         try
         {
             var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
             if (string.IsNullOrEmpty(exePath)) return;
-            
-            var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+
+            using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
                 "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            
-            if (key == null) return;
-            
+
+            if (key == null)
+            {
+                Console.WriteLine("无法访问注册表键");
+                return;
+            }
+
             const string appName = "电脑伴侣";
-            
+
             if (enable)
             {
                 key.SetValue(appName, exePath);
+                Console.WriteLine("已设置开机自动启动");
             }
             else
             {
                 if (key.GetValue(appName) != null)
                 {
                     key.DeleteValue(appName);
+                    Console.WriteLine("已取消开机自动启动");
                 }
             }
-            
-            key.Close();
         }
-        catch
+        catch (UnauthorizedAccessException ex)
         {
+            Console.WriteLine($"权限不足，无法修改注册表: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"修改注册表失败: {ex.Message}");
         }
     }
 
@@ -213,7 +222,7 @@ public partial class MainWindow : Window
 
     private void UpdateStatusText()
     {
-        // 状态更新由 ViewModel 处理
+        Console.WriteLine($"状态更新: 鼠标穿透={_isClickThroughEnabled}, 游戏模式={(DataContext as ViewModels.MainWindowViewModel)?.GameMode ?? false}");
     }
 
     private void SetClickThrough(bool enable)

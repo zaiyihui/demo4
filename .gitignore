@@ -1,4 +1,6 @@
-# .NET
+# =============================================================================
+# .NET 构建产物
+# =============================================================================
 bin/
 obj/
 [Bb]uild/
@@ -6,60 +8,211 @@ obj/
 [Rr]elease/
 x64/
 x86/
+[Ll]og/
+[Ll]ogs/
+
+# 平台特定产物
 [Aa][Rr][Mm]/
 [Aa][Rr][Mm]64/
+bld/
+.artifacts/
 
-# Visual Studio
+# .NET 特定
+*.dll
+*.exe
+*.pdb
+*.mdb
+*.cache
+*.ilk
+*.log
+*.tmp
+*.user
+*.rsuser
+*.suo
+*.userosscache
+*.sln.docstates
 .vs/
 *.user
 *.suo
 *.userosscache
-*.sln.docstates
-
-# Rider
-.idea/
-*.sln.iml
-
-# VS Code
-.vscode/
 
 # NuGet
 *.nupkg
 *.snupkg
 packages/
+project.lock.json
+project.fragment.lock.json
+artifacts/
 
-# User-specific files
-*.rsuser
-*.suo
-*.user
-*.sln.docstates
+# =============================================================================
+# IDE 和编辑器
+# =============================================================================
 
-# Build results
-[Dd]ebugPublic/
-[Rr]eleasePublic/
-x64/
-x86/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+# JetBrains Rider
+.idea/
+*.sln.iml
+ Rider/
+ RiderSettings/
 
-# Visual Studio 2015/2017 cache/options
-.vs/
+# Visual Studio Code
+.vscode/
+*.code-workspace
 
-# Backup files
-*.bak
-*~
+# Sublime Text
+*.sublime-*
 
-# macOS
-.DS_Store
+# Atom
+.atom/
+*.atom-edit-config
+
+# Notepad++
+*.npp
+
+# =============================================================================
+# 操作系统文件
+# =============================================================================
 
 # Windows
 Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
 Desktop.ini
 
-# Logs
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+*~
+.fuse_hidden*
+.Directory
+.Trash-*
+.Trash-.*
+
+# =============================================================================
+# 临时文件和缓存
+# =============================================================================
+
+*.tmp
+*.temp
+*.bak
+*~
+.~*
+*.swp
+*.swo
+*.lock
+*~
+
+# 缓存目录
+*.cache
+[Cc]ache/
+[Tt]emp/
+[Tt]mp/
+
+# =============================================================================
+# 日志文件
+# =============================================================================
+
 *.log
+logs/
+Log/
+Logs/
+
+# =============================================================================
+# 配置文件（本地）
+# =============================================================================
+
+# 本地应用数据
+AppData/
+LocalApplicationData/
+LocalConfig/
+App.config.local
+
+# 开发环境配置
+appsettings.Development.json
+appsettings.Local.json
+*.local.json
+*.local.config
+
+# =============================================================================
+# 数据库和媒体文件（如果不需要版本控制）
+# =============================================================================
+
+*.db
+*.sqlite
+*.sqlite3
+*.mdf
+*.ldf
+*.accdb
+
+# 大型二进制文件（可选）
+# *.dll
+# *.exe
+# *.so
+# *.dylib
+
+# =============================================================================
+# 测试覆盖率报告
+# =============================================================================
+
+coverage/
+TestResults/
+TestReport/
+*.coverage
+*.coveragexml
+
+# =============================================================================
+# 第三方依赖（如果使用本地副本）
+# =============================================================================
+
+# Libs/
+# External/
+# Vendor/
+
+# =============================================================================
+# 安全相关
+# =============================================================================
+
+# 敏感信息
+*.pem
+*.key
+*.pfx
+*.p12
+*.cer
+*.csr
+secrets.json
+appsettings.*.json
+
+# =============================================================================
+# 其他
+# =============================================================================
+
+*.orig
+*.rej
+*.merge
+*.bak
+
+# Mono 相关
+*.pidb
+*.resources
+
+# Unity
+Library/
+Temp/
+Obj/
+Build/
+Logs/
+
+# Unreal Engine
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/

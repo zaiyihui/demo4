@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Timers;
 using System.Threading.Tasks;
 
@@ -232,8 +233,20 @@ public class HardwareMonitorService : IDisposable
             UpdateNetworkData();
             UpdateDiskData();
             UpdateBatteryData();
-            
-            DataUpdated?.Invoke();
+
+            // 使用线程安全的方式触发事件
+            var handler = Volatile.Read(ref DataUpdated);
+            if (handler != null)
+            {
+                try
+                {
+                    handler();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"DataUpdated事件处理时发生错误: {ex.Message}");
+                }
+            }
         }
         catch (Exception ex)
         {

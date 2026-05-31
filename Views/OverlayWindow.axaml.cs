@@ -15,6 +15,7 @@ public partial class OverlayWindow : Window
     private DispatcherTimer? _frameTimer;
     private Point _dragStartPoint;
     private bool _isDragging = false;
+    private bool _isInitialized = false;
 
     public OverlayWindow()
     {
@@ -25,29 +26,39 @@ public partial class OverlayWindow : Window
     {
         _viewModel = viewModel;
         DataContext = _viewModel;
-        
+
         SetWindowTransparent();
-        
+
         _frameTimer = new DispatcherTimer();
         _frameTimer.Interval = TimeSpan.FromMilliseconds(16);
         _frameTimer.Tick += OnFrameTick;
         _frameTimer.Start();
-        
-        PositionWindow();
+
+        // 等待窗口完全加载后再设置位置
+        this.Loaded += (s, e) =>
+        {
+            _isInitialized = true;
+            PositionWindow();
+        };
     }
 
     private void PositionWindow()
     {
-        if (_viewModel == null) return;
-        
+        if (_viewModel == null || !_isInitialized) return;
+
         var screen = Screens.Primary;
         if (screen == null) return;
-        
+
         var workArea = screen.WorkingArea;
-        
+
         var settings = App.SettingsService?.GetSettings();
         if (settings == null) return;
-        
+
+        // 等待布局完成后获取实际窗口尺寸
+        this.UpdateLayout();
+        var windowWidth = this.Bounds.Width;
+        var windowHeight = this.Bounds.Height;
+
         int x, y;
         switch (settings.OverlayPosition)
         {
@@ -56,20 +67,20 @@ public partial class OverlayWindow : Window
                 y = workArea.Y + 20;
                 break;
             case OverlayPosition.TopRight:
-                x = workArea.X + workArea.Width - (int)Width - 20;
+                x = workArea.X + workArea.Width - (int)windowWidth - 20;
                 y = workArea.Y + 20;
                 break;
             case OverlayPosition.BottomLeft:
                 x = workArea.X + 20;
-                y = workArea.Y + workArea.Height - (int)Height - 20;
+                y = workArea.Y + workArea.Height - (int)windowHeight - 20;
                 break;
             case OverlayPosition.BottomRight:
             default:
-                x = workArea.X + workArea.Width - (int)Width - 20;
-                y = workArea.Y + workArea.Height - (int)Height - 20;
+                x = workArea.X + workArea.Width - (int)windowWidth - 20;
+                y = workArea.Y + workArea.Height - (int)windowHeight - 20;
                 break;
         }
-        
+
         Position = new PixelPoint(x, y);
     }
 

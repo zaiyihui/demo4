@@ -122,58 +122,58 @@
                 <ScrollViewer>
                     <StackPanel Spacing="20">
                         <!-- 概览面板 -->
-                        <StackPanel x:Name="OverviewPanel" IsVisible="True">
-                            <TextBlock Text="概览" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
-                            
-                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20">
-                                <StackPanel>
-                                    <TextBlock Text="悬浮窗状态" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
-                                    
-                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="150,*">
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="启用状态" Foreground="#aaa" VerticalAlignment="Center"/>
-                                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="10">
-                                            <Border Background="{Binding EnableOverlay, Converter={x:Static converters:BoolConverters.ToEnabledColor}}" 
-                                                    CornerRadius="4" Padding="10,5">
-                                                <TextBlock Text="{Binding EnableOverlay, Converter={x:Static converters:BoolConverters.ToEnabledText}}" 
-                                                           Foreground="White" FontWeight="SemiBold"/>
-                                            </Border>
-                                        </StackPanel>
-                                        
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="位置" Foreground="#aaa" VerticalAlignment="Center" Margin="0,12,0,0"/>
-                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.ToDisplayName}}" 
-                                                   Foreground="#fff" VerticalAlignment="Center" Margin="0,12,0,0"/>
-                                        
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="透明度" Foreground="#aaa" VerticalAlignment="Center" Margin="0,12,0,0"/>
-                                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}" 
-                                                   Foreground="#fff" VerticalAlignment="Center" Margin="0,12,0,0"/>
-                                        
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="显示内容数" Foreground="#aaa" VerticalAlignment="Center" Margin="0,12,0,0"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="1" Foreground="#fff" VerticalAlignment="Center" Margin="0,12,0,0">
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="{}{0} / {1} / {2} / {3} / {4}">
-                                                    <Binding Path="OverlayShowFPS"/>
-                                                    <Binding Path="OverlayShowCpu"/>
-                                                    <Binding Path="OverlayShowGpu"/>
-                                                    <Binding Path="OverlayShowMemory"/>
-                                                    <Binding Path="OverlayShowLatency"/>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-                            
-                            <Border Background="#2d2d2d" CornerRadius="8" Padding="20" Margin="0,15,0,0">
-                                <StackPanel>
-                                    <TextBlock Text="快捷操作" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
-                                    
-                                    <WrapPanel Orientation="Horizontal">
-                                        <Button Content="应用默认设置" Classes="actionButton" Command="{Binding ResetToDefaults}" Margin="0,0,10,10"/>
-                                        <Button Content="保存并关闭" Classes="applyButton" Click="OnSaveClick" Margin="0,0,10,10"/>
-                                    </WrapPanel>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
+            <StackPanel x:Name="OverviewPanel" IsVisible="True">
+                <TextBlock Text="概览" FontSize="24" FontWeight="Bold" Foreground="White" Margin="0,0,0,20"/>
+
+                <Border Background="#2d2d2d" CornerRadius="8" Padding="20">
+                    <StackPanel>
+                        <TextBlock Text="悬浮窗状态" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+
+                        <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="150,*">
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="启用状态" Foreground="#aaa" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                <Border Background="{Binding EnableOverlay, Converter={x:Static converters:BoolConverters.ToEnabledColor}}"
+                                        CornerRadius="4" Padding="10,5">
+                                    <TextBlock Text="{Binding EnableOverlay, Converter={x:Static converters:BoolConverters.ToEnabledText}}"
+                                               Foreground="White" FontWeight="SemiBold"/>
+                                </Border>
+                            </StackPanel>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="位置" Foreground="#aaa" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.ToDisplayName}}"
+                                       Foreground="#fff" VerticalAlignment="Center" Margin="0,12,0,0"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="透明度" Foreground="#aaa" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
+                                       Foreground="#fff" VerticalAlignment="Center" Margin="0,12,0,0"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="显示内容数" Foreground="#aaa" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Foreground="#fff" VerticalAlignment="Center" Margin="0,12,0,0">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="FPS: {0} | GPU: {1} | CPU: {2} | 内存: {3} | 延迟: {4}">
+                                        <Binding Path="OverlayShowFPS"/>
+                                        <Binding Path="OverlayShowGpu"/>
+                                        <Binding Path="OverlayShowCpu"/>
+                                        <Binding Path="OverlayShowMemory"/>
+                                        <Binding Path="OverlayShowLatency"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="#2d2d2d" CornerRadius="8" Padding="20" Margin="0,15,0,0">
+                    <StackPanel>
+                        <TextBlock Text="快捷操作" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+
+                        <WrapPanel Orientation="Horizontal">
+                            <Button Content="应用默认设置" Classes="actionButton" Command="{Binding ResetToDefaultsCommand}" Margin="0,0,10,10"/>
+                            <Button Content="保存并关闭" Classes="applyButton" Click="OnSaveClick" Margin="0,0,10,10"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
 
                         <!-- 显示设置面板 -->
                         <StackPanel x:Name="DisplayPanel" IsVisible="False">

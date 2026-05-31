@@ -9,7 +9,7 @@ public class TrayIconService : IDisposable
     private bool _isDisposed;
     private NotifyIcon? _notifyIcon;
 
-    public TrayIconService(SettingsService settingsService)
+    public TrayIconService()
     {
     }
 
@@ -28,7 +28,7 @@ public class TrayIconService : IDisposable
             contextMenu.Items.Add("显示主窗口", null, (s, e) => ShowMainWindow?.Invoke(this, EventArgs.Empty));
             contextMenu.Items.Add("-");
             contextMenu.Items.Add("退出", null, (s, e) => ExitApplication?.Invoke(this, EventArgs.Empty));
-            
+
             _notifyIcon.ContextMenuStrip = contextMenu;
             _notifyIcon.MouseClick += (s, e) =>
             {
@@ -47,7 +47,7 @@ public class TrayIconService : IDisposable
     public void Dispose()
     {
         if (_isDisposed) return;
-        
+
         _isDisposed = true;
         _notifyIcon?.Dispose();
     }

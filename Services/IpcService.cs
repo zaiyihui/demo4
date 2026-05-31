@@ -176,10 +176,22 @@ public class IpcService : IDisposable
         {
             var json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
             var message = JsonConvert.DeserializeObject<IpcMessage>(json);
-            
+
             if (message != null && !string.IsNullOrEmpty(message.Type))
             {
-                await Task.Run(() => MessageReceived?.Invoke(message));
+                // 使用线程安全的方式触发事件，确保在正确的线程上下文中处理
+                var handler = Volatile.Read(ref MessageReceived);
+                if (handler != null)
+                {
+                    try
+                    {
+                        handler(message);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"处理IPC消息时发生错误: {ex.Message}");
+                    }
+                }
             }
         }
         catch (Exception ex)

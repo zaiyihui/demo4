@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net8.0-windows</TargetFramework>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>true</SelfContained>
     <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <EnableDefaultAvaloniaXamlItems>true</EnableDefaultAvaloniaXamlItems>
     <DefaultItemExcludes>$(DefaultItemExcludes);Tests/**/*</DefaultItemExcludes>
@@ -49,18 +50,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="12.0.3" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.0.3" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.0.3" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.0.3" />
-    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.1">
-      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
-    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
-  </ItemGroup>
+      <PackageReference Include="Avalonia" Version="11.0.10" />
+      <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
+      <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
+      <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
+      <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.1.1">
+        <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
+      <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+    </ItemGroup>
 
   <ItemGroup>
     <Content Include="Assets\avalonia-logo.ico">

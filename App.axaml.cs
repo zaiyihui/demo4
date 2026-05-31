@@ -66,15 +66,18 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
-            
+
             var overlayWindow = new OverlayWindow();
             overlayWindow.Initialize(new OverlayViewModel(_hardwareMonitorService ?? throw new InvalidOperationException("硬件监控服务未初始化"), settings));
             desktop.MainWindow = overlayWindow;
-            
+
             // 初始化 IPC 客户端
             _ipcService = new IpcService();
             _ipcService.MessageReceived += OnIpcMessageReceived;
             _ = ConnectIpcAsync();
+
+            // 通知主程序悬浮窗已准备就绪
+            _ = SendIpcMessageAsync(IpcMessageTypes.OverlayReady, "悬浮窗已启动");
         }
     }
 
@@ -106,7 +109,7 @@ public partial class App : Application
             _ = StartIpcServerAsync();
 
             // 初始化系统托盘
-            _trayIconService = new TrayIconService(_settingsService ?? throw new InvalidOperationException("设置服务未初始化"));
+            _trayIconService = new TrayIconService();
             _trayIconService.ShowMainWindow += (s, e) => ShowMainWindow();
             _trayIconService.ExitApplication += (s, e) => ExitApplication();
             _trayIconService.Initialize();
@@ -186,6 +189,13 @@ public partial class App : Application
     private void HandleOverlayReady()
     {
         // 悬浮窗已准备好，可以发送初始设置等
+        Console.WriteLine("悬浮窗已成功启动并准备就绪");
+        // 这里可以添加更多初始化逻辑，比如向悬浮窗发送当前设置
+        if (!IsOverlayMode && _settingsService != null)
+        {
+            var settings = _settingsService.GetSettings();
+            Console.WriteLine($"悬浮窗初始化配置: 显示FPS={settings.OverlayShowFPS}, 显示GPU={settings.OverlayShowGpu}");
+        }
     }
 
     /// <summary>

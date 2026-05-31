@@ -137,39 +137,59 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    private readonly System.Text.StringBuilder _stringBuilder = new System.Text.StringBuilder();
+
     private string BuildCpuInfo()
     {
-        var parts = new System.Collections.Generic.List<string>();
-        
+        _stringBuilder.Clear();
         if (_monitor.CpuUsage.HasValue)
-            parts.Add($"{_monitor.CpuUsage.Value:F1}%");
-        
+            _stringBuilder.AppendFormat("{0:F1}%", _monitor.CpuUsage.Value);
+
         if (_monitor.CpuTemp.HasValue)
-            parts.Add($"{_monitor.CpuTemp.Value:F0}°C");
-        
+        {
+            if (_stringBuilder.Length > 0)
+                _stringBuilder.Append(" | ");
+            _stringBuilder.AppendFormat("{0:F0}°C", _monitor.CpuTemp.Value);
+        }
+
         if (_monitor.CpuFanSpeed.HasValue && _monitor.CpuFanSpeed.Value > 0)
-            parts.Add($"{_monitor.CpuFanSpeed.Value} RPM");
-        
-        return string.Join(" | ", parts) ?? "CPU: --";
+        {
+            if (_stringBuilder.Length > 0)
+                _stringBuilder.Append(" | ");
+            _stringBuilder.AppendFormat("{0} RPM", _monitor.CpuFanSpeed.Value);
+        }
+
+        return _stringBuilder.Length > 0 ? _stringBuilder.ToString() : "CPU: --";
     }
 
     private string BuildGpuInfo()
     {
-        var parts = new System.Collections.Generic.List<string>();
-        
+        _stringBuilder.Clear();
         if (_monitor.GpuUsage.HasValue)
-            parts.Add($"{_monitor.GpuUsage.Value:F1}%");
-        
+            _stringBuilder.AppendFormat("{0:F1}%", _monitor.GpuUsage.Value);
+
         if (_monitor.GpuTemp.HasValue)
-            parts.Add($"{_monitor.GpuTemp.Value:F0}°C");
-        
+        {
+            if (_stringBuilder.Length > 0)
+                _stringBuilder.Append(" | ");
+            _stringBuilder.AppendFormat("{0:F0}°C", _monitor.GpuTemp.Value);
+        }
+
         if (_monitor.GpuVramUsed.HasValue && _monitor.GpuVramTotal.HasValue)
-            parts.Add($"{_monitor.GpuVramUsed.Value:F1}/{_monitor.GpuVramTotal.Value:F1} GB");
-        
+        {
+            if (_stringBuilder.Length > 0)
+                _stringBuilder.Append(" | ");
+            _stringBuilder.AppendFormat("{0:F1}/{1:F1} GB", _monitor.GpuVramUsed.Value, _monitor.GpuVramTotal.Value);
+        }
+
         if (_monitor.GpuFanSpeed.HasValue && _monitor.GpuFanSpeed.Value > 0)
-            parts.Add($"{_monitor.GpuFanSpeed.Value} RPM");
-        
-        return string.Join(" | ", parts) ?? "GPU: --";
+        {
+            if (_stringBuilder.Length > 0)
+                _stringBuilder.Append(" | ");
+            _stringBuilder.AppendFormat("{0} RPM", _monitor.GpuFanSpeed.Value);
+        }
+
+        return _stringBuilder.Length > 0 ? _stringBuilder.ToString() : "GPU: --";
     }
 
     private string BuildMemoryInfo()
@@ -184,15 +204,18 @@ public partial class MainWindowViewModel : ObservableObject
 
     private string BuildNetworkInfo()
     {
-        var parts = new System.Collections.Generic.List<string>();
-        
+        _stringBuilder.Clear();
         if (_monitor.NetworkDownload.HasValue)
-            parts.Add($"↓ {_monitor.NetworkDownload.Value:F2} MB/s");
-        
+            _stringBuilder.AppendFormat("↓ {0:F2} MB/s", _monitor.NetworkDownload.Value);
+
         if (_monitor.NetworkUpload.HasValue)
-            parts.Add($"↑ {_monitor.NetworkUpload.Value:F2} MB/s");
-        
-        return string.Join(" ", parts) ?? "网络: --";
+        {
+            if (_stringBuilder.Length > 0)
+                _stringBuilder.Append(" ");
+            _stringBuilder.AppendFormat("↑ {0:F2} MB/s", _monitor.NetworkUpload.Value);
+        }
+
+        return _stringBuilder.Length > 0 ? _stringBuilder.ToString() : "网络: --";
     }
 
     private string BuildDiskInfo()
