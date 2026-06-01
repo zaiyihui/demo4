@@ -14,14 +14,14 @@ public partial class OverlayViewModel : ObservableObject
 {
     #region 私有字段
 
-    private readonly HardwareMonitorService _monitor;
+    private readonly IHardwareMonitorService _monitor;
     private readonly Settings _settings;
 
     #endregion
 
     #region 构造函数
 
-    public OverlayViewModel(HardwareMonitorService monitor, Settings settings)
+    public OverlayViewModel(IHardwareMonitorService monitor, Settings settings)
     {
         _monitor = monitor;
         _settings = settings;

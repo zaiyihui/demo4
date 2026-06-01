@@ -6,8 +6,8 @@ namespace ComputerCompanion.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    private readonly HardwareMonitorService _monitor;
-    private readonly SettingsService _settingsService;
+    private readonly IHardwareMonitorService _monitor;
+    private readonly ISettingsService _settingsService;
     private Settings _settings;
 
     [ObservableProperty]
@@ -73,7 +73,7 @@ public partial class MainWindowViewModel : ObservableObject
         ShowBattery = _monitor.HasBattery && _settings.ShowBattery;
     }
     
-    public MainWindowViewModel(HardwareMonitorService monitor, Settings settings)
+    public MainWindowViewModel(IHardwareMonitorService monitor, Settings settings)
     {
         _settings = settings;
         _settingsService = App.SettingsService ?? new SettingsService();

@@ -5,7 +5,7 @@ using System.IO;
 
 namespace ComputerCompanion.Services;
 
-public class SettingsService
+public class SettingsService : ISettingsService
 {
     private readonly string _settingsPath;
     private Settings? _settings;

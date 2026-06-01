@@ -11,6 +11,12 @@ public partial class SettingsViewModel : ObservableObject
     private readonly Settings _settings;
     private readonly Action<Settings> _onSave;
 
+    public MainWindowSettings MainWindowSettings => _settings.MainWindow;
+    public OverlaySettings OverlaySettings => _settings.Overlay;
+    public DisplayContentSettings DisplayContentSettings => _settings.DisplayContent;
+    public PerformanceSettings PerformanceSettings => _settings.Performance;
+    public StartupSettings StartupSettings => _settings.Startup;
+
     [ObservableProperty]
     private LayoutMode _layoutMode = LayoutMode.Vertical;
 
@@ -53,7 +59,6 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private bool _showBattery = true;
 
-    // 悬浮窗相关设置
     [ObservableProperty]
     private bool _enableOverlay = true;
 
@@ -83,11 +88,10 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _overlayShowLatency = true;
-    
-    // 启动设置
+
     [ObservableProperty]
     private bool _autoStart = false;
-    
+
     [ObservableProperty]
     private bool _startMinimized = false;
 
@@ -101,71 +105,67 @@ public partial class SettingsViewModel : ObservableObject
 
     private void LoadSettings()
     {
-        LayoutMode = _settings.LayoutMode;
-        TextColor = _settings.TextColor;
-        BackgroundColor = _settings.BackgroundColor;
-        BackgroundOpacity = _settings.BackgroundOpacity;
-        FontSize = _settings.FontSize;
-        RefreshInterval = _settings.RefreshInterval;
-        GameMode = _settings.GameMode;
-        GameModeRefreshInterval = _settings.GameModeRefreshInterval;
-        ShowCpu = _settings.ShowCpu;
-        ShowGpu = _settings.ShowGpu;
-        ShowMemory = _settings.ShowMemory;
-        ShowNetwork = _settings.ShowNetwork;
-        ShowDisk = _settings.ShowDisk;
-        ShowBattery = _settings.ShowBattery;
+        LayoutMode = MainWindowSettings.LayoutMode;
+        TextColor = MainWindowSettings.TextColor;
+        BackgroundColor = MainWindowSettings.BackgroundColor;
+        BackgroundOpacity = MainWindowSettings.BackgroundOpacity;
+        FontSize = MainWindowSettings.FontSize;
+        RefreshInterval = PerformanceSettings.RefreshInterval;
+        GameMode = PerformanceSettings.GameMode;
+        GameModeRefreshInterval = PerformanceSettings.GameModeRefreshInterval;
+        ShowCpu = DisplayContentSettings.ShowCpu;
+        ShowGpu = DisplayContentSettings.ShowGpu;
+        ShowMemory = DisplayContentSettings.ShowMemory;
+        ShowNetwork = DisplayContentSettings.ShowNetwork;
+        ShowDisk = DisplayContentSettings.ShowDisk;
+        ShowBattery = DisplayContentSettings.ShowBattery;
         
-        // 加载悬浮窗设置
-        EnableOverlay = _settings.EnableOverlay;
-        OverlayAlwaysOnTop = _settings.OverlayAlwaysOnTop;
-        OverlayFontSize = _settings.OverlayFontSize;
-        OverlayTextColor = _settings.OverlayTextColor;
-        OverlayPosition = _settings.OverlayPosition;
-        OverlayShowFPS = _settings.OverlayShowFPS;
-        OverlayShowGpu = _settings.OverlayShowGpu;
-        OverlayShowCpu = _settings.OverlayShowCpu;
-        OverlayShowMemory = _settings.OverlayShowMemory;
-        OverlayShowLatency = _settings.OverlayShowLatency;
+        EnableOverlay = OverlaySettings.EnableOverlay;
+        OverlayAlwaysOnTop = OverlaySettings.OverlayAlwaysOnTop;
+        OverlayFontSize = OverlaySettings.OverlayFontSize;
+        OverlayTextColor = OverlaySettings.OverlayTextColor;
+        OverlayPosition = OverlaySettings.OverlayPosition;
+        OverlayShowFPS = OverlaySettings.OverlayShowFPS;
+        OverlayShowGpu = OverlaySettings.OverlayShowGpu;
+        OverlayShowCpu = OverlaySettings.OverlayShowCpu;
+        OverlayShowMemory = OverlaySettings.OverlayShowMemory;
+        OverlayShowLatency = OverlaySettings.OverlayShowLatency;
         
-        // 加载启动设置
-        AutoStart = _settings.AutoStart;
-        StartMinimized = _settings.StartMinimized;
+        AutoStart = StartupSettings.AutoStart;
+        StartMinimized = StartupSettings.StartMinimized;
     }
 
     [RelayCommand]
     public void Save()
     {
-        _settings.LayoutMode = LayoutMode;
-        _settings.TextColor = TextColor;
-        _settings.BackgroundColor = BackgroundColor;
-        _settings.BackgroundOpacity = BackgroundOpacity;
-        _settings.FontSize = FontSize;
-        _settings.RefreshInterval = RefreshInterval;
-        _settings.GameMode = GameMode;
-        _settings.GameModeRefreshInterval = GameModeRefreshInterval;
-        _settings.ShowCpu = ShowCpu;
-        _settings.ShowGpu = ShowGpu;
-        _settings.ShowMemory = ShowMemory;
-        _settings.ShowNetwork = ShowNetwork;
-        _settings.ShowDisk = ShowDisk;
-        _settings.ShowBattery = ShowBattery;
+        MainWindowSettings.LayoutMode = LayoutMode;
+        MainWindowSettings.TextColor = TextColor;
+        MainWindowSettings.BackgroundColor = BackgroundColor;
+        MainWindowSettings.BackgroundOpacity = BackgroundOpacity;
+        MainWindowSettings.FontSize = FontSize;
+        PerformanceSettings.RefreshInterval = RefreshInterval;
+        PerformanceSettings.GameMode = GameMode;
+        PerformanceSettings.GameModeRefreshInterval = GameModeRefreshInterval;
+        DisplayContentSettings.ShowCpu = ShowCpu;
+        DisplayContentSettings.ShowGpu = ShowGpu;
+        DisplayContentSettings.ShowMemory = ShowMemory;
+        DisplayContentSettings.ShowNetwork = ShowNetwork;
+        DisplayContentSettings.ShowDisk = ShowDisk;
+        DisplayContentSettings.ShowBattery = ShowBattery;
         
-        // 保存悬浮窗设置
-        _settings.EnableOverlay = EnableOverlay;
-        _settings.OverlayAlwaysOnTop = OverlayAlwaysOnTop;
-        _settings.OverlayFontSize = OverlayFontSize;
-        _settings.OverlayTextColor = OverlayTextColor;
-        _settings.OverlayPosition = OverlayPosition;
-        _settings.OverlayShowFPS = OverlayShowFPS;
-        _settings.OverlayShowGpu = OverlayShowGpu;
-        _settings.OverlayShowCpu = OverlayShowCpu;
-        _settings.OverlayShowMemory = OverlayShowMemory;
-        _settings.OverlayShowLatency = OverlayShowLatency;
+        OverlaySettings.EnableOverlay = EnableOverlay;
+        OverlaySettings.OverlayAlwaysOnTop = OverlayAlwaysOnTop;
+        OverlaySettings.OverlayFontSize = OverlayFontSize;
+        OverlaySettings.OverlayTextColor = OverlayTextColor;
+        OverlaySettings.OverlayPosition = OverlayPosition;
+        OverlaySettings.OverlayShowFPS = OverlayShowFPS;
+        OverlaySettings.OverlayShowGpu = OverlayShowGpu;
+        OverlaySettings.OverlayShowCpu = OverlayShowCpu;
+        OverlaySettings.OverlayShowMemory = OverlayShowMemory;
+        OverlaySettings.OverlayShowLatency = OverlayShowLatency;
         
-        // 保存启动设置
-        _settings.AutoStart = AutoStart;
-        _settings.StartMinimized = StartMinimized;
+        StartupSettings.AutoStart = AutoStart;
+        StartupSettings.StartMinimized = StartMinimized;
 
         _onSave?.Invoke(_settings);
     }
@@ -173,35 +173,7 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     public void ResetToDefaults()
     {
-        LayoutMode = LayoutMode.Vertical;
-        TextColor = "#FFFFFF";
-        BackgroundColor = "#1a1a2eea";
-        BackgroundOpacity = 0.9;
-        FontSize = 14;
-        RefreshInterval = 1000;
-        GameMode = false;
-        GameModeRefreshInterval = 3000;
-        ShowCpu = true;
-        ShowGpu = true;
-        ShowMemory = true;
-        ShowNetwork = true;
-        ShowDisk = true;
-        ShowBattery = true;
-        
-        // 重置悬浮窗设置为默认值
-        EnableOverlay = true;
-        OverlayAlwaysOnTop = true;
-        OverlayFontSize = 16;
-        OverlayTextColor = "#76B900";
-        OverlayPosition = OverlayPosition.TopRight;
-        OverlayShowFPS = true;
-        OverlayShowGpu = true;
-        OverlayShowCpu = true;
-        OverlayShowMemory = true;
-        OverlayShowLatency = true;
-        
-        // 重置启动设置
-        AutoStart = false;
-        StartMinimized = false;
+        _settings.ResetToDefaults();
+        LoadSettings();
     }
 }

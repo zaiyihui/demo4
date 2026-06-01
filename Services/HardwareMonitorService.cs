@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ComputerCompanion.Services;
 
-public class HardwareMonitorService : IDisposable
+public class HardwareMonitorService : IHardwareMonitorService
 {
     #region 私有字段
 
@@ -358,13 +358,17 @@ public class HardwareMonitorService : IDisposable
             if (sensor.Name.Contains("Memory Used"))
                 MemoryUsed = sensor.Value / 1024;
             else if (sensor.Name.Contains("Memory Available"))
-                MemoryTotal = (sensor.Value + MemoryUsed.GetValueOrDefault() * 1024) / 1024;
+                MemoryTotal = sensor.Value / 1024 + MemoryUsed.GetValueOrDefault();
+            else if (sensor.Name.Contains("Memory Total"))
+                MemoryTotal = sensor.Value / 1024;
         }
         else if (IsGpuType(hardwareType))
         {
             if (sensor.Name.Contains("VRAM Used"))
                 GpuVramUsed = sensor.Value / 1024;
             else if (sensor.Name.Contains("VRAM Total"))
+                GpuVramTotal = sensor.Value / 1024;
+            else if (sensor.Name.Contains("Dedicated Video Memory"))
                 GpuVramTotal = sensor.Value / 1024;
         }
     }

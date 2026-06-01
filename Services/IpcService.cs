@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 
 namespace ComputerCompanion.Services;
 
-public class IpcService : IDisposable
+public class IpcService : IIpcService
 {
     private const string PipeName = "ComputerCompanion_IPC";
     private const int ReconnectDelayMs = 2000;
