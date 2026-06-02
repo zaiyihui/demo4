@@ -278,7 +278,7 @@
                                             <Border Width="30" Height="30" CornerRadius="4" 
                                                     Background="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverter}}" 
                                                     BorderBrush="#444" BorderThickness="1"/>
-                                            <TextBox Text="{Binding OverlayTextColor}" Width="120" PlaceholderText="如: #76B900"/>
+                                            <TextBox Text="{Binding OverlayTextColor}" Width="120" Watermark="如: #76B900"/>
                                             <Button Content="预设" Classes="presetButton" Click="ShowColorPresets"/>
                                         </StackPanel>
                                     </Grid>

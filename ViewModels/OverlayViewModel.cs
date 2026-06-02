@@ -35,7 +35,7 @@ public partial class OverlayViewModel : ObservableObject
         _cpuText = "处理: --";
         _memoryText = "内存: --";
         _latencyText = "延迟: --";
-        _overlayTextColor = settings.OverlayTextColor;
+        _overlayTextColor = settings.Overlay.OverlayTextColor;
     }
 
     #endregion
@@ -106,7 +106,7 @@ public partial class OverlayViewModel : ObservableObject
     {
         // 构建 GPU 信息 (NVIDIA 风格)
         var gpuParts = new System.Collections.Generic.List<string>();
-        if (_settings.OverlayShowGpu && _monitor.HasGpu)
+        if (_settings.Overlay.OverlayShowGpu && _monitor.HasGpu)
         {
             if (_monitor.GpuUsage.HasValue)
                 gpuParts.Add($"GPU {_monitor.GpuUsage.Value:F0}%");
@@ -124,7 +124,7 @@ public partial class OverlayViewModel : ObservableObject
 
         // 构建 CPU 信息
         var cpuParts = new System.Collections.Generic.List<string>();
-        if (_settings.OverlayShowCpu)
+        if (_settings.Overlay.OverlayShowCpu)
         {
             if (_monitor.CpuUsage.HasValue)
                 cpuParts.Add($"CPU {_monitor.CpuUsage.Value:F0}%");
@@ -137,7 +137,7 @@ public partial class OverlayViewModel : ObservableObject
         }
 
         // 构建内存信息
-        if (_settings.OverlayShowMemory)
+        if (_settings.Overlay.OverlayShowMemory)
         {
             if (_monitor.MemoryUsed.HasValue && _monitor.MemoryTotal.HasValue)
             {
@@ -155,7 +155,7 @@ public partial class OverlayViewModel : ObservableObject
         }
 
         // 延迟
-        if (_settings.OverlayShowLatency)
+        if (_settings.Overlay.OverlayShowLatency)
         {
             if (_monitor.NetworkLatency.HasValue)
             {

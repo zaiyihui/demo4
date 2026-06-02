@@ -2,7 +2,9 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
+using ComputerCompanion;
 using ComputerCompanion.Models;
+using ComputerCompanion.Services;
 using ComputerCompanion.ViewModels;
 using System;
 using System.Runtime.InteropServices;
@@ -51,7 +53,8 @@ public partial class OverlayWindow : Window
 
         var workArea = screen.WorkingArea;
 
-        var settings = App.SettingsService?.GetSettings();
+        var settingsService = App.ServiceProvider.GetService(typeof(ISettingsService)) as ISettingsService;
+        var settings = settingsService?.GetSettings();
         if (settings == null) return;
 
         // 等待布局完成后获取实际窗口尺寸
@@ -60,7 +63,7 @@ public partial class OverlayWindow : Window
         var windowHeight = this.Bounds.Height;
 
         int x, y;
-        switch (settings.OverlayPosition)
+        switch (settings.Overlay.OverlayPosition)
         {
             case OverlayPosition.TopLeft:
                 x = workArea.X + 20;

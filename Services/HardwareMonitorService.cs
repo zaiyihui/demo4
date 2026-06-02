@@ -83,6 +83,7 @@ public class HardwareMonitorService : IHardwareMonitorService
             return;
 
         _isRunning = true;
+        Program.Log("[硬件] 开始初始化硬件监控服务");
 
         try
         {
@@ -97,16 +98,32 @@ public class HardwareMonitorService : IHardwareMonitorService
                 IsBatteryEnabled = true
             };
             _computer.Open();
+            Program.Log("[硬件] LibreHardwareMonitor 已成功启动");
+        }
+        catch (System.Security.SecurityException ex)
+        {
+            Program.Log($"[硬件] 权限不足: {ex.Message}（提示：以管理员身份运行可获得更完整的硬件数据）");
+        }
+        catch (System.UnauthorizedAccessException ex)
+        {
+            Program.Log($"[硬件] 拒绝访问: {ex.Message}（提示：以管理员身份运行可获得更完整的硬件数据）");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"初始化硬件监控失败: {ex.Message}");
+            Program.Log($"[硬件] 初始化失败: {ex.Message}（程序将继续运行，仅硬件数据不可用）");
         }
 
-        _dataTimer = new System.Timers.Timer(intervalMs);
-        _dataTimer.Elapsed += OnDataTimerElapsed;
-        _dataTimer.AutoReset = true;
-        _dataTimer.Start();
+        try
+        {
+            _dataTimer = new System.Timers.Timer(intervalMs);
+            _dataTimer.Elapsed += OnDataTimerElapsed;
+            _dataTimer.AutoReset = true;
+            _dataTimer.Start();
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[硬件] 定时器启动失败: {ex.Message}");
+        }
 
         StartPingMonitor();
     }

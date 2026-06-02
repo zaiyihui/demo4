@@ -1,35 +1,117 @@
 using Avalonia;
 using System;
 using System.Globalization;
-using System.Linq;
+using System.IO;
 using System.Text;
+using System.Runtime.InteropServices;
 
 namespace ComputerCompanion;
 
 sealed class Program
 {
-    // 命令行参数常量
     public const string OverlayModeArg = "--overlay";
+    private static string? _logPath;
 
-    // Initialization code. Don't use any Avalonia, third-party APIs or any
-    // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
-    // yet and stuff might break.
     [STAThread]
     public static void Main(string[] args)
     {
-        // 设置控制台编码为 UTF-8（Windows 平台）
+        InitDiagnostics();
+
+        try
+        {
+            Log("[启动] 程序已启动");
+            Log($"[启动] 运行目录: {AppContext.BaseDirectory}");
+            Log($"[启动] 运行时: {RuntimeInformation.FrameworkDescription}");
+            Log($"[启动] 平台: {RuntimeInformation.OSDescription}");
+
+            InitEncoding();
+            InitCulture();
+            EnsureAngleOrFallback();
+
+            App.IsOverlayMode = Array.Exists(args, a => a == OverlayModeArg);
+            Log($"[启动] 悬浮窗模式: {App.IsOverlayMode}");
+
+            Log("[启动] 启动 Avalonia 桌面生命周期");
+            BuildAvaloniaApp()
+                .StartWithClassicDesktopLifetime(args);
+
+            Log("[退出] 程序正常退出");
+        }
+        catch (Exception ex)
+        {
+            Log($"[致命错误] {ex.GetType().Name}: {ex.Message}");
+            Log(ex.StackTrace ?? "无堆栈信息");
+            try
+            {
+                var errorDir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                    "ComputerCompanion");
+                Directory.CreateDirectory(errorDir);
+                File.WriteAllText(
+                    Path.Combine(errorDir, $"crash_{DateTime.Now:yyyyMMdd_HHmmss}.log"),
+                    $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\n{ex}\n\n{ex.StackTrace}");
+            }
+            catch { }
+            throw;
+        }
+    }
+
+    public static AppBuilder BuildAvaloniaApp()
+        => AppBuilder.Configure<App>()
+            .UsePlatformDetect()
+            .WithInterFont()
+            .LogToTrace();
+
+    private static void InitDiagnostics()
+    {
+        try
+        {
+            var logDir = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "ComputerCompanion");
+            Directory.CreateDirectory(logDir);
+            _logPath = Path.Combine(logDir, "runtime.log");
+
+            // 限制日志文件大小
+            if (File.Exists(_logPath) && new FileInfo(_logPath).Length > 10 * 1024 * 1024)
+            {
+                File.Delete(_logPath);
+            }
+        }
+        catch { }
+    }
+
+    internal static void Log(string message)
+    {
+        try
+        {
+            var line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}";
+            if (_logPath != null)
+            {
+                File.AppendAllText(_logPath, line + Environment.NewLine);
+            }
+            Console.WriteLine(line);
+            System.Diagnostics.Debug.WriteLine(line);
+        }
+        catch { }
+    }
+
+    private static void InitEncoding()
+    {
         try
         {
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             Console.OutputEncoding = Encoding.UTF8;
             Console.InputEncoding = Encoding.UTF8;
         }
-        catch
+        catch (Exception ex)
         {
-            // 忽略编码设置失败，继续执行
+            Log($"[编码] UTF-8 设置失败: {ex.Message}");
         }
+    }
 
-        // 设置默认文化为中文（简体）
+    private static void InitCulture()
+    {
         try
         {
             var zhCN = new CultureInfo("zh-CN");
@@ -38,21 +120,41 @@ sealed class Program
             CultureInfo.CurrentCulture = zhCN;
             CultureInfo.CurrentUICulture = zhCN;
         }
-        catch
+        catch (Exception ex)
         {
-            // 忽略文化设置失败，继续执行
+            Log($"[文化] 中文设置失败: {ex.Message}");
         }
-
-        // 检查是否以悬浮窗模式启动
-        App.IsOverlayMode = args.Contains(OverlayModeArg);
-        BuildAvaloniaApp()
-            .StartWithClassicDesktopLifetime(args);
     }
 
-    // Avalonia configuration, don't remove; also used by visual designer.
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace();
+    private static void EnsureAngleOrFallback()
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            return;
+
+        try
+        {
+            var baseDir = AppContext.BaseDirectory;
+            var files = Directory.GetFiles(baseDir, "*libgles*.dll", SearchOption.TopDirectoryOnly);
+            bool hasAngle = files.Length > 0;
+
+            Log($"[渲染] 检测到 ANGLE DLL: {(hasAngle ? string.Join(", ", files) : "未找到")}");
+
+            if (!hasAngle)
+            {
+                Log("[渲染] ANGLE 缺失，启用 Direct2D 回退渲染");
+                Environment.SetEnvironmentVariable("AVALONIA_GL_RENDERER", "direct2d");
+                Environment.SetEnvironmentVariable("AVALONIA_NO_ANGLE", "1");
+            }
+            else
+            {
+                Log("[渲染] 使用 ANGLE OpenGL 渲染");
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"[渲染] 探测失败: {ex.Message}，回退到 Direct2D");
+            Environment.SetEnvironmentVariable("AVALONIA_GL_RENDERER", "direct2d");
+            Environment.SetEnvironmentVariable("AVALONIA_NO_ANGLE", "1");
+        }
+    }
 }

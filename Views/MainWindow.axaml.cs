@@ -6,6 +6,7 @@ using ComputerCompanion.Models;
 using ComputerCompanion.Services;
 using ComputerCompanion.ViewModels;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace ComputerCompanion.Views;
@@ -135,7 +136,7 @@ public partial class MainWindow : Window
     {
         SetClickThrough(false);
         
-        var settingsService = new SettingsService();
+        var settingsService = App.ServiceProvider.GetService(typeof(ISettingsService)) as ISettingsService ?? new SettingsService();
         var settings = settingsService.GetSettings();
         
         var settingsWindow = new SettingsWindow(settings, OnSettingsSaved);
@@ -149,7 +150,7 @@ public partial class MainWindow : Window
             viewModel.UpdateSettings(settings);
         }
 
-        if (settings.EnableOverlay)
+        if (settings.Overlay.EnableOverlay)
         {
             App.RestartOverlayProcess();
         }
@@ -158,7 +159,7 @@ public partial class MainWindow : Window
             App.StopOverlayProcess();
         }
 
-        HandleAutoStart(settings.AutoStart);
+        HandleAutoStart(settings.Startup.AutoStart);
 
         SetClickThrough(_isClickThroughEnabled);
     }
@@ -175,9 +176,9 @@ public partial class MainWindow : Window
         {
             var exePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
             
-            if (!ValidateExePath(exePath))
+            if (!ValidateExePath(exePath, out var validationError))
             {
-                Console.WriteLine("无效的应用程序路径，拒绝修改注册表");
+                Console.WriteLine($"无效的应用程序路径，拒绝修改注册表: {validationError}");
                 return;
             }
 
@@ -194,6 +195,7 @@ public partial class MainWindow : Window
 
             if (enable)
             {
+                ValidateRegistryValue(appName, exePath!);
                 key.SetValue(appName, exePath);
                 Console.WriteLine("已设置开机自动启动");
             }
@@ -221,47 +223,116 @@ public partial class MainWindow : Window
         }
     }
 
-    private bool ValidateExePath(string? exePath)
+    private bool ValidateExePath(string? exePath, out string errorMessage)
     {
+        errorMessage = string.Empty;
+
         if (string.IsNullOrWhiteSpace(exePath))
         {
+            errorMessage = "路径为空";
+            return false;
+        }
+
+        if (exePath.Length > 260)
+        {
+            errorMessage = "路径长度超过 Windows 限制(260字符)";
             return false;
         }
 
         if (exePath.Contains(".."))
         {
-            Console.WriteLine("检测到路径遍历攻击尝试");
+            errorMessage = "检测到路径遍历攻击尝试(..)";
             return false;
         }
 
-        if (exePath.Contains("|") || exePath.Contains("&") || exePath.Contains(";"))
+        var dangerousChars = new[] { '|', '&', ';', '<', '>', '`', '$', '(', ')', '!', '@', '#', '%', '^', '*', '+' };
+        if (dangerousChars.Any(c => exePath.Contains(c)))
         {
-            Console.WriteLine("检测到可疑的命令注入字符");
+            errorMessage = $"检测到可疑的命令注入字符: {string.Join(", ", dangerousChars.Where(c => exePath.Contains(c)))}";
             return false;
         }
 
         try
         {
             var fullPath = System.IO.Path.GetFullPath(exePath);
+            
             if (!fullPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
             {
-                Console.WriteLine("应用程序路径必须是 .exe 文件");
+                errorMessage = "应用程序路径必须是 .exe 文件";
                 return false;
             }
             
             if (!System.IO.File.Exists(fullPath))
             {
-                Console.WriteLine("指定的应用程序文件不存在");
+                errorMessage = "指定的应用程序文件不存在";
                 return false;
+            }
+
+            if (!IsPathInSecureLocation(fullPath))
+            {
+                errorMessage = "应用程序路径不在安全目录中(仅允许 Program Files、AppData、用户目录)";
+                return false;
+            }
+
+            if (!VerifyFileIntegrity(fullPath))
+            {
+                errorMessage = "文件完整性验证失败";
+                Console.WriteLine("警告: 建议验证文件数字签名");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"路径验证失败: {ex.Message}");
+            errorMessage = $"路径验证失败: {ex.Message}";
             return false;
         }
 
         return true;
+    }
+
+    private bool IsPathInSecureLocation(string fullPath)
+    {
+        var securePaths = new[]
+        {
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile)
+        };
+
+        return securePaths.Any(securePath => 
+            fullPath.StartsWith(securePath, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private bool VerifyFileIntegrity(string filePath)
+    {
+        try
+        {
+            var fileInfo = new System.IO.FileInfo(filePath);
+            if (fileInfo.Length == 0)
+            {
+                return false;
+            }
+            
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private void ValidateRegistryValue(string valueName, string valueData)
+    {
+        if (valueName.Contains("\\") || valueName.Contains("/") || valueName.Contains("."))
+        {
+            throw new ArgumentException($"注册表值名称包含非法字符: {valueName}");
+        }
+
+        if (valueData.Length > 1024)
+        {
+            throw new ArgumentException("注册表值数据长度超过限制");
+        }
     }
 
     #endregion

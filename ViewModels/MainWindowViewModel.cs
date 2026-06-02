@@ -63,25 +63,25 @@ public partial class MainWindowViewModel : ObservableObject
         
         _monitor.DataUpdated += OnDataUpdated;
         
-        ShowGpu = _monitor.HasGpu && _settings.ShowGpu;
-        ShowBattery = _monitor.HasBattery && _settings.ShowBattery;
+        ShowGpu = _monitor.HasGpu && _settings.DisplayContent.ShowGpu;
+        ShowBattery = _monitor.HasBattery && _settings.DisplayContent.ShowBattery;
     }
 
     private void OnDataUpdated()
     {
-        if (_settings.ShowCpu)
+        if (_settings.DisplayContent.ShowCpu)
         {
             CpuInfo = BuildCpuInfo();
             CpuUsagePercent = _monitor.CpuUsage ?? 0;
         }
 
-        if (_settings.ShowGpu && _monitor.HasGpu)
+        if (_settings.DisplayContent.ShowGpu && _monitor.HasGpu)
         {
             GpuInfo = BuildGpuInfo();
             GpuUsagePercent = _monitor.GpuUsage ?? 0;
         }
 
-        if (_settings.ShowMemory)
+        if (_settings.DisplayContent.ShowMemory)
         {
             MemoryInfo = BuildMemoryInfo();
             if (_monitor.MemoryUsed.HasValue && _monitor.MemoryTotal.HasValue)
@@ -90,7 +90,7 @@ public partial class MainWindowViewModel : ObservableObject
             }
         }
 
-        if (_settings.ShowNetwork)
+        if (_settings.DisplayContent.ShowNetwork)
         {
             NetworkInfo = BuildNetworkInfo();
             if (_monitor.NetworkLatency.HasValue)
@@ -103,7 +103,7 @@ public partial class MainWindowViewModel : ObservableObject
             }
         }
 
-        if (_settings.ShowDisk)
+        if (_settings.DisplayContent.ShowDisk)
         {
             DiskInfo = BuildDiskInfo();
             if (_monitor.DiskFreeSpace.HasValue && _monitor.DiskTotalSpace.HasValue)
@@ -113,7 +113,7 @@ public partial class MainWindowViewModel : ObservableObject
             }
         }
 
-        if (_settings.ShowBattery && _monitor.HasBattery)
+        if (_settings.DisplayContent.ShowBattery && _monitor.HasBattery)
         {
             BatteryInfo = BuildBatteryInfo();
             BatteryLevelPercent = _monitor.BatteryLevel ?? 0;
@@ -225,11 +225,11 @@ public partial class MainWindowViewModel : ObservableObject
     public void ToggleGameMode()
     {
         GameMode = !GameMode;
-        _settings.GameMode = GameMode;
+        _settings.Performance.GameMode = GameMode;
         _settingsService.SaveSettings();
         
         _monitor.Stop();
-        _monitor.Start(GameMode ? _settings.GameModeRefreshInterval : _settings.RefreshInterval);
+        _monitor.Start(GameMode ? _settings.Performance.GameModeRefreshInterval : _settings.Performance.RefreshInterval);
     }
 
     public void UpdateSettings(Settings settings)
@@ -238,6 +238,6 @@ public partial class MainWindowViewModel : ObservableObject
         _settingsService.SaveSettings();
         
         _monitor.Stop();
-        _monitor.Start(_settings.GameMode ? _settings.GameModeRefreshInterval : _settings.RefreshInterval);
+        _monitor.Start(_settings.Performance.GameMode ? _settings.Performance.GameModeRefreshInterval : _settings.Performance.RefreshInterval);
     }
 }

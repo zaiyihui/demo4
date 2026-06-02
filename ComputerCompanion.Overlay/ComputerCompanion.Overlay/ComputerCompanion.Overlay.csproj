@@ -6,6 +6,11 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+
+    <!-- 确保 Avalonia ANGLE 原生 DLL(av_libGLESv2.dll / libEGL.dll / d3dcompiler_47.dll)
+         在构建和发布时被复制到输出根目录，避免运行时报 "Unable to load DLL 'av_libGLESv2.dll'" -->
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,4 +22,29 @@
     <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
+
+  <!-- Avalonia ANGLE 原生 DLL 兜底复制：
+       Avalonia 的 ANGLE 依赖位于 runtimes/win-x64/native 下，
+       在某些 RID/自包含配置下 NuGet 解析器不会将其拷贝到输出根目录，
+       导致启动时抛 "Unable to load DLL 'av_libGLESv2.dll'"。
+       这里显式收集 NuGet 包中 runtimes/$(RuntimeIdentifier)/native 下的所有原生文件，
+       在构建与发布完成后拷贝到输出根目录，作为运行时兜底。 -->
+  <Target Name="CopyAvaloniaAngleNativeDlls" AfterTargets="Build;Publish" DependsOnTargets="ResolveLockFileCopyLocalFiles">
+    <ItemGroup>
+      <AvaloniaAngleNativeFiles Include="$(NuGetPackageRoot)avalonia.angle.windows.natives\*\runtimes\$(RuntimeIdentifier)\native\*.dll" />
+      <AvaloniaAngleNativeFiles Include="$(NuGetPackageRoot)avalonia.angle.windows.natives\*\runtimes\win-x64\native\*.dll" Condition="'$(RuntimeIdentifier)' == ''" />
+    </ItemGroup>
+    <Copy SourceFiles="@(AvaloniaAngleNativeFiles)"
+          DestinationFolder="$(OutputPath)"
+          SkipUnchangedFiles="true"
+          Condition="'@(AvaloniaAngleNativeFiles)' != ''" />
+    <Copy SourceFiles="@(AvaloniaAngleNativeFiles)"
+          DestinationFolder="$(PublishDir)"
+          SkipUnchangedFiles="true"
+          Condition="'$(PublishDir)' != '' And '@(AvaloniaAngleNativeFiles)' != ''" />
+    <Message Importance="High" Condition="'@(AvaloniaAngleNativeFiles)' != ''"
+             Text="已复制 Avalonia ANGLE 原生依赖: @(AvaloniaAngleNativeFiles -> '%(FileName)%(Extension)', ', ')" />
+    <Warning Condition="'@(AvaloniaAngleNativeFiles)' == ''"
+             Text="未找到 Avalonia ANGLE 原生依赖，请确认已还原 Avalonia.Desktop / Avalonia.Angle.Windows.Natives 包。" />
+  </Target>
 </Project>
