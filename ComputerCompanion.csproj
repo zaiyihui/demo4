@@ -50,17 +50,21 @@
   </ItemGroup>
 
   <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.0.10" />
-      <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
-      <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.10" />
-      <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.10" />
+      <PackageReference Include="Avalonia" Version="11.2.0" />
+      <PackageReference Include="Avalonia.Desktop" Version="11.2.0" />
+      <PackageReference Include="Avalonia.Themes.Fluent" Version="11.2.0" />
+      <PackageReference Include="Avalonia.Fonts.Inter" Version="11.2.0" />
       <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.1.1">
         <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
       </PackageReference>
       <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
-      <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+      <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6">
+        <PrivateAssets>none</PrivateAssets>
+        <CopyLocal>true</CopyLocal>
+      </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-      <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+        <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
     </ItemGroup>
 
   <ItemGroup>
@@ -68,4 +72,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+
+  <Target Name="CopyLibreHardwareMonitorRuntime" AfterTargets="Build">
+    <Copy SourceFiles="$(NuGetPackageRoot)librehardwaremonitorlib\0.9.6\runtimes\win-x64\lib\net8.0\LibreHardwareMonitorLib.dll" DestinationFolder="$(OutputPath)" Condition="Exists('$(NuGetPackageRoot)librehardwaremonitorlib\0.9.6\runtimes\win-x64\lib\net8.0\LibreHardwareMonitorLib.dll')" />
+  </Target>
 </Project>

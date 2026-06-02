@@ -13,12 +13,15 @@ public class IpcService : IIpcService
     private const string PipeName = "ComputerCompanion_IPC";
     private const int ReconnectDelayMs = 2000;
     private const int ConnectTimeoutMs = 5000;
+    private const int MaxMessageSize = 65536;
     
     private NamedPipeServerStream? _server;
     private NamedPipeClientStream? _client;
     private CancellationTokenSource? _cancellationTokenSource;
     private bool _isServer;
     private bool _isDisposed;
+    private readonly ISecurityService? _securityService;
+    private string? _sessionKey;
     
     public event Action<IpcMessage>? MessageReceived;
     public event EventHandler? Connected;
@@ -33,6 +36,13 @@ public class IpcService : IIpcService
             else
                 return _client?.IsConnected ?? false;
         }
+    }
+
+    public IpcService() : this(null) { }
+
+    public IpcService(ISecurityService? securityService)
+    {
+        _securityService = securityService;
     }
 
     public async Task StartServerAsync()
@@ -61,6 +71,13 @@ public class IpcService : IIpcService
                     PipeOptions.Asynchronous);
                 
                 await _server.WaitForConnectionAsync(cancellationToken);
+                
+                if (_securityService != null)
+                {
+                    _sessionKey = _securityService.GenerateSessionKey();
+                    await SendSessionKeyAsync(_server);
+                }
+                
                 OnConnected();
                 
                 _ = Task.Run(
@@ -107,6 +124,12 @@ public class IpcService : IIpcService
                 connectCts.CancelAfter(ConnectTimeoutMs);
                 
                 await _client.ConnectAsync(connectCts.Token);
+                
+                if (_securityService != null)
+                {
+                    await ReceiveSessionKeyAsync(_client);
+                }
+                
                 OnConnected();
                 
                 await ReadMessagesLoopAsync(_client, cancellationToken);
@@ -130,6 +153,64 @@ public class IpcService : IIpcService
         }
     }
 
+    private async Task SendSessionKeyAsync(PipeStream pipeStream)
+    {
+        if (string.IsNullOrEmpty(_sessionKey))
+            return;
+
+        try
+        {
+            var sessionMessage = new IpcMessage
+            {
+                Type = IpcMessageTypes.SessionKey,
+                Data = _sessionKey
+            };
+            
+            var json = JsonConvert.SerializeObject(sessionMessage);
+            var bytes = Encoding.UTF8.GetBytes(json);
+            
+            var lengthBytes = BitConverter.GetBytes(bytes.Length);
+            await pipeStream.WriteAsync(lengthBytes.AsMemory(0, 4));
+            await pipeStream.WriteAsync(bytes.AsMemory(0, bytes.Length));
+            await pipeStream.FlushAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to send session key: {ex.Message}");
+        }
+    }
+
+    private async Task ReceiveSessionKeyAsync(PipeStream pipeStream)
+    {
+        var lengthBuffer = new byte[4];
+        try
+        {
+            await pipeStream.ReadAsync(lengthBuffer, 0, 4);
+            var messageLength = BitConverter.ToInt32(lengthBuffer, 0);
+            
+            if (messageLength <= 0 || messageLength > MaxMessageSize)
+            {
+                throw new InvalidOperationException("Invalid session key message length");
+            }
+            
+            var messageBuffer = new byte[messageLength];
+            await pipeStream.ReadAsync(messageBuffer, 0, messageLength);
+            
+            var json = Encoding.UTF8.GetString(messageBuffer);
+            var message = JsonConvert.DeserializeObject<IpcMessage>(json);
+            
+            if (message?.Type == IpcMessageTypes.SessionKey && !string.IsNullOrEmpty(message.Data))
+            {
+                _sessionKey = message.Data;
+                Console.WriteLine("Session key received");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to receive session key: {ex.Message}");
+        }
+    }
+
     private async Task ReadMessagesLoopAsync(PipeStream pipeStream, CancellationToken cancellationToken)
     {
         var lengthBuffer = new byte[4];
@@ -146,7 +227,7 @@ public class IpcService : IIpcService
                 }
                 
                 var messageLength = BitConverter.ToInt32(lengthBuffer, 0);
-                if (messageLength <= 0 || messageLength > 65536)
+                if (messageLength <= 0 || messageLength > MaxMessageSize)
                 {
                     Console.WriteLine($"Invalid message length: {messageLength}");
                     continue;
@@ -175,22 +256,36 @@ public class IpcService : IIpcService
         try
         {
             var json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
-            var message = JsonConvert.DeserializeObject<IpcMessage>(json);
+            var message = JsonConvert.DeserializeObject<SecureIpcMessage>(json);
 
-            if (message != null && !string.IsNullOrEmpty(message.Type))
+            if (message == null || string.IsNullOrEmpty(message.Type))
             {
-                // 使用线程安全的方式触发事件，确保在正确的线程上下文中处理
-                var handler = Volatile.Read(ref MessageReceived);
-                if (handler != null)
+                Console.WriteLine("Invalid message received");
+                return;
+            }
+
+            if (!ValidateMessageSignature(message))
+            {
+                Console.WriteLine("Message signature validation failed");
+                return;
+            }
+
+            var plainMessage = new IpcMessage
+            {
+                Type = message.Type,
+                Data = message.Data
+            };
+
+            var handler = Volatile.Read(ref MessageReceived);
+            if (handler != null)
+            {
+                try
                 {
-                    try
-                    {
-                        handler(message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"处理IPC消息时发生错误: {ex.Message}");
-                    }
+                    handler(plainMessage);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"处理IPC消息时发生错误: {ex.Message}");
                 }
             }
         }
@@ -198,6 +293,21 @@ public class IpcService : IIpcService
         {
             Console.WriteLine($"Failed to process IPC message: {ex.Message}");
         }
+    }
+
+    private bool ValidateMessageSignature(SecureIpcMessage message)
+    {
+        if (_securityService == null)
+            return true;
+
+        if (string.IsNullOrEmpty(message.Signature))
+        {
+            Console.WriteLine("Message without signature");
+            return false;
+        }
+
+        var dataToSign = $"{message.Type}|{message.Data}|{message.Timestamp}";
+        return _securityService.VerifySignature(dataToSign, message.Signature);
     }
 
     public async Task SendMessageAsync(IpcMessage message)
@@ -217,10 +327,11 @@ public class IpcService : IIpcService
                 return;
             }
 
-            var json = JsonConvert.SerializeObject(message);
+            var secureMessage = CreateSecureMessage(message);
+            var json = JsonConvert.SerializeObject(secureMessage);
             var bytes = Encoding.UTF8.GetBytes(json);
             
-            if (bytes.Length > 65536)
+            if (bytes.Length > MaxMessageSize)
             {
                 Console.WriteLine("Message too large");
                 return;
@@ -248,6 +359,24 @@ public class IpcService : IIpcService
         }
     }
 
+    private SecureIpcMessage CreateSecureMessage(IpcMessage message)
+    {
+        var secureMessage = new SecureIpcMessage
+        {
+            Type = message.Type,
+            Data = message.Data,
+            Timestamp = DateTime.UtcNow.Ticks
+        };
+
+        if (_securityService != null)
+        {
+            var dataToSign = $"{message.Type}|{message.Data}|{secureMessage.Timestamp}";
+            secureMessage.Signature = _securityService.SignMessage(dataToSign);
+        }
+
+        return secureMessage;
+    }
+
     private void OnConnected()
     {
         Console.WriteLine("IPC connected");
@@ -257,6 +386,7 @@ public class IpcService : IIpcService
     private void OnDisconnected()
     {
         Console.WriteLine("IPC disconnected");
+        _sessionKey = null;
         Disconnected?.Invoke(this, EventArgs.Empty);
     }
 
@@ -307,10 +437,17 @@ public class IpcMessage
     public string Data { get; set; } = string.Empty;
 }
 
+public class SecureIpcMessage : IpcMessage
+{
+    public long Timestamp { get; set; }
+    public string Signature { get; set; } = string.Empty;
+}
+
 public static class IpcMessageTypes
 {
     public const string SettingsChanged = "SettingsChanged";
     public const string ShowMainWindow = "ShowMainWindow";
     public const string ExitApplication = "ExitApplication";
     public const string OverlayReady = "OverlayReady";
+    public const string SessionKey = "SessionKey";
 }

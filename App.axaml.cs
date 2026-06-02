@@ -6,6 +6,7 @@ using ComputerCompanion.Models;
 using ComputerCompanion.ViewModels;
 using ComputerCompanion.Views;
 using ComputerCompanion.Services;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -14,30 +15,43 @@ namespace ComputerCompanion;
 
 public partial class App : Application
 {
-    // 全局状态
     public static bool IsOverlayMode { get; set; } = false;
-    private static HardwareMonitorService? _hardwareMonitorService;
-    private static SettingsService? _settingsService;
+    
+    private static IServiceProvider? _serviceProvider;
     private static Process? _overlayProcess;
-    private static IpcService? _ipcService;
-    private static TrayIconService? _trayIconService;
     private static MainWindow? _mainWindow;
+
+    public static IServiceProvider ServiceProvider => _serviceProvider ?? throw new InvalidOperationException("服务容器未初始化");
 
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        ConfigureServices();
+    }
+
+    private void ConfigureServices()
+    {
+        var services = new ServiceCollection();
+        
+        services.AddSingleton<ISecurityService, SecurityService>();
+        services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
+        services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<IIpcService>(sp => 
+            new IpcService(sp.GetService<ISecurityService>()));
+        services.AddSingleton<TrayIconService>();
+        
+        _serviceProvider = services.BuildServiceProvider();
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
         try
         {
-            // 初始化服务
-            _settingsService = new SettingsService();
-            _hardwareMonitorService = new HardwareMonitorService();
-            _hardwareMonitorService.Start();
+            var settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
+            var hardwareMonitorService = ServiceProvider.GetRequiredService<IHardwareMonitorService>();
+            hardwareMonitorService.Start();
 
-            var settings = _settingsService.GetSettings();
+            var settings = settingsService.GetSettings();
 
             if (IsOverlayMode)
             {
@@ -58,40 +72,34 @@ public partial class App : Application
 
     #region 初始化方法
 
-    /// <summary>
-    /// 初始化悬浮窗模式
-    /// </summary>
     private void InitializeOverlayMode(Settings settings)
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
+            var monitor = ServiceProvider.GetRequiredService<IHardwareMonitorService>();
             var overlayWindow = new OverlayWindow();
-            overlayWindow.Initialize(new OverlayViewModel(_hardwareMonitorService ?? throw new InvalidOperationException("硬件监控服务未初始化"), settings));
+            overlayWindow.Initialize(new OverlayViewModel(monitor, settings));
             desktop.MainWindow = overlayWindow;
 
-            // 初始化 IPC 客户端
-            _ipcService = new IpcService();
-            _ipcService.MessageReceived += OnIpcMessageReceived;
-            _ = ConnectIpcAsync();
-
-            // 通知主程序悬浮窗已准备就绪
-            _ = SendIpcMessageAsync(IpcMessageTypes.OverlayReady, "悬浮窗已启动");
+            var ipcService = ServiceProvider.GetRequiredService<IIpcService>();
+            ipcService.MessageReceived += OnIpcMessageReceived;
+            _ = ConnectIpcAsync(ipcService);
+            _ = SendIpcMessageAsync(ipcService, IpcMessageTypes.OverlayReady, "悬浮窗已启动");
         }
     }
 
-    /// <summary>
-    /// 初始化主程序模式
-    /// </summary>
     private void InitializeMainMode(Settings settings)
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // 创建主窗口
+            var monitor = ServiceProvider.GetRequiredService<IHardwareMonitorService>();
+            var settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
+            
             _mainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(_hardwareMonitorService ?? throw new InvalidOperationException("硬件监控服务未初始化"), settings)
+                DataContext = new MainWindowViewModel(monitor, settings, settingsService)
             };
 
             desktop.MainWindow = _mainWindow;
@@ -103,24 +111,20 @@ public partial class App : Application
                 _mainWindow.Hide();
             };
 
-            // 初始化 IPC 服务器
-            _ipcService = new IpcService();
-            _ipcService.MessageReceived += OnIpcMessageReceived;
-            _ = StartIpcServerAsync();
+            var ipcService = ServiceProvider.GetRequiredService<IIpcService>();
+            ipcService.MessageReceived += OnIpcMessageReceived;
+            _ = StartIpcServerAsync(ipcService);
 
-            // 初始化系统托盘
-            _trayIconService = new TrayIconService();
-            _trayIconService.ShowMainWindow += (s, e) => ShowMainWindow();
-            _trayIconService.ExitApplication += (s, e) => ExitApplication();
-            _trayIconService.Initialize();
+            var trayIconService = ServiceProvider.GetRequiredService<TrayIconService>();
+            trayIconService.ShowMainWindow += (s, e) => ShowMainWindow();
+            trayIconService.ExitApplication += (s, e) => ExitApplication();
+            trayIconService.Initialize();
 
-            // 如果启用了悬浮窗，启动悬浮窗进程
             if (settings.EnableOverlay)
             {
                 StartOverlayProcess();
             }
 
-            // 如果设置了启动时最小化，隐藏主窗口
             if (settings.StartMinimized)
             {
                 _mainWindow.Hide();
@@ -132,9 +136,6 @@ public partial class App : Application
 
     #region IPC 消息处理
 
-    /// <summary>
-    /// 处理 IPC 消息
-    /// </summary>
     private void OnIpcMessageReceived(IpcMessage message)
     {
         if (message == null || string.IsNullOrEmpty(message.Type))
@@ -147,15 +148,12 @@ public partial class App : Application
             case IpcMessageTypes.SettingsChanged:
                 HandleSettingsChanged();
                 break;
-
             case IpcMessageTypes.ShowMainWindow:
                 HandleShowMainWindow();
                 break;
-
             case IpcMessageTypes.ExitApplication:
                 HandleExitApplication();
                 break;
-
             case IpcMessageTypes.OverlayReady:
                 HandleOverlayReady();
                 break;
@@ -164,9 +162,10 @@ public partial class App : Application
 
     private void HandleSettingsChanged()
     {
-        if (IsOverlayMode && _settingsService != null)
+        if (IsOverlayMode)
         {
-            _settingsService.LoadSettings();
+            var settingsService = ServiceProvider.GetService<ISettingsService>();
+            settingsService?.LoadSettings();
         }
     }
 
@@ -188,31 +187,27 @@ public partial class App : Application
 
     private void HandleOverlayReady()
     {
-        // 悬浮窗已准备好，可以发送初始设置等
         Console.WriteLine("悬浮窗已成功启动并准备就绪");
-        // 这里可以添加更多初始化逻辑，比如向悬浮窗发送当前设置
-        if (!IsOverlayMode && _settingsService != null)
+        if (!IsOverlayMode)
         {
-            var settings = _settingsService.GetSettings();
-            Console.WriteLine($"悬浮窗初始化配置: 显示FPS={settings.OverlayShowFPS}, 显示GPU={settings.OverlayShowGpu}");
+            var settingsService = ServiceProvider.GetService<ISettingsService>();
+            if (settingsService != null)
+            {
+                var settings = settingsService.GetSettings();
+                Console.WriteLine($"悬浮窗初始化配置: 显示FPS={settings.OverlayShowFPS}, 显示GPU={settings.OverlayShowGpu}");
+            }
         }
     }
 
-    /// <summary>
-    /// 发送 IPC 消息
-    /// </summary>
-    public static async Task SendIpcMessageAsync(string type, string data = "")
+    private static async Task SendIpcMessageAsync(IIpcService ipcService, string type, string data = "")
     {
-        if (_ipcService != null)
+        try
         {
-            try
-            {
-                await _ipcService.SendMessageAsync(new IpcMessage { Type = type, Data = data });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"发送IPC消息失败: {ex.Message}");
-            }
+            await ipcService.SendMessageAsync(new IpcMessage { Type = type, Data = data });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"发送IPC消息失败: {ex.Message}");
         }
     }
 
@@ -220,9 +215,6 @@ public partial class App : Application
 
     #region 悬浮窗进程管理
 
-    /// <summary>
-    /// 启动悬浮窗进程
-    /// </summary>
     public static void StartOverlayProcess()
     {
         try
@@ -255,19 +247,18 @@ public partial class App : Application
         }
     }
 
-    /// <summary>
-    /// 停止悬浮窗进程
-    /// </summary>
     public static void StopOverlayProcess()
     {
         try
         {
             if (_overlayProcess != null && !_overlayProcess.HasExited)
             {
-                // 发送退出消息
-                _ = SendIpcMessageAsync(IpcMessageTypes.ExitApplication);
+                var ipcService = _serviceProvider?.GetService<IIpcService>();
+                if (ipcService != null)
+                {
+                    _ = SendIpcMessageAsync(ipcService, IpcMessageTypes.ExitApplication);
+                }
                 
-                // 等待进程退出
                 if (!_overlayProcess.WaitForExit(2000))
                 {
                     _overlayProcess.Kill();
@@ -285,9 +276,6 @@ public partial class App : Application
         }
     }
 
-    /// <summary>
-    /// 重启悬浮窗进程
-    /// </summary>
     public static void RestartOverlayProcess()
     {
         StopOverlayProcess();
@@ -296,45 +284,27 @@ public partial class App : Application
 
     #endregion
 
-    #region 服务访问
-
-    /// <summary>
-    /// 获取硬件监控服务
-    /// </summary>
-    public static HardwareMonitorService? HardwareMonitor => _hardwareMonitorService;
-
-    /// <summary>
-    /// 获取设置服务
-    /// </summary>
-    public static SettingsService? SettingsService => _settingsService;
-
-    #endregion
-
     #region 窗口管理
 
-    /// <summary>
-    /// 获取主窗口实例
-    /// </summary>
     public static MainWindow? MainWindow => _mainWindow;
 
-    /// <summary>
-    /// 显示主窗口
-    /// </summary>
     public static void ShowMainWindow()
     {
         _mainWindow?.Show();
         _mainWindow?.Activate();
     }
 
-    /// <summary>
-    /// 完全退出应用
-    /// </summary>
     public static void ExitApplication()
     {
         StopOverlayProcess();
-        _trayIconService?.Dispose();
-        _ipcService?.Dispose();
-        _hardwareMonitorService?.Dispose();
+        
+        var trayIconService = _serviceProvider?.GetService<TrayIconService>();
+        var ipcService = _serviceProvider?.GetService<IIpcService>();
+        var hardwareMonitorService = _serviceProvider?.GetService<IHardwareMonitorService>();
+        
+        trayIconService?.Dispose();
+        ipcService?.Dispose();
+        hardwareMonitorService?.Dispose();
         
         Environment.Exit(0);
     }
@@ -343,14 +313,11 @@ public partial class App : Application
 
     #region 辅助方法
 
-    private async Task ConnectIpcAsync()
+    private static async Task ConnectIpcAsync(IIpcService ipcService)
     {
         try
         {
-            if (_ipcService != null)
-            {
-                await _ipcService.ConnectAsync();
-            }
+            await ipcService.ConnectAsync();
         }
         catch (Exception ex)
         {
@@ -358,14 +325,11 @@ public partial class App : Application
         }
     }
 
-    private async Task StartIpcServerAsync()
+    private static async Task StartIpcServerAsync(IIpcService ipcService)
     {
         try
         {
-            if (_ipcService != null)
-            {
-                await _ipcService.StartServerAsync();
-            }
+            await ipcService.StartServerAsync();
         }
         catch (Exception ex)
         {

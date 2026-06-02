@@ -55,29 +55,12 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private double _batteryLevelPercent = 0;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(IHardwareMonitorService monitor, Settings settings, ISettingsService settingsService)
     {
-        _settingsService = App.SettingsService ?? new SettingsService();
-        _settings = _settingsService.GetSettings();
+        _monitor = monitor ?? throw new System.ArgumentNullException(nameof(monitor));
+        _settings = settings ?? throw new System.ArgumentNullException(nameof(settings));
+        _settingsService = settingsService ?? throw new System.ArgumentNullException(nameof(settingsService));
         
-        _monitor = App.HardwareMonitor ?? new HardwareMonitorService();
-        
-        if (App.HardwareMonitor == null)
-        {
-            _monitor.Start(_settings.GameMode ? _settings.GameModeRefreshInterval : _settings.RefreshInterval);
-        }
-        
-        _monitor.DataUpdated += OnDataUpdated;
-        
-        ShowGpu = _monitor.HasGpu && _settings.ShowGpu;
-        ShowBattery = _monitor.HasBattery && _settings.ShowBattery;
-    }
-    
-    public MainWindowViewModel(IHardwareMonitorService monitor, Settings settings)
-    {
-        _settings = settings;
-        _settingsService = App.SettingsService ?? new SettingsService();
-        _monitor = monitor;
         _monitor.DataUpdated += OnDataUpdated;
         
         ShowGpu = _monitor.HasGpu && _settings.ShowGpu;
