@@ -33,6 +33,11 @@ public class Settings
     /// </summary>
     public StartupSettings Startup { get; set; } = new StartupSettings();
 
+    /// <summary>
+    /// 数据存储设置
+    /// </summary>
+    public DataStorageSettings DataStorage { get; set; } = new DataStorageSettings();
+
     #endregion
 
     #region 向后兼容属性（已废弃，建议使用子模块）
@@ -341,6 +346,7 @@ public class Settings
         DisplayContent = new DisplayContentSettings();
         Performance = new PerformanceSettings();
         Startup = new StartupSettings();
+        DataStorage = new DataStorageSettings();
     }
 
     /// <summary>

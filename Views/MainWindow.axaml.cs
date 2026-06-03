@@ -63,6 +63,9 @@ public partial class MainWindow : Window
         Opened += OnWindowOpened;
         KeyDown += OnKeyDown;
         Deactivated += OnDeactivated;
+        
+        // 主窗口默认不启用鼠标穿透，确保用户可以正常交互
+        _isClickThroughEnabled = false;
     }
 
     #endregion
@@ -145,23 +148,45 @@ public partial class MainWindow : Window
 
     private void OnSettingsSaved(Settings settings)
     {
+        Program.Log("[窗口] 设置已保存，开始应用配置");
+
+        // 1. 更新主窗口 ViewModel
         if (DataContext is MainWindowViewModel viewModel)
         {
             viewModel.UpdateSettings(settings);
         }
 
+        // 2. 发送 IPC 消息通知悬浮窗设置已变更（悬浮窗会自动重新加载设置）
+        var ipcService = App.ServiceProvider.GetService(typeof(IIpcService)) as IIpcService;
+        if (ipcService != null && ipcService.IsConnected)
+        {
+            Program.Log("[窗口] 发送设置变更消息到悬浮窗");
+            _ = App.SendIpcMessageAsync(ipcService, IpcMessageTypes.SettingsChanged);
+        }
+
+        // 3. 根据悬浮窗启用状态控制进程
         if (settings.Overlay.EnableOverlay)
         {
-            App.RestartOverlayProcess();
+            // 只有在悬浮窗进程未运行时才启动
+            if (!App.IsOverlayRunning)
+            {
+                Program.Log("[窗口] 启动悬浮窗进程");
+                App.StartOverlayProcess();
+            }
         }
         else
         {
+            Program.Log("[窗口] 停止悬浮窗进程");
             App.StopOverlayProcess();
         }
 
+        // 4. 处理自启动选项
         HandleAutoStart(settings.Startup.AutoStart);
 
+        // 5. 确保主窗口鼠标穿透设置正确
         SetClickThrough(_isClickThroughEnabled);
+
+        Program.Log("[窗口] 配置应用完成");
     }
     
     private void HandleAutoStart(bool enable)

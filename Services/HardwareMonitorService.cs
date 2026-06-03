@@ -128,16 +128,28 @@ public class HardwareMonitorService : IHardwareMonitorService
         StartPingMonitor();
     }
 
-    private void OnDataTimerElapsed(object? sender, ElapsedEventArgs e)
+    private async void OnDataTimerElapsed(object? sender, ElapsedEventArgs e)
     {
         try
         {
-            UpdateData();
+            // 使用Task.Run避免阻塞定时器线程
+            await Task.Run(() => UpdateData());
         }
         catch (Exception ex)
         {
             Program.Log($"[硬件] 更新硬件数据失败: {ex.Message}");
         }
+    }
+
+    // 差分更新：记录上一次的数据值，避免不必要的UI更新
+    private float _lastCpuUsage = 0;
+    private float _lastGpuUsage = 0;
+    private float _lastMemoryUsage = 0;
+    private const float UpdateThreshold = 0.5f; // 0.5%的变化才触发更新
+
+    private bool ShouldUpdateUI(float currentValue, float lastValue)
+    {
+        return Math.Abs(currentValue - lastValue) > UpdateThreshold;
     }
 
     public void Stop()
@@ -246,22 +258,51 @@ public class HardwareMonitorService : IHardwareMonitorService
     {
         try
         {
+            // 更新原始硬件数据
             UpdateHardwareData();
             UpdateNetworkData();
             UpdateDiskData();
             UpdateBatteryData();
 
-            // 使用线程安全的方式触发事件
-            var handler = Volatile.Read(ref DataUpdated);
-            if (handler != null)
+            // 差分更新：只有关键指标变化超过阈值时才触发UI更新
+            bool needUpdate = false;
+            
+            if (CpuUsage.HasValue && ShouldUpdateUI(CpuUsage.Value, _lastCpuUsage))
             {
-                try
+                needUpdate = true;
+                _lastCpuUsage = CpuUsage.Value;
+            }
+            
+            if (GpuUsage.HasValue && ShouldUpdateUI(GpuUsage.Value, _lastGpuUsage))
+            {
+                needUpdate = true;
+                _lastGpuUsage = GpuUsage.Value;
+            }
+            
+            if (MemoryUsed.HasValue && MemoryTotal.HasValue)
+            {
+                var currentMemoryUsage = (MemoryUsed.Value / MemoryTotal.Value) * 100;
+                if (ShouldUpdateUI(currentMemoryUsage, _lastMemoryUsage))
                 {
-                    handler();
+                    needUpdate = true;
+                    _lastMemoryUsage = currentMemoryUsage;
                 }
-                catch (Exception ex)
+            }
+
+            if (needUpdate)
+            {
+                // 使用线程安全的方式触发事件
+                var handler = Volatile.Read(ref DataUpdated);
+                if (handler != null)
                 {
-                    Program.Log($"[硬件] DataUpdated事件处理时发生错误: {ex.Message}");
+                    try
+                    {
+                        handler();
+                    }
+                    catch (Exception ex)
+                    {
+                        Program.Log($"[硬件] DataUpdated事件处理时发生错误: {ex.Message}");
+                    }
                 }
             }
         }

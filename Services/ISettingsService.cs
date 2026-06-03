@@ -8,4 +8,5 @@ public interface ISettingsService
     void SaveSettings();
     void LoadSettings();
     void ResetToDefaults();
+    void UpdateSettingsPath(string newPath);
 }

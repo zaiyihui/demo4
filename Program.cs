@@ -66,11 +66,9 @@ sealed class Program
     {
         try
         {
-            var logDir = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                "ComputerCompanion");
-            Directory.CreateDirectory(logDir);
-            _logPath = Path.Combine(logDir, "runtime.log");
+            var defaultLogDir = GetDefaultDataPath();
+            Directory.CreateDirectory(defaultLogDir);
+            _logPath = Path.Combine(defaultLogDir, "runtime.log");
 
             // 限制日志文件大小
             if (File.Exists(_logPath) && new FileInfo(_logPath).Length > 10 * 1024 * 1024)
@@ -79,6 +77,46 @@ sealed class Program
             }
         }
         catch { }
+    }
+
+    public static string GetDefaultDataPath()
+    {
+        try
+        {
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            return Path.Combine(appDataPath, "ComputerCompanion");
+        }
+        catch
+        {
+            return Directory.GetCurrentDirectory();
+        }
+    }
+
+    public static void UpdateLogPath(string newLogDir)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(newLogDir))
+            {
+                Directory.CreateDirectory(newLogDir);
+                var newLogPath = Path.Combine(newLogDir, "runtime.log");
+                
+                if (_logPath != newLogPath)
+                {
+                    // 如果旧日志文件存在且新日志文件不存在，复制旧日志
+                    if (File.Exists(_logPath) && !File.Exists(newLogPath))
+                    {
+                        File.Copy(_logPath, newLogPath);
+                    }
+                    _logPath = newLogPath;
+                    Log($"[日志] 日志路径已更新为: {_logPath}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log($"[日志] 更新日志路径失败: {ex.Message}");
+        }
     }
 
     internal static void Log(string message)

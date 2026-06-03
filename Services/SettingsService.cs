@@ -7,27 +7,13 @@ namespace ComputerCompanion.Services;
 
 public class SettingsService : ISettingsService
 {
-    private readonly string _settingsPath;
+    private string _settingsPath;
     private Settings? _settings;
 
     public SettingsService()
     {
-        try
-        {
-            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            if (string.IsNullOrEmpty(appDataPath))
-                appDataPath = ".";
-
-            var appFolder = Path.Combine(appDataPath, "ComputerCompanion");
-            Directory.CreateDirectory(appFolder);
-            _settingsPath = Path.Combine(appFolder, "settings.json");
-            Program.Log($"[设置] 配置文件路径: {_settingsPath}");
-        }
-        catch (Exception ex)
-        {
-            Program.Log($"[设置] 初始化目录失败: {ex.Message}，使用当前目录");
-            _settingsPath = Path.Combine(Directory.GetCurrentDirectory(), "settings.json");
-        }
+        _settingsPath = GetDefaultSettingsPath();
+        Program.Log($"[设置] 配置文件路径: {_settingsPath}");
 
         try
         {
@@ -37,6 +23,54 @@ public class SettingsService : ISettingsService
         {
             Program.Log($"[设置] LoadSettings 异常: {ex.Message}");
             _settings = new Settings();
+        }
+    }
+
+    private string GetDefaultSettingsPath()
+    {
+        try
+        {
+            var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (string.IsNullOrEmpty(appDataPath))
+                appDataPath = ".";
+
+            var appFolder = Path.Combine(appDataPath, "ComputerCompanion");
+            Directory.CreateDirectory(appFolder);
+            return Path.Combine(appFolder, "settings.json");
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[设置] 初始化目录失败: {ex.Message}，使用当前目录");
+            return Path.Combine(Directory.GetCurrentDirectory(), "settings.json");
+        }
+    }
+
+    public void UpdateSettingsPath(string newPath)
+    {
+        if (!string.IsNullOrEmpty(newPath) && _settingsPath != newPath)
+        {
+            var oldPath = _settingsPath;
+            _settingsPath = newPath;
+            
+            try
+            {
+                var dir = Path.GetDirectoryName(newPath);
+                if (!string.IsNullOrEmpty(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+                
+                if (File.Exists(oldPath) && !File.Exists(newPath))
+                {
+                    File.Copy(oldPath, newPath);
+                    Program.Log($"[设置] 配置文件已迁移到新路径: {newPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Program.Log($"[设置] 更新配置路径失败: {ex.Message}");
+                _settingsPath = oldPath;
+            }
         }
     }
 

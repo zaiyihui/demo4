@@ -241,7 +241,7 @@ public class IpcService : IIpcService
                     break;
                 }
                 
-                await ProcessMessageAsync(messageBuffer, bytesRead);
+                ProcessMessageAsync(messageBuffer, bytesRead);
             }
         }
         catch (Exception ex)
@@ -445,9 +445,20 @@ public class SecureIpcMessage : IpcMessage
 
 public static class IpcMessageTypes
 {
+    // 基础控制消息
     public const string SettingsChanged = "SettingsChanged";
     public const string ShowMainWindow = "ShowMainWindow";
     public const string ExitApplication = "ExitApplication";
     public const string OverlayReady = "OverlayReady";
     public const string SessionKey = "SessionKey";
+    
+    // 增强型消息 - 进程间状态同步
+    public const string Heartbeat = "Heartbeat";              // 心跳检测
+    public const string StatusUpdate = "StatusUpdate";         // 状态更新
+    public const string HardwareData = "HardwareData";        // 硬件数据
+    public const string PositionChanged = "PositionChanged";     // 位置变更
+    public const string VisibilityChanged = "VisibilityChanged";  // 可见性变更
+    public const string RefreshIntervalChanged = "RefreshIntervalChanged";  // 刷新频率变更
+    public const string ToggleOverlay = "ToggleOverlay";       // 切换悬浮窗
+    public const string Error = "Error";                        // 错误信息
 }

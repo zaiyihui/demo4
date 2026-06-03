@@ -2,19 +2,16 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <SelfContained>true</SelfContained>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <EnableDefaultAvaloniaXamlItems>true</EnableDefaultAvaloniaXamlItems>
     <DefaultItemExcludes>$(DefaultItemExcludes);Tests/**/*;src/ComputerCompanion.Overlay/**/*</DefaultItemExcludes>
 
-    <!-- 确保 Avalonia ANGLE 原生 DLL(av_libGLESv2.dll / libEGL.dll / d3dcompiler_47.dll)
-         在构建和发布时被复制到输出根目录，避免运行时报 "Unable to load DLL 'av_libGLESv2.dll'" -->
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <!-- 开发时使用框架依赖模式，减少构建时间和资源占用 -->
+    <SelfContained>false</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>false</IncludeNativeLibrariesForSelfExtract>
     <EnableDynamicLoadingSupport>true</EnableDynamicLoadingSupport>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     
     <!-- 中文本地化和编码配置 -->
     <NeutralLanguage>zh-CN</NeutralLanguage>
@@ -116,4 +113,11 @@
     <Warning Condition="'@(AvaloniaAngleNativeFiles)' == ''"
              Text="未找到 Avalonia ANGLE 原生依赖，请确认已还原 Avalonia.Desktop / Avalonia.Angle.Windows.Natives 包。" />
   </Target>
+
+  <!-- 发布时使用自包含模式 -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
 </Project>

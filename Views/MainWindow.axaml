@@ -16,6 +16,70 @@
         TransparencyLevelHint="Blur"
         ExtendClientAreaToDecorationsHint="True">
 
+    <Window.Resources>
+        <!-- CPU 渐变 -->
+        <LinearGradientBrush x:Key="CpuGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#4ecdc4" Offset="0"/>
+            <GradientStop Color="#2a9d8f" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="CpuGradient2" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#4ecdc4" Offset="0"/>
+            <GradientStop Color="#3ba69d" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <!-- GPU 渐变 -->
+        <LinearGradientBrush x:Key="GpuGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#a29bfe" Offset="0"/>
+            <GradientStop Color="#6c5ce7" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="GpuGradient2" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#a29bfe" Offset="0"/>
+            <GradientStop Color="#6c5ce7" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <!-- 内存渐变 -->
+        <LinearGradientBrush x:Key="MemoryGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#fd79a8" Offset="0"/>
+            <GradientStop Color="#e84393" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="MemoryGradient2" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#fd79a8" Offset="0"/>
+            <GradientStop Color="#e84393" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <!-- 网络渐变 -->
+        <LinearGradientBrush x:Key="NetworkGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#ffeaa7" Offset="0"/>
+            <GradientStop Color="#fdcb6e" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <!-- 磁盘渐变 -->
+        <LinearGradientBrush x:Key="DiskGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#dfe6e9" Offset="0"/>
+            <GradientStop Color="#b2bec3" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="DiskGradient2" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#dfe6e9" Offset="0"/>
+            <GradientStop Color="#b2bec3" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <!-- 电池渐变 -->
+        <LinearGradientBrush x:Key="BatteryGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#00b894" Offset="0"/>
+            <GradientStop Color="#00a085" Offset="1"/>
+        </LinearGradientBrush>
+        <LinearGradientBrush x:Key="BatteryGradient2" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#00b894" Offset="0"/>
+            <GradientStop Color="#00a085" Offset="1"/>
+        </LinearGradientBrush>
+        
+        <!-- 背景渐变 -->
+        <LinearGradientBrush x:Key="WindowGradient" StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#1a1a2e" Offset="0"/>
+            <GradientStop Color="#151525" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Resources>
+
     <Window.Styles>
         <!-- 全局样式 -->
         <Style Selector="TextBlock">
@@ -72,13 +136,8 @@
         CornerRadius="18"
         BorderBrush="#333344"
         BorderThickness="1"
-        BoxShadow="0 10 40 0 #40000000">
-        <Border.Background>
-            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                <GradientStop Color="#1a1a2e" Offset="0"/>
-                <GradientStop Color="#151525" Offset="1"/>
-            </LinearGradientBrush>
-        </Border.Background>
+        BoxShadow="0 10 40 0 #40000000"
+        Background="{StaticResource WindowGradient}">
         
         <Grid RowDefinitions="Auto,*,Auto">
             
@@ -94,7 +153,7 @@
                         <Border 
                             Width="36" Height="36" 
                             CornerRadius="10"
-                            Background="LinearGradient(135, #4ecdc4, #2a9d8f)">
+                            Background="{StaticResource CpuGradient}">
                             <TextBlock 
                                 Text="⚡" 
                                 FontSize="18" 
@@ -138,7 +197,7 @@
                         Padding="14">
                         <Grid ColumnDefinitions="36,*">
                             <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
-                                Background="LinearGradient(135, #4ecdc4, #3ba69d)"
+                                Background="{StaticResource CpuGradient}"
                                 VerticalAlignment="Top">
                                 <TextBlock Text="C" FontSize="15" FontWeight="Bold" 
                                     Foreground="#1a1a2e" 
@@ -158,7 +217,7 @@
                                 <ProgressBar 
                                     x:DataType="viewModels:MainWindowViewModel"
                                     Value="{Binding CpuUsagePercent}"
-                                    Foreground="LinearGradient(90, #4ecdc4, #3ba69d)"
+                                    Foreground="{StaticResource CpuGradient2}"
                                     Background="#1a1a30"/>
                             </StackPanel>
                         </Grid>
@@ -173,7 +232,7 @@
                         Padding="14">
                         <Grid ColumnDefinitions="36,*">
                             <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
-                                Background="LinearGradient(135, #a29bfe, #6c5ce7)"
+                                Background="{StaticResource GpuGradient}"
                                 VerticalAlignment="Top">
                                 <TextBlock Text="G" FontSize="15" FontWeight="Bold" 
                                     Foreground="#1a1a2e" 
@@ -189,7 +248,7 @@
                                 
                                 <ProgressBar 
                                     Value="{Binding GpuUsagePercent}"
-                                    Foreground="LinearGradient(90, #a29bfe, #6c5ce7)"
+                                    Foreground="{StaticResource GpuGradient2}"
                                     Background="#1a1a30"/>
                             </StackPanel>
                         </Grid>
@@ -202,7 +261,7 @@
                         Padding="14">
                         <Grid ColumnDefinitions="36,*">
                             <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
-                                Background="LinearGradient(135, #fd79a8, #e84393)"
+                                Background="{StaticResource MemoryGradient}"
                                 VerticalAlignment="Top">
                                 <TextBlock Text="M" FontSize="15" FontWeight="Bold" 
                                     Foreground="#1a1a2e" 
@@ -222,7 +281,7 @@
                                 <ProgressBar 
                                     x:DataType="viewModels:MainWindowViewModel"
                                     Value="{Binding MemoryUsagePercent}"
-                                    Foreground="LinearGradient(90, #fd79a8, #e84393)"
+                                    Foreground="{StaticResource MemoryGradient2}"
                                     Background="#1a1a30"/>
                             </StackPanel>
                         </Grid>
@@ -235,7 +294,7 @@
                         Padding="14">
                         <Grid ColumnDefinitions="36,*">
                             <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
-                                Background="LinearGradient(135, #ffeaa7, #fdcb6e)"
+                                Background="{StaticResource NetworkGradient}"
                                 VerticalAlignment="Top">
                                 <TextBlock Text="N" FontSize="15" FontWeight="Bold" 
                                     Foreground="#1a1a2e" 
@@ -267,7 +326,7 @@
                         Padding="14">
                         <Grid ColumnDefinitions="36,*">
                             <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
-                                Background="LinearGradient(135, #dfe6e9, #b2bec3)"
+                                Background="{StaticResource DiskGradient}"
                                 VerticalAlignment="Top">
                                 <TextBlock Text="D" FontSize="15" FontWeight="Bold" 
                                     Foreground="#1a1a2e" 
@@ -287,7 +346,7 @@
                                 <ProgressBar 
                                     x:DataType="viewModels:MainWindowViewModel"
                                     Value="{Binding DiskUsagePercent}"
-                                    Foreground="LinearGradient(90, #dfe6e9, #b2bec3)"
+                                    Foreground="{StaticResource DiskGradient2}"
                                     Background="#1a1a30"/>
                             </StackPanel>
                         </Grid>
@@ -302,7 +361,7 @@
                         Padding="14">
                         <Grid ColumnDefinitions="36,*">
                             <Border Grid.Column="0" Width="32" Height="32" CornerRadius="8" 
-                                Background="LinearGradient(135, #00b894, #00a085)"
+                                Background="{StaticResource BatteryGradient}"
                                 VerticalAlignment="Top">
                                 <TextBlock Text="B" FontSize="15" FontWeight="Bold" 
                                     Foreground="#1a1a2e" 
@@ -318,7 +377,7 @@
                                 
                                 <ProgressBar 
                                     Value="{Binding BatteryLevelPercent}"
-                                    Foreground="LinearGradient(90, #00b894, #00a085)"
+                                    Foreground="{StaticResource BatteryGradient2}"
                                     Background="#1a1a30"/>
                             </StackPanel>
                         </Grid>
