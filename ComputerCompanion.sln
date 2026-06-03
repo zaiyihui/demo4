@@ -1,13 +1,13 @@
-﻿﻿
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerCompanion", "ComputerCompanion.csproj", "{B97E4A48-843B-491F-8820-0D24153BC624}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ComputerCompanion.Overlay", "ComputerCompanion.Overlay", "{03710EDE-315C-4367-A9AD-7C90C7B9F5DE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{03710EDE-315C-4367-A9AD-7C90C7B9F5DE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerCompanion.Overlay", "ComputerCompanion.Overlay\ComputerCompanion.Overlay\ComputerCompanion.Overlay.csproj", "{4FCDA464-CBDE-4658-BC52-18E6B4100889}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ComputerCompanion.Overlay", "src\ComputerCompanion.Overlay\ComputerCompanion.Overlay\ComputerCompanion.Overlay.csproj", "{4FCDA464-CBDE-4658-BC52-18E6B4100889}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -168,7 +168,7 @@ public partial class MainWindow : Window
     {
         if (!OperatingSystem.IsWindows())
         {
-            Console.WriteLine("自动启动功能仅支持 Windows 系统");
+            Program.Log("[窗口] 自动启动功能仅支持 Windows 系统");
             return;
         }
 
@@ -178,7 +178,7 @@ public partial class MainWindow : Window
             
             if (!ValidateExePath(exePath, out var validationError))
             {
-                Console.WriteLine($"无效的应用程序路径，拒绝修改注册表: {validationError}");
+                Program.Log($"[窗口] 无效的应用程序路径，拒绝修改注册表: {validationError}");
                 return;
             }
 
@@ -187,7 +187,7 @@ public partial class MainWindow : Window
 
             if (key == null)
             {
-                Console.WriteLine("无法访问注册表键，可能权限不足");
+                Program.Log("[窗口] 无法访问注册表键，可能权限不足");
                 return;
             }
 
@@ -195,31 +195,36 @@ public partial class MainWindow : Window
 
             if (enable)
             {
-                ValidateRegistryValue(appName, exePath!);
+                if (exePath == null)
+                {
+                    Program.Log("[窗口] 无法获取应用程序路径，无法设置自动启动");
+                    return;
+                }
+                ValidateRegistryValue(appName, exePath);
                 key.SetValue(appName, exePath);
-                Console.WriteLine("已设置开机自动启动");
+                Program.Log("[窗口] 已设置开机自动启动");
             }
             else
             {
                 if (key.GetValue(appName) != null)
                 {
                     key.DeleteValue(appName);
-                    Console.WriteLine("已取消开机自动启动");
+                    Program.Log("[窗口] 已取消开机自动启动");
                 }
             }
         }
         catch (UnauthorizedAccessException ex)
         {
-            Console.WriteLine($"权限不足，无法修改注册表: {ex.Message}");
-            Console.WriteLine("请以管理员身份运行此程序以启用自动启动功能");
+            Program.Log($"[窗口] 权限不足，无法修改注册表: {ex.Message}");
+            Program.Log("[窗口] 请以管理员身份运行此程序以启用自动启动功能");
         }
         catch (System.Security.SecurityException ex)
         {
-            Console.WriteLine($"安全策略阻止了注册表访问: {ex.Message}");
+            Program.Log($"[窗口] 安全策略阻止了注册表访问: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"修改注册表失败: {ex.Message}");
+            Program.Log($"[窗口] 修改注册表失败: {ex.Message}");
         }
     }
 
@@ -277,7 +282,7 @@ public partial class MainWindow : Window
             if (!VerifyFileIntegrity(fullPath))
             {
                 errorMessage = "文件完整性验证失败";
-                Console.WriteLine("警告: 建议验证文件数字签名");
+                Program.Log("[窗口] 警告: 建议验证文件数字签名");
             }
         }
         catch (Exception ex)
@@ -350,7 +355,7 @@ public partial class MainWindow : Window
 
     private void UpdateStatusText()
     {
-        Console.WriteLine($"状态更新: 鼠标穿透={_isClickThroughEnabled}, 游戏模式={(DataContext as ViewModels.MainWindowViewModel)?.GameMode ?? false}");
+        Program.Log($"[窗口] 状态更新: 鼠标穿透={_isClickThroughEnabled}, 游戏模式={(DataContext as ViewModels.MainWindowViewModel)?.GameMode ?? false}");
     }
 
     private void SetClickThrough(bool enable)

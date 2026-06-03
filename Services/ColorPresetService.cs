@@ -153,7 +153,7 @@ public class ColorPresetService
 
             if (customPresets.Count == 0)
             {
-                Console.WriteLine("没有可导出的自定义预设");
+                Program.Log("[颜色预设] 没有可导出的自定义预设");
                 return false;
             }
 
@@ -166,12 +166,12 @@ public class ColorPresetService
             var json = JsonConvert.SerializeObject(exportData, Formatting.Indented);
             File.WriteAllText(filePath, json);
 
-            Console.WriteLine($"成功导出 {customPresets.Count} 个预设到: {filePath}");
+            Program.Log($"[颜色预设] 成功导出 {customPresets.Count} 个预设到: {filePath}");
             return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"导出预设失败: {ex.Message}");
+            Program.Log($"[颜色预设] 导出预设失败: {ex.Message}");
             return false;
         }
     }
@@ -185,7 +185,7 @@ public class ColorPresetService
         {
             if (!File.Exists(filePath))
             {
-                Console.WriteLine($"文件不存在: {filePath}");
+                Program.Log($"[颜色预设] 文件不存在: {filePath}");
                 return 0;
             }
 
@@ -194,7 +194,7 @@ public class ColorPresetService
 
             if (importedCollection.Presets.Count == 0)
             {
-                Console.WriteLine("导入的文件中没有预设");
+                Program.Log("[颜色预设] 导入的文件中没有预设");
                 return 0;
             }
 
@@ -227,12 +227,12 @@ public class ColorPresetService
             }
 
             SavePresets();
-            Console.WriteLine($"成功导入 {importedCount} 个预设");
+            Program.Log($"[颜色预设] 成功导入 {importedCount} 个预设");
             return importedCount;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"导入预设失败: {ex.Message}");
+            Program.Log($"[颜色预设] 导入预设失败: {ex.Message}");
             return 0;
         }
     }
@@ -285,7 +285,7 @@ public class ColorPresetService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"加载颜色预设失败: {ex.Message}");
+            Program.Log($"[颜色预设] 加载颜色预设失败: {ex.Message}");
             ResetToDefaults();
         }
     }
@@ -314,7 +314,7 @@ public class ColorPresetService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"保存颜色预设失败: {ex.Message}");
+            Program.Log($"[颜色预设] 保存颜色预设失败: {ex.Message}");
         }
     }
 }

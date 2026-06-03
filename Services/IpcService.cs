@@ -90,7 +90,7 @@ public class IpcService : IIpcService
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"IPC Server error: {ex.Message}");
+                Program.Log($"[IPC] Server error: {ex.Message}");
                 await Task.Delay(ReconnectDelayMs, cancellationToken);
             }
         }
@@ -138,12 +138,12 @@ public class IpcService : IIpcService
             {
                 if (!cancellationToken.IsCancellationRequested)
                 {
-                    Console.WriteLine("IPC connection timeout, retrying...");
+                    Program.Log("[IPC] connection timeout, retrying...");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"IPC Client error: {ex.Message}");
+                Program.Log($"[IPC] Client error: {ex.Message}");
             }
             
             if (!cancellationToken.IsCancellationRequested && !_isDisposed)
@@ -176,7 +176,7 @@ public class IpcService : IIpcService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to send session key: {ex.Message}");
+            Program.Log($"[IPC] Failed to send session key: {ex.Message}");
         }
     }
 
@@ -202,12 +202,12 @@ public class IpcService : IIpcService
             if (message?.Type == IpcMessageTypes.SessionKey && !string.IsNullOrEmpty(message.Data))
             {
                 _sessionKey = message.Data;
-                Console.WriteLine("Session key received");
+                Program.Log("[IPC] Session key received");
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to receive session key: {ex.Message}");
+            Program.Log($"[IPC] Failed to receive session key: {ex.Message}");
         }
     }
 
@@ -229,7 +229,7 @@ public class IpcService : IIpcService
                 var messageLength = BitConverter.ToInt32(lengthBuffer, 0);
                 if (messageLength <= 0 || messageLength > MaxMessageSize)
                 {
-                    Console.WriteLine($"Invalid message length: {messageLength}");
+                    Program.Log($"[IPC] Invalid message length: {messageLength}");
                     continue;
                 }
                 
@@ -246,12 +246,12 @@ public class IpcService : IIpcService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error reading IPC message: {ex.Message}");
+            Program.Log($"[IPC] Error reading message: {ex.Message}");
             OnDisconnected();
         }
     }
 
-    private async Task ProcessMessageAsync(byte[] buffer, int bytesRead)
+    private void ProcessMessageAsync(byte[] buffer, int bytesRead)
     {
         try
         {
@@ -260,13 +260,13 @@ public class IpcService : IIpcService
 
             if (message == null || string.IsNullOrEmpty(message.Type))
             {
-                Console.WriteLine("Invalid message received");
+                Program.Log("[IPC] Invalid message received");
                 return;
             }
 
             if (!ValidateMessageSignature(message))
             {
-                Console.WriteLine("Message signature validation failed");
+                Program.Log("[IPC] Message signature validation failed");
                 return;
             }
 
@@ -285,13 +285,13 @@ public class IpcService : IIpcService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"处理IPC消息时发生错误: {ex.Message}");
+                    Program.Log($"[IPC] Error processing message: {ex.Message}");
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to process IPC message: {ex.Message}");
+            Program.Log($"[IPC] Failed to process message: {ex.Message}");
         }
     }
 
@@ -302,7 +302,7 @@ public class IpcService : IIpcService
 
         if (string.IsNullOrEmpty(message.Signature))
         {
-            Console.WriteLine("Message without signature");
+            Program.Log("[IPC] Message without signature");
             return false;
         }
 
@@ -323,7 +323,7 @@ public class IpcService : IIpcService
             PipeStream? pipeStream = _isServer ? (PipeStream?)_server : _client;
             if (pipeStream == null || !pipeStream.IsConnected)
             {
-                Console.WriteLine("IPC not connected, message dropped");
+                Program.Log("[IPC] not connected, message dropped");
                 return;
             }
 
@@ -333,7 +333,7 @@ public class IpcService : IIpcService
             
             if (bytes.Length > MaxMessageSize)
             {
-                Console.WriteLine("Message too large");
+                Program.Log("[IPC] Message too large");
                 return;
             }
 
@@ -347,15 +347,15 @@ public class IpcService : IIpcService
         }
         catch (ObjectDisposedException)
         {
-            Console.WriteLine("IPC pipe disposed");
+            Program.Log("[IPC] pipe disposed");
         }
         catch (IOException ex)
         {
-            Console.WriteLine($"IPC IO error: {ex.Message}");
+            Program.Log($"[IPC] IO error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to send IPC message: {ex.Message}");
+            Program.Log($"[IPC] Failed to send message: {ex.Message}");
         }
     }
 
@@ -379,7 +379,7 @@ public class IpcService : IIpcService
 
     private void OnConnected()
     {
-        Console.WriteLine("IPC connected");
+        Program.Log("[IPC] connected");
         Connected?.Invoke(this, EventArgs.Empty);
     }
 

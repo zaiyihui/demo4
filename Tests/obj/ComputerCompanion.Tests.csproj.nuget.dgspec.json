@@ -1,30 +1,30 @@
 {
   "format": 1,
   "restore": {
-    "D:\\BC\\xiangmu\\demo4\\demo4\\Tests\\ComputerCompanion.Tests.csproj": {}
+    "D:\\BC\\xiangmu\\demo4\\Tests\\ComputerCompanion.Tests.csproj": {}
   },
   "projects": {
-    "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj": {
+    "D:\\BC\\xiangmu\\demo4\\ComputerCompanion.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj",
+        "projectUniqueName": "D:\\BC\\xiangmu\\demo4\\ComputerCompanion.csproj",
         "projectName": "电脑伴侣",
-        "projectPath": "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj",
+        "projectPath": "D:\\BC\\xiangmu\\demo4\\ComputerCompanion.csproj",
         "packagesPath": "C:\\Users\\17819\\.nuget\\packages\\",
-        "outputPath": "D:\\BC\\xiangmu\\demo4\\demo4\\obj\\",
+        "outputPath": "D:\\BC\\xiangmu\\demo4\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\17819\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
-          "net8.0"
+          "net8.0-windows"
         ],
         "sources": {
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
+          "net8.0-windows7.0": {
+            "targetAlias": "net8.0-windows",
             "projectReferences": {}
           }
         },
@@ -40,40 +40,45 @@
         }
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net8.0-windows7.0": {
+          "targetAlias": "net8.0-windows",
           "dependencies": {
             "Avalonia": {
               "target": "Package",
-              "version": "[12.0.3, )"
+              "version": "[11.2.0, )"
             },
             "Avalonia.Desktop": {
               "target": "Package",
-              "version": "[12.0.3, )"
+              "version": "[11.2.0, )"
             },
             "Avalonia.Fonts.Inter": {
               "target": "Package",
-              "version": "[12.0.3, )"
+              "version": "[11.2.0, )"
             },
             "Avalonia.Themes.Fluent": {
               "target": "Package",
-              "version": "[12.0.3, )"
+              "version": "[11.2.0, )"
             },
             "AvaloniaUI.DiagnosticsSupport": {
               "target": "Package",
-              "version": "[2.2.1, )"
+              "version": "[2.1.1, )"
             },
             "CommunityToolkit.Mvvm": {
               "target": "Package",
               "version": "[8.4.1, )"
             },
             "LibreHardwareMonitorLib": {
+              "suppressParent": "None",
               "target": "Package",
               "version": "[0.9.6, )"
             },
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[8.0.0, )"
+            },
             "Newtonsoft.Json": {
               "target": "Package",
-              "version": "[13.0.4, )"
+              "version": "[13.0.3, )"
             }
           },
           "imports": [
@@ -107,6 +112,9 @@
             },
             "Microsoft.WindowsDesktop.App": {
               "privateAssets": "none"
+            },
+            "Microsoft.WindowsDesktop.App.WindowsForms": {
+              "privateAssets": "none"
             }
           },
           "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.421/PortableRuntimeIdentifierGraph.json"
@@ -118,14 +126,14 @@
         }
       }
     },
-    "D:\\BC\\xiangmu\\demo4\\demo4\\Tests\\ComputerCompanion.Tests.csproj": {
+    "D:\\BC\\xiangmu\\demo4\\Tests\\ComputerCompanion.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\BC\\xiangmu\\demo4\\demo4\\Tests\\ComputerCompanion.Tests.csproj",
+        "projectUniqueName": "D:\\BC\\xiangmu\\demo4\\Tests\\ComputerCompanion.Tests.csproj",
         "projectName": "ComputerCompanion.Tests",
-        "projectPath": "D:\\BC\\xiangmu\\demo4\\demo4\\Tests\\ComputerCompanion.Tests.csproj",
+        "projectPath": "D:\\BC\\xiangmu\\demo4\\Tests\\ComputerCompanion.Tests.csproj",
         "packagesPath": "C:\\Users\\17819\\.nuget\\packages\\",
-        "outputPath": "D:\\BC\\xiangmu\\demo4\\demo4\\Tests\\obj\\",
+        "outputPath": "D:\\BC\\xiangmu\\demo4\\Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\17819\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -140,8 +148,8 @@
           "net8.0-windows7.0": {
             "targetAlias": "net8.0-windows",
             "projectReferences": {
-              "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj": {
-                "projectPath": "D:\\BC\\xiangmu\\demo4\\demo4\\ComputerCompanion.csproj"
+              "D:\\BC\\xiangmu\\demo4\\ComputerCompanion.csproj": {
+                "projectPath": "D:\\BC\\xiangmu\\demo4\\ComputerCompanion.csproj"
               }
             }
           }

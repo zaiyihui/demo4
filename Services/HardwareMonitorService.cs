@@ -136,7 +136,7 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"更新硬件数据失败: {ex.Message}");
+            Program.Log($"[硬件] 更新硬件数据失败: {ex.Message}");
         }
     }
 
@@ -155,7 +155,7 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"关闭硬件监控失败: {ex.Message}");
+            Program.Log($"[硬件] 关闭硬件监控失败: {ex.Message}");
         }
     }
 
@@ -226,7 +226,7 @@ public class HardwareMonitorService : IHardwareMonitorService
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ping {host} 失败: {ex.Message}");
+                Program.Log($"[硬件] Ping {host} 失败: {ex.Message}");
             }
         }
 
@@ -261,13 +261,13 @@ public class HardwareMonitorService : IHardwareMonitorService
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"DataUpdated事件处理时发生错误: {ex.Message}");
+                    Program.Log($"[硬件] DataUpdated事件处理时发生错误: {ex.Message}");
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"更新数据失败: {ex.Message}");
+            Program.Log($"[硬件] 更新数据失败: {ex.Message}");
         }
     }
 
@@ -285,7 +285,7 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"更新硬件数据失败: {ex.Message}");
+            Program.Log($"[硬件] 更新硬件数据失败: {ex.Message}");
         }
     }
 
@@ -449,7 +449,7 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"更新网络数据失败: {ex.Message}");
+            Program.Log($"[硬件] 更新网络数据失败: {ex.Message}");
         }
     }
 
@@ -469,7 +469,7 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"更新磁盘数据失败: {ex.Message}");
+            Program.Log($"[硬件] 更新磁盘数据失败: {ex.Message}");
         }
     }
 

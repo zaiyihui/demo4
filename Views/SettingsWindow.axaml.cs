@@ -32,11 +32,11 @@ public partial class SettingsWindow : Window
         try
         {
             _colorPresetService = new ColorPresetService();
-            Console.WriteLine("颜色预设服务初始化成功");
+            Program.Log("[设置] 颜色预设服务初始化成功");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"初始化颜色预设服务失败: {ex.Message}");
+            Program.Log($"[设置] 初始化颜色预设服务失败: {ex.Message}");
         }
     }
 
@@ -127,7 +127,7 @@ public partial class SettingsWindow : Window
                 viewModel.OverlayTextColor = color;
 
                 // 更新颜色预览
-                Console.WriteLine($"颜色已更改为: {color}");
+                Program.Log($"[设置] 颜色已更改为: {color}");
 
                 // 记录使用预设
                 if (_colorPresetService != null)
@@ -138,7 +138,7 @@ public partial class SettingsWindow : Window
                     if (preset != null)
                     {
                         _colorPresetService.SetCurrentPreset(preset.Id);
-                        Console.WriteLine($"已应用预设: {preset.Name}");
+                        Program.Log($"[设置] 已应用预设: {preset.Name}");
                     }
                 }
             }
@@ -149,57 +149,15 @@ public partial class SettingsWindow : Window
     {
         if (_colorPresetService == null)
         {
-            Console.WriteLine("颜色预设服务未初始化");
+            Program.Log("[设置] 颜色预设服务未初始化");
             return;
         }
 
         // 获取所有预设
         var presets = _colorPresetService.GetAllPresets();
 
-        // 按类别分组显示
-        var professionalPresets = presets.Where(p => p.Category == ColorPresetCategory.Professional).ToList();
-        var gamingPresets = presets.Where(p => p.Category == ColorPresetCategory.Gaming).ToList();
-        var minimalPresets = presets.Where(p => p.Category == ColorPresetCategory.Minimal).ToList();
-        var customPresets = presets.Where(p => p.Category == ColorPresetCategory.Custom).ToList();
-
-        // 显示预设信息
-        Console.WriteLine("\n========== 颜色预设 ==========");
-        Console.WriteLine("\n【专业级预设】");
-        foreach (var preset in professionalPresets)
-        {
-            Console.WriteLine($"  {preset.Name}: 文字=#{preset.TextColor} 背景=#{preset.BackgroundColor}");
-            Console.WriteLine($"    {preset.Description}");
-        }
-
-        Console.WriteLine("\n【游戏级预设】");
-        foreach (var preset in gamingPresets)
-        {
-            Console.WriteLine($"  {preset.Name}: 文字=#{preset.TextColor} 背景=#{preset.BackgroundColor}");
-            Console.WriteLine($"    {preset.Description}");
-        }
-
-        Console.WriteLine("\n【简洁风格预设】");
-        foreach (var preset in minimalPresets)
-        {
-            Console.WriteLine($"  {preset.Name}: 文字=#{preset.TextColor} 背景=#{preset.BackgroundColor}");
-            Console.WriteLine($"    {preset.Description}");
-        }
-
-        if (customPresets.Any())
-        {
-            Console.WriteLine("\n【自定义预设】");
-            foreach (var preset in customPresets)
-            {
-                Console.WriteLine($"  {preset.Name}: 文字=#{preset.TextColor} 背景=#{preset.BackgroundColor}");
-                Console.WriteLine($"    {preset.Description}");
-            }
-        }
-
-        Console.WriteLine("\n请通过点击颜色块应用预设，或使用以下命令管理预设：");
-        Console.WriteLine("  - ExportPresets() 导出自定义预设");
-        Console.WriteLine("  - ImportPresets(path) 导入预设");
-        Console.WriteLine("  - CreateCustomPreset() 创建自定义预设");
-        Console.WriteLine("================================\n");
+        // 按类别分组显示（UI展示由XAML绑定处理）
+        _ = presets;
     }
 
     /// <summary>

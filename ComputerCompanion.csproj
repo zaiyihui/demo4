@@ -8,7 +8,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <EnableDefaultAvaloniaXamlItems>true</EnableDefaultAvaloniaXamlItems>
-    <DefaultItemExcludes>$(DefaultItemExcludes);Tests/**/*;ComputerCompanion.Overlay/**/*</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Tests/**/*;src/ComputerCompanion.Overlay/**/*</DefaultItemExcludes>
 
     <!-- 确保 Avalonia ANGLE 原生 DLL(av_libGLESv2.dll / libEGL.dll / d3dcompiler_47.dll)
          在构建和发布时被复制到输出根目录，避免运行时报 "Unable to load DLL 'av_libGLESv2.dll'" -->
@@ -45,7 +45,9 @@
 
   <!-- 资源文件 - 确保 UTF-8 编码 -->
   <ItemGroup>
-    <None Include="**/*.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="**/*.md" CopyToOutputDirectory="PreserveNewest">
+      <Exclude>bin\**;obj\**</Exclude>
+    </None>
   </ItemGroup>
 
   <!-- 确保所有源文件使用 UTF-8 编码 -->
@@ -53,13 +55,13 @@
     <Compile Update="**/*.cs">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Compile>
-    <Compile Remove="ComputerCompanion.Overlay/**/*.cs" />
+    <Compile Remove="src/ComputerCompanion.Overlay/**/*.cs" />
   </ItemGroup>
 
   <!-- 排除 Overlay 项目的 XAML 文件 -->
   <ItemGroup>
-    <AvaloniaResource Remove="ComputerCompanion.Overlay/**/*.axaml" />
-    <Page Remove="ComputerCompanion.Overlay/**/*.axaml" />
+    <AvaloniaResource Remove="src/ComputerCompanion.Overlay/**/*.axaml" />
+    <Page Remove="src/ComputerCompanion.Overlay/**/*.axaml" />
   </ItemGroup>
 
   <ItemGroup>
