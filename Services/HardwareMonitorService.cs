@@ -318,10 +318,31 @@ public class HardwareMonitorService : IHardwareMonitorService
 
         try
         {
+            // 重置内存数据，确保每次更新都能正确计算
+            var previousMemoryUsed = MemoryUsed;
+            var previousMemoryTotal = MemoryTotal;
+            MemoryUsed = null;
+            MemoryTotal = null;
+            
             foreach (var hardware in _computer.Hardware)
             {
                 hardware.Update();
                 ProcessHardware(hardware);
+            }
+            
+            // 备用方案：如果传感器无法提供内存数据，使用系统API
+            if (!MemoryTotal.HasValue || MemoryTotal.Value <= 0)
+            {
+                MemoryTotal = GetTotalPhysicalMemory();
+                Program.Log($"[硬件] 使用系统API获取内存总量: {MemoryTotal?.ToString("F2")} GB");
+            }
+            
+            // 如果有总量但没有已使用量，尝试计算
+            if (MemoryTotal.HasValue && !MemoryUsed.HasValue)
+            {
+                // 使用性能计数器或系统API获取已使用内存
+                MemoryUsed = GetUsedPhysicalMemory();
+                Program.Log($"[硬件] 使用系统API获取内存已使用: {MemoryUsed?.ToString("F2")} GB");
             }
         }
         catch (Exception ex)
@@ -390,9 +411,36 @@ public class HardwareMonitorService : IHardwareMonitorService
     private void ProcessTemperatureSensor(ISensor sensor, HardwareType hardwareType)
     {
         if (hardwareType == HardwareType.Cpu)
-            CpuTemp = sensor.Value;
-        else if (IsGpuType(hardwareType) && sensor.Name == "GPU Core")
-            GpuTemp = sensor.Value;
+        {
+            // 优先查找特定的CPU温度传感器名称（按优先级排序）
+            var cpuTempNames = new[] {
+                "CPU Package",
+                "Core (Tctl/Tdie)",
+                "CPU Core",
+                "Core #1",
+                "CPU",
+                "Package"
+            };
+            
+            // 检查是否是优先的传感器名称
+            bool isPrioritySensor = cpuTempNames.Any(name => 
+                sensor.Name.Equals(name, StringComparison.OrdinalIgnoreCase) ||
+                sensor.Name.Contains(name));
+            
+            // 只有当当前值为空，或者找到优先传感器时才更新
+            if (isPrioritySensor || !CpuTemp.HasValue)
+            {
+                CpuTemp = sensor.Value;
+            }
+        }
+        else if (IsGpuType(hardwareType))
+        {
+            // GPU温度：优先查找 "GPU Core"，否则使用任何GPU温度传感器
+            if (sensor.Name == "GPU Core" || !GpuTemp.HasValue)
+            {
+                GpuTemp = sensor.Value;
+            }
+        }
     }
 
     private void ProcessFanSensor(ISensor sensor, HardwareType hardwareType)
@@ -413,20 +461,56 @@ public class HardwareMonitorService : IHardwareMonitorService
     {
         if (hardwareType == HardwareType.Memory)
         {
-            if (sensor.Name.Contains("Memory Used"))
+            // 改进的内存传感器匹配逻辑
+            var sensorName = sensor.Name.ToLowerInvariant();
+            
+            if (sensorName.Contains("used"))
+            {
+                // Memory Used: 已使用的内存（GB）
                 MemoryUsed = sensor.Value / 1024;
-            else if (sensor.Name.Contains("Memory Available"))
-                MemoryTotal = sensor.Value / 1024 + MemoryUsed.GetValueOrDefault();
-            else if (sensor.Name.Contains("Memory Total"))
+                Program.Log($"[硬件] 内存已使用: {MemoryUsed?.ToString("F2")} GB (传感器: {sensor.Name})");
+            }
+            else if (sensorName.Contains("available"))
+            {
+                // Memory Available: 可用内存（GB）
+                // 总内存 = 已使用 + 可用
+                var memoryAvailable = sensor.Value / 1024;
+                if (MemoryUsed.HasValue)
+                {
+                    MemoryTotal = MemoryUsed.Value + memoryAvailable;
+                    Program.Log($"[硬件] 内存总量(计算): {MemoryTotal?.ToString("F2")} GB = 已使用({MemoryUsed?.ToString("F2")}) + 可用({memoryAvailable.ToString("F2")})");
+                }
+            }
+            else if (sensorName.Contains("total"))
+            {
+                // Memory Total: 直接报告的总内存（GB）
                 MemoryTotal = sensor.Value / 1024;
+                Program.Log($"[硬件] 内存总量(直接): {MemoryTotal?.ToString("F2")} GB (传感器: {sensor.Name})");
+            }
+            
+            // 如果只有 MemoryUsed 而没有 MemoryTotal，尝试从系统获取总内存
+            if (MemoryUsed.HasValue && !MemoryTotal.HasValue)
+            {
+                try
+                {
+                    var totalPhysicalMemory = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
+                    MemoryTotal = (float)(totalPhysicalMemory / (1024.0 * 1024.0 * 1024.0));
+                    Program.Log($"[硬件] 内存总量(系统): {MemoryTotal?.ToString("F2")} GB (从系统API获取)");
+                }
+                catch
+                {
+                    // 如果系统API也失败，使用常见的内存大小作为参考
+                    Program.Log("[硬件] 无法获取内存总量，使用估算值");
+                }
+            }
         }
         else if (IsGpuType(hardwareType))
         {
-            if (sensor.Name.Contains("VRAM Used"))
+            var sensorName = sensor.Name.ToLowerInvariant();
+            
+            if (sensorName.Contains("vram used") || sensorName.Contains("d3d dedicated memory used"))
                 GpuVramUsed = sensor.Value / 1024;
-            else if (sensor.Name.Contains("VRAM Total"))
-                GpuVramTotal = sensor.Value / 1024;
-            else if (sensor.Name.Contains("Dedicated Video Memory"))
+            else if (sensorName.Contains("vram total") || sensorName.Contains("dedicated video memory"))
                 GpuVramTotal = sensor.Value / 1024;
         }
     }
@@ -559,6 +643,90 @@ public class HardwareMonitorService : IHardwareMonitorService
 
     #endregion
 
+    #region 系统内存获取方法
+
+    /// <summary>
+    /// 获取物理内存总量（GB）- 使用多种方法确保可靠性
+    /// </summary>
+    private float GetTotalPhysicalMemory()
+    {
+        try
+        {
+            // 方法1: 使用 GC.GetGCMemoryInfo (最可靠)
+            var gcInfo = GC.GetGCMemoryInfo();
+            var totalMemory = gcInfo.TotalAvailableMemoryBytes;
+            return (float)(totalMemory / (1024.0 * 1024.0 * 1024.0));
+        }
+        catch
+        {
+            try
+            {
+                // 方法2: 使用 Environment.SystemPageSize 和工作集估算
+                // 这个方法不太准确，但可以作为备用
+                var processMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
+                // 假设系统内存至少是进程工作集的4倍（粗略估算）
+                return (float)(processMemory * 4 / (1024.0 * 1024.0 * 1024.0));
+            }
+            catch
+            {
+                // 方法3: 返回一个常见的默认值（16GB）
+                return 16.0f;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取已使用的物理内存（GB）- 使用系统性能数据
+    /// </summary>
+    private float GetUsedPhysicalMemory()
+    {
+        try
+        {
+            // 使用性能计数器获取可用内存，然后计算已使用
+            var availableMemory = GetAvailablePhysicalMemory();
+            var totalMemory = GetTotalPhysicalMemory();
+            
+            if (availableMemory.HasValue && totalMemory > 0)
+            {
+                return totalMemory - availableMemory.Value;
+            }
+            
+            // 备用方案：使用进程工作集估算
+            var processMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
+            return (float)(processMemory / (1024.0 * 1024.0 * 1024.0));
+        }
+        catch
+        {
+            return 0.0f;
+        }
+    }
+
+    /// <summary>
+    /// 获取可用的物理内存（GB）
+    /// </summary>
+    private float? GetAvailablePhysicalMemory()
+    {
+        try
+        {
+            // 使用 Windows API 获取可用内存
+            MEMORYSTATUSEX status = new MEMORYSTATUSEX();
+            status.dwLength = (uint)Marshal.SizeOf(typeof(MEMORYSTATUSEX));
+            
+            if (GlobalMemoryStatusEx(ref status))
+            {
+                return (float)(status.ullAvailPhys / (1024.0 * 1024.0 * 1024.0));
+            }
+        }
+        catch
+        {
+            // 忽略错误
+        }
+        
+        return null;
+    }
+
+    #endregion
+
     #region Win32 API 定义
 
     [StructLayout(LayoutKind.Sequential)]
@@ -574,6 +742,25 @@ public class HardwareMonitorService : IHardwareMonitorService
 
     [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
     private static extern bool GetSystemPowerStatus(ref SYSTEM_POWER_STATUS lpSystemPowerStatus);
+
+    // 内存状态结构体
+    [StructLayout(LayoutKind.Sequential)]
+    private struct MEMORYSTATUSEX
+    {
+        public uint dwLength;
+        public uint dwMemoryLoad;
+        public ulong ullTotalPhys;
+        public ulong ullAvailPhys;
+        public ulong ullTotalPageFile;
+        public ulong ullAvailPageFile;
+        public ulong ullTotalVirtual;
+        public ulong ullAvailVirtual;
+        public ulong ullAvailExtendedVirtual;
+    }
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GlobalMemoryStatusEx(ref MEMORYSTATUSEX lpBuffer);
 
     #endregion
 }
