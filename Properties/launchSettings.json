@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "ComputerCompanion": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "",
+      "nativeDebugging": false
+    },
+    "ComputerCompanion (Overlay Mode)": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      },
+      "commandLineArgs": "--overlay",
+      "nativeDebugging": false
+    }
+  }
+}

@@ -18,20 +18,12 @@ public interface IHardwareMonitorService : IDisposable
     float? MemoryUsed { get; }
     float? MemoryTotal { get; }
     
-    float? NetworkUpload { get; }
-    float? NetworkDownload { get; }
-    
     float? DiskFreeSpace { get; }
     float? DiskTotalSpace { get; }
     
-    float? BatteryLevel { get; }
-    bool? IsCharging { get; }
+    float? Fps { get; }
     
     bool HasGpu { get; }
-    bool HasBattery { get; }
-    
-    float? Fps { get; }
-    int? NetworkLatency { get; }
     
     event Action? DataUpdated;
     

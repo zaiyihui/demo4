@@ -165,19 +165,20 @@ public partial class MainWindow : Window
         }
 
         // 3. 根据悬浮窗启用状态控制进程
+        var overlayManager = App.ServiceProvider.GetService(typeof(IOverlayProcessManager)) as IOverlayProcessManager;
         if (settings.Overlay.EnableOverlay)
         {
             // 只有在悬浮窗进程未运行时才启动
-            if (!App.IsOverlayRunning)
+            if (overlayManager != null && !overlayManager.IsRunning)
             {
                 Program.Log("[窗口] 启动悬浮窗进程");
-                App.StartOverlayProcess();
+                overlayManager.Start();
             }
         }
         else
         {
             Program.Log("[窗口] 停止悬浮窗进程");
-            App.StopOverlayProcess();
+            overlayManager?.Stop();
         }
 
         // 4. 处理自启动选项

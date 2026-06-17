@@ -385,7 +385,7 @@ public class IpcService : IIpcService
 
     private void OnDisconnected()
     {
-        Console.WriteLine("IPC disconnected");
+        Program.Log("[IPC] disconnected");
         _sessionKey = null;
         Disconnected?.Invoke(this, EventArgs.Empty);
     }

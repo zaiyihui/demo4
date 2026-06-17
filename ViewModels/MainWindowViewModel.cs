@@ -1,14 +1,20 @@
+using Avalonia.Threading;
 using ComputerCompanion.Models;
 using ComputerCompanion.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 
 namespace ComputerCompanion.ViewModels;
 
-public partial class MainWindowViewModel : ObservableObject
+public partial class MainWindowViewModel : ObservableObject, IDisposable
 {
     private readonly IHardwareMonitorService _monitor;
+    private readonly INetworkMonitorService _networkMonitor;
+    private readonly ILatencyMonitorService _latencyMonitor;
+    private readonly IBatteryMonitorService _batteryMonitor;
     private readonly ISettingsService _settingsService;
     private Settings _settings;
+    private bool _disposed;
 
     [ObservableProperty]
     private string _cpuInfo = "CPU: --";
@@ -55,20 +61,41 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty]
     private double _batteryLevelPercent = 0;
 
-    public MainWindowViewModel(IHardwareMonitorService monitor, Settings settings, ISettingsService settingsService)
+    public MainWindowViewModel(
+        IHardwareMonitorService monitor, 
+        INetworkMonitorService networkMonitor,
+        ILatencyMonitorService latencyMonitor,
+        IBatteryMonitorService batteryMonitor,
+        Settings settings, 
+        ISettingsService settingsService)
     {
-        _monitor = monitor ?? throw new System.ArgumentNullException(nameof(monitor));
-        _settings = settings ?? throw new System.ArgumentNullException(nameof(settings));
-        _settingsService = settingsService ?? throw new System.ArgumentNullException(nameof(settingsService));
+        _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
+        _networkMonitor = networkMonitor ?? throw new ArgumentNullException(nameof(networkMonitor));
+        _latencyMonitor = latencyMonitor ?? throw new ArgumentNullException(nameof(latencyMonitor));
+        _batteryMonitor = batteryMonitor ?? throw new ArgumentNullException(nameof(batteryMonitor));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+        _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
         
-        _monitor.DataUpdated += OnDataUpdated;
+        _monitor.DataUpdated += OnHardwareDataUpdated;
+        _networkMonitor.NetworkDataUpdated += OnNetworkDataUpdated;
+        _latencyMonitor.LatencyUpdated += OnLatencyUpdated;
+        _batteryMonitor.BatteryUpdated += OnBatteryUpdated;
         
         ShowGpu = _monitor.HasGpu && _settings.DisplayContent.ShowGpu;
-        ShowBattery = _monitor.HasBattery && _settings.DisplayContent.ShowBattery;
+        ShowBattery = _batteryMonitor.HasBattery && _settings.DisplayContent.ShowBattery;
     }
 
-    private void OnDataUpdated()
+    private void OnHardwareDataUpdated()
     {
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(OnHardwareDataUpdated);
+            return;
+        }
+
+        if (_disposed)
+            return;
+
         if (_settings.DisplayContent.ShowCpu)
         {
             CpuInfo = BuildCpuInfo();
@@ -90,19 +117,6 @@ public partial class MainWindowViewModel : ObservableObject
             }
         }
 
-        if (_settings.DisplayContent.ShowNetwork)
-        {
-            NetworkInfo = BuildNetworkInfo();
-            if (_monitor.NetworkLatency.HasValue)
-            {
-                LatencyInfo = $"{_monitor.NetworkLatency.Value}ms";
-            }
-            else
-            {
-                LatencyInfo = "延迟: --";
-            }
-        }
-
         if (_settings.DisplayContent.ShowDisk)
         {
             DiskInfo = BuildDiskInfo();
@@ -112,11 +126,59 @@ public partial class MainWindowViewModel : ObservableObject
                 DiskUsagePercent = (used / _monitor.DiskTotalSpace.Value) * 100;
             }
         }
+    }
 
-        if (_settings.DisplayContent.ShowBattery && _monitor.HasBattery)
+    private void OnNetworkDataUpdated()
+    {
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(OnNetworkDataUpdated);
+            return;
+        }
+
+        if (_disposed)
+            return;
+
+        if (_settings.DisplayContent.ShowNetwork)
+        {
+            NetworkInfo = BuildNetworkInfo();
+        }
+    }
+
+    private void OnLatencyUpdated()
+    {
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(OnLatencyUpdated);
+            return;
+        }
+
+        if (_disposed)
+            return;
+
+        if (_settings.DisplayContent.ShowNetwork)
+        {
+            LatencyInfo = _latencyMonitor.NetworkLatency.HasValue 
+                ? $"{_latencyMonitor.NetworkLatency.Value}ms" 
+                : "延迟: --";
+        }
+    }
+
+    private void OnBatteryUpdated()
+    {
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(OnBatteryUpdated);
+            return;
+        }
+
+        if (_disposed)
+            return;
+
+        if (_settings.DisplayContent.ShowBattery && _batteryMonitor.HasBattery)
         {
             BatteryInfo = BuildBatteryInfo();
-            BatteryLevelPercent = _monitor.BatteryLevel ?? 0;
+            BatteryLevelPercent = _batteryMonitor.BatteryLevel ?? 0;
         }
     }
 
@@ -188,14 +250,14 @@ public partial class MainWindowViewModel : ObservableObject
     private string BuildNetworkInfo()
     {
         _stringBuilder.Clear();
-        if (_monitor.NetworkDownload.HasValue)
-            _stringBuilder.AppendFormat("↓ {0:F2} MB/s", _monitor.NetworkDownload.Value);
+        if (_networkMonitor.NetworkDownload.HasValue)
+            _stringBuilder.AppendFormat("↓ {0:F2} MB/s", _networkMonitor.NetworkDownload.Value);
 
-        if (_monitor.NetworkUpload.HasValue)
+        if (_networkMonitor.NetworkUpload.HasValue)
         {
             if (_stringBuilder.Length > 0)
                 _stringBuilder.Append(" ");
-            _stringBuilder.AppendFormat("↑ {0:F2} MB/s", _monitor.NetworkUpload.Value);
+            _stringBuilder.AppendFormat("↑ {0:F2} MB/s", _networkMonitor.NetworkUpload.Value);
         }
 
         return _stringBuilder.Length > 0 ? _stringBuilder.ToString() : "网络: --";
@@ -214,10 +276,10 @@ public partial class MainWindowViewModel : ObservableObject
 
     private string BuildBatteryInfo()
     {
-        if (_monitor.BatteryLevel.HasValue)
+        if (_batteryMonitor.BatteryLevel.HasValue)
         {
-            var status = _monitor.IsCharging.HasValue && _monitor.IsCharging.Value ? "⚡" : "";
-            return $"{status}{_monitor.BatteryLevel.Value:F0}%";
+            var status = _batteryMonitor.IsCharging.HasValue && _batteryMonitor.IsCharging.Value ? "⚡" : "";
+            return $"{status}{_batteryMonitor.BatteryLevel.Value:F0}%";
         }
         return "电池: --";
     }
@@ -239,5 +301,20 @@ public partial class MainWindowViewModel : ObservableObject
         
         _monitor.Stop();
         _monitor.Start(_settings.Performance.GameMode ? _settings.Performance.GameModeRefreshInterval : _settings.Performance.RefreshInterval);
+    }
+
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+
+        _disposed = true;
+        
+        _monitor.DataUpdated -= OnHardwareDataUpdated;
+        _networkMonitor.NetworkDataUpdated -= OnNetworkDataUpdated;
+        _latencyMonitor.LatencyUpdated -= OnLatencyUpdated;
+        _batteryMonitor.BatteryUpdated -= OnBatteryUpdated;
+        
+        GC.SuppressFinalize(this);
     }
 }

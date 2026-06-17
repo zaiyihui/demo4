@@ -19,7 +19,7 @@
     <LangVersion>latest</LangVersion>
     
     <!-- 编码和字符集配置 -->
-    <AssemblyName>电脑伴侣</AssemblyName>
+    <AssemblyName>ComputerCompanion</AssemblyName>
     <AssemblyTitle>电脑伴侣 - 硬件监控工具</AssemblyTitle>
     <AssemblyDescription>高性能硬件监控和游戏性能显示工具</AssemblyDescription>
     <Company>开源社区</Company>
@@ -114,10 +114,9 @@
              Text="未找到 Avalonia ANGLE 原生依赖，请确认已还原 Avalonia.Desktop / Avalonia.Angle.Windows.Natives 包。" />
   </Target>
 
-  <!-- 发布时使用自包含模式 -->
+  <!-- Debug 和 Release 使用相同的框架依赖模式 -->
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <SelfContained>true</SelfContained>
-    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <SelfContained>false</SelfContained>
+    <IncludeNativeLibrariesForSelfExtract>false</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 </Project>

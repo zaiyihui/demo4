@@ -1,35 +1,49 @@
+using Avalonia.Threading;
 using ComputerCompanion.Models;
 using ComputerCompanion.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
-using System.Linq;
+using System.Collections.Generic;
 
 namespace ComputerCompanion.ViewModels;
 
-/// <summary>
-/// NVIDIA 风格悬浮窗视图模型
-/// 用于在游戏中显示硬件性能数据
-/// </summary>
-public partial class OverlayViewModel : ObservableObject
+public partial class OverlayViewModel : ObservableObject, IDisposable
 {
-    #region 私有字段
-
     private readonly IHardwareMonitorService _monitor;
+    private readonly ILatencyMonitorService _latencyMonitor;
     private readonly Settings _settings;
+    private bool _disposed;
 
-    #endregion
+    [ObservableProperty]
+    private string _fpsText;
 
-    #region 构造函数
+    [ObservableProperty]
+    private string _gpuText;
 
-    public OverlayViewModel(IHardwareMonitorService monitor, Settings settings)
+    [ObservableProperty]
+    private string _cpuText;
+
+    [ObservableProperty]
+    private string _memoryText;
+
+    [ObservableProperty]
+    private string _latencyText;
+    
+    [ObservableProperty]
+    private string _overlayTextColor;
+
+    public OverlayViewModel(
+        IHardwareMonitorService monitor, 
+        ILatencyMonitorService latencyMonitor,
+        Settings settings)
     {
-        _monitor = monitor;
-        _settings = settings;
+        _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
+        _latencyMonitor = latencyMonitor ?? throw new ArgumentNullException(nameof(latencyMonitor));
+        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         
-        // 订阅数据更新事件
-        _monitor.DataUpdated += OnDataUpdated;
+        _monitor.DataUpdated += OnHardwareDataUpdated;
+        _latencyMonitor.LatencyUpdated += OnLatencyUpdated;
         
-        // 初始化默认值
         _fpsText = "--";
         _gpuText = "显示: --";
         _cpuText = "处理: --";
@@ -38,129 +52,99 @@ public partial class OverlayViewModel : ObservableObject
         _overlayTextColor = settings.Overlay.OverlayTextColor;
     }
 
-    #endregion
-
-    #region 可观察属性
-
-    /// <summary>
-    /// FPS 显示文本
-    /// </summary>
-    [ObservableProperty]
-    private string _fpsText;
-
-    /// <summary>
-    /// GPU 显示文本
-    /// </summary>
-    [ObservableProperty]
-    private string _gpuText;
-
-    /// <summary>
-    /// CPU 显示文本
-    /// </summary>
-    [ObservableProperty]
-    private string _cpuText;
-
-    /// <summary>
-    /// 内存显示文本
-    /// </summary>
-    [ObservableProperty]
-    private string _memoryText;
-
-    /// <summary>
-    /// 延迟显示文本
-    /// </summary>
-    [ObservableProperty]
-    private string _latencyText;
-    
-    /// <summary>
-    /// 悬浮窗文字颜色
-    /// </summary>
-    [ObservableProperty]
-    private string _overlayTextColor;
-
-    #endregion
-
-    #region 公共方法
-
-    /// <summary>
-    /// 标记一个帧（用于真实FPS测量）
-    /// </summary>
     public void MarkFrame()
     {
         _monitor.MarkFrame();
         
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(() => UpdateFpsDisplay());
+            return;
+        }
+        
+        UpdateFpsDisplay();
+    }
+
+    private void UpdateFpsDisplay()
+    {
+        if (_disposed)
+            return;
+            
         if (_monitor.Fps.HasValue)
         {
             FpsText = _monitor.Fps.Value > 0 ? _monitor.Fps.Value.ToString("0") : "--";
         }
     }
 
-    #endregion
-
-    #region 私有方法
-
-    /// <summary>
-    /// 数据更新事件处理
-    /// </summary>
-    private void OnDataUpdated()
+    private void OnHardwareDataUpdated()
     {
-        // 构建 GPU 信息 (NVIDIA 风格)
-        var gpuParts = new System.Collections.Generic.List<string>();
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(OnHardwareDataUpdated);
+            return;
+        }
+
+        if (_disposed)
+            return;
+
         if (_settings.Overlay.OverlayShowGpu && _monitor.HasGpu)
         {
             if (_monitor.GpuUsage.HasValue)
-                gpuParts.Add($"GPU {_monitor.GpuUsage.Value:F0}%");
-            if (_monitor.GpuTemp.HasValue)
-                gpuParts.Add($"{_monitor.GpuTemp.Value:F0}°C");
-            if (_monitor.GpuClock.HasValue)
-                gpuParts.Add($"{_monitor.GpuClock.Value:F0} MHz");
-            
-            GpuText = string.Join(" | ", gpuParts);
+                GpuText = $"{_monitor.GpuUsage.Value:F0}%";
+            else
+                GpuText = "--";
         }
         else
         {
-            GpuText = "GPU: --";
+            GpuText = "--";
         }
 
-        // 构建 CPU 信息
-        var cpuParts = new System.Collections.Generic.List<string>();
         if (_settings.Overlay.OverlayShowCpu)
         {
             if (_monitor.CpuUsage.HasValue)
-                cpuParts.Add($"CPU {_monitor.CpuUsage.Value:F0}%");
-            
-            CpuText = string.Join(" | ", cpuParts);
+                CpuText = $"{_monitor.CpuUsage.Value:F0}%";
+            else
+                CpuText = "--";
         }
         else
         {
-            CpuText = "CPU: --";
+            CpuText = "--";
         }
 
-        // 构建内存信息
         if (_settings.Overlay.OverlayShowMemory)
         {
             if (_monitor.MemoryUsed.HasValue && _monitor.MemoryTotal.HasValue)
             {
                 var usagePercent = (_monitor.MemoryUsed.Value / _monitor.MemoryTotal.Value) * 100;
-                MemoryText = $"MEM {usagePercent:F0}%";
+                MemoryText = $"{usagePercent:F0}%";
             }
             else
             {
-                MemoryText = "MEM: --";
+                MemoryText = "--";
             }
         }
         else
         {
-            MemoryText = "MEM: --";
+            MemoryText = "--";
+        }
+    }
+
+    private void OnLatencyUpdated()
+    {
+        if (!Dispatcher.UIThread.CheckAccess())
+        {
+            Dispatcher.UIThread.Post(OnLatencyUpdated);
+            return;
         }
 
-        // 延迟
+        if (_disposed)
+            return;
+
         if (_settings.Overlay.OverlayShowLatency)
         {
-            if (_monitor.NetworkLatency.HasValue)
+            if (_latencyMonitor.NetworkLatency.HasValue)
             {
-                var latency = _monitor.NetworkLatency.Value;
-                LatencyText = $"LAT {latency}ms";
+                LatencyText = $"LAT {_latencyMonitor.NetworkLatency.Value}ms";
             }
             else
             {
@@ -173,5 +157,16 @@ public partial class OverlayViewModel : ObservableObject
         }
     }
 
-    #endregion
+    public void Dispose()
+    {
+        if (_disposed)
+            return;
+
+        _disposed = true;
+        
+        _monitor.DataUpdated -= OnHardwareDataUpdated;
+        _latencyMonitor.LatencyUpdated -= OnLatencyUpdated;
+        
+        GC.SuppressFinalize(this);
+    }
 }

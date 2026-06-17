@@ -24,7 +24,7 @@
     <Application.Styles>
         <FluentTheme />
         <!-- 全局字体样式 -->
-        <StyleInclude Source="avares://电脑伴侣/Styles/GlobalStyles.axaml"/>
-        <StyleInclude Source="avares://电脑伴侣/Styles/SettingsStyles.axaml"/>
+        <StyleInclude Source="avares://ComputerCompanion/Styles/GlobalStyles.axaml"/>
+        <StyleInclude Source="avares://ComputerCompanion/Styles/SettingsStyles.axaml"/>
     </Application.Styles>
 </Application>
