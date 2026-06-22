@@ -399,17 +399,22 @@
                             <TextBlock Text="F1" FontSize="10" Foreground="#4ecdc4" FontWeight="SemiBold"/>
                         </Border>
                         <TextBlock Text="鼠标穿透" Classes="shortcut" VerticalAlignment="Center"/>
-                        
+
                         <Border Background="#252540" CornerRadius="6" Padding="8,5">
                             <TextBlock Text="F2" FontSize="10" Foreground="#76B900" FontWeight="SemiBold"/>
                         </Border>
                         <TextBlock Text="游戏" Classes="shortcut" VerticalAlignment="Center"/>
-                        
+
                         <Border Background="#252540" CornerRadius="6" Padding="8,5">
                             <TextBlock Text="F3" FontSize="10" Foreground="#a29bfe" FontWeight="SemiBold"/>
                         </Border>
                         <TextBlock Text="设置" Classes="shortcut" VerticalAlignment="Center"/>
-                        
+
+                        <Border Background="#252540" CornerRadius="6" Padding="8,5">
+                            <TextBlock Text="F4" FontSize="10" Foreground="#fd79a8" FontWeight="SemiBold"/>
+                        </Border>
+                        <TextBlock Text="性能面板" Classes="shortcut" VerticalAlignment="Center"/>
+
                         <Border Background="#252540" CornerRadius="6" Padding="8,5">
                             <TextBlock Text="Esc" FontSize="10" Foreground="#fd79a8" FontWeight="SemiBold"/>
                         </Border>

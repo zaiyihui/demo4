@@ -6,6 +6,7 @@ using ComputerCompanion.Models;
 using ComputerCompanion.ViewModels;
 using ComputerCompanion.Views;
 using ComputerCompanion.Services;
+using ComputerCompanion.Core.Abstractions;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Diagnostics;
@@ -56,24 +57,50 @@ public partial class App : Application
         services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<IDataStorageService, DataStorageService>();
-        
+
         // 拆分的监控服务
         services.AddSingleton<INetworkMonitorService, NetworkMonitorService>();
         services.AddSingleton<ILatencyMonitorService, LatencyMonitorService>();
         services.AddSingleton<IBatteryMonitorService, BatteryMonitorService>();
-        
+
         // IPC 服务
         services.AddSingleton<IIpcService>(sp =>
             new IpcService(sp.GetService<ISecurityService>()));
         services.AddSingleton<IIpcMessageRouter, IpcMessageRouter>();
-        
+
         // 新抽取的管理服务
         services.AddSingleton<IOverlayProcessManager>(sp =>
             new OverlayProcessManager(sp.GetService<IIpcService>()));
         services.AddSingleton<IWindowManager, WindowManager>();
-        
+
         // 托盘服务
         services.AddSingleton<TrayIconService>();
+
+        // 新增核心服务 - 性能监控、日志、备份等
+        services.AddSingleton<Core.Abstractions.ILogService, Core.Services.LogService>();
+        services.AddSingleton<Core.Abstractions.IPerformanceMonitorService, Core.Services.PerformanceMonitorService>();
+        services.AddSingleton<Core.Abstractions.IBackupService>(sp =>
+            new Core.Services.BackupService(
+                sp.GetRequiredService<ISettingsService>()));
+        services.AddSingleton<Core.Abstractions.ILocalizationService, Core.Services.LocalizationService>();
+        services.AddSingleton<Core.Abstractions.ICloudSyncService, Core.Services.CloudSyncService>();
+        services.AddSingleton<Core.Abstractions.IAIService>(sp =>
+            new Core.Services.AIService(
+                sp.GetRequiredService<Core.Abstractions.IPerformanceMonitorService>(),
+                sp.GetRequiredService<IHardwareMonitorService>()));
+        services.AddSingleton<Core.Abstractions.IPluginService, Core.Services.PluginService>();
+
+            // 图表服务
+            services.AddSingleton<IChartService, ChartService>();
+            
+            // 告警声音服务
+            services.AddSingleton<IAlertSoundService, AlertSoundService>();
+            
+            // 主题服务
+            services.AddSingleton<IThemeService, ThemeService>();
+            
+            // 告警规则服务
+            services.AddSingleton<IAlertRuleService, AlertRuleService>();
 
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -196,52 +223,36 @@ public partial class App : Application
             {
                 _desktopLifetime = desktop;
                 
+                Program.Log("[应用] 获取性能监控服务");
+                var performanceMonitor = ServiceProvider.GetRequiredService<IPerformanceMonitorService>();
+                
                 Program.Log("[应用] 获取硬件监控服务");
-                var monitor = ServiceProvider.GetRequiredService<IHardwareMonitorService>();
-                if (monitor == null)
-                {
-                    Program.Log("[应用] 硬件监控服务为 null");
-                    throw new InvalidOperationException("硬件监控服务为 null");
-                }
+                var hardwareMonitor = ServiceProvider.GetRequiredService<IHardwareMonitorService>();
                 
-                Program.Log("[应用] 获取网络监控服务");
-                var networkMonitor = ServiceProvider.GetRequiredService<INetworkMonitorService>();
+                Program.Log("[应用] 获取日志服务");
+                var logService = ServiceProvider.GetRequiredService<ILogService>();
                 
-                Program.Log("[应用] 获取延迟监控服务");
-                var latencyMonitor = ServiceProvider.GetRequiredService<ILatencyMonitorService>();
-                
-                Program.Log("[应用] 获取电池监控服务");
-                var batteryMonitor = ServiceProvider.GetRequiredService<IBatteryMonitorService>();
-                
-                Program.Log("[应用] 获取设置服务");
-                var settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
-                if (settingsService == null)
-                {
-                    Program.Log("[应用] 设置服务为 null");
-                    throw new InvalidOperationException("设置服务为 null");
-                }
+                Program.Log("[应用] 获取告警声音服务");
+                var alertSoundService = ServiceProvider.GetRequiredService<IAlertSoundService>();
 
-                Program.Log("[应用] 创建主窗口视图模型");
-                var viewModel = new MainWindowViewModel(monitor, networkMonitor, latencyMonitor, batteryMonitor, settings, settingsService);
+                Program.Log("[应用] 创建性能监控面板视图模型");
+                var viewModel = new PerformanceDashboardViewModel(performanceMonitor, hardwareMonitor, logService, alertSoundService);
                 
-                Program.Log("[应用] 创建主窗口");
-                var mainWindow = new MainWindow
-                {
-                    DataContext = viewModel
-                };
+                Program.Log("[应用] 创建性能监控面板窗口");
+                var dashboardWindow = new PerformanceDashboardWindow();
+                dashboardWindow.SetViewModel(viewModel);
 
                 // 使用窗口管理器
                 var windowManager = ServiceProvider.GetRequiredService<IWindowManager>();
-                windowManager.SetMainWindow(mainWindow);
-                windowManager.ConfigureCloseToHideBehavior();
+                windowManager.SetMainWindow(dashboardWindow);
 
-                desktop.MainWindow = mainWindow;
-                desktop.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+                desktop.MainWindow = dashboardWindow;
+                desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
 
-                // 先显示窗口
-                mainWindow.Show();
-                mainWindow.Activate();
-                Program.Log("[应用] 主窗口已显示");
+                // 显示窗口
+                dashboardWindow.Show();
+                dashboardWindow.Activate();
+                Program.Log("[应用] 性能监控面板已显示");
 
                 // IPC 服务和路由器
                 var ipcService = ServiceProvider.GetRequiredService<IIpcService>();
@@ -277,14 +288,7 @@ public partial class App : Application
                     overlayManager.Start();
                 }
 
-                // 最小化启动
-                if (settings.Startup.StartMinimized)
-                {
-                    Program.Log("[应用] 设置为最小化启动 -> 隐藏主窗口");
-                    windowManager.HideMainWindow();
-                }
-
-                Program.Log("[应用] 主窗口模式初始化完成");
+                Program.Log("[应用] 性能监控面板模式初始化完成");
             }
             catch (Exception ex)
             {
@@ -293,18 +297,9 @@ public partial class App : Application
                 // 尝试显示一个简单的错误窗口
                 try
                 {
-                    var mainWindow = new MainWindow
-                    {
-                        DataContext = new MainWindowViewModel(
-                            new HardwareMonitorService(),
-                            new NetworkMonitorService(),
-                            new LatencyMonitorService(),
-                            new BatteryMonitorService(),
-                            settings,
-                            new SettingsService())
-                    };
-                    desktop.MainWindow = mainWindow;
-                    mainWindow.Show();
+                    var dashboardWindow = new PerformanceDashboardWindow();
+                    desktop.MainWindow = dashboardWindow;
+                    dashboardWindow.Show();
                 }
                 catch { }
             }
@@ -427,7 +422,7 @@ public partial class App : Application
 
     #region 窗口管理（公共静态方法，保持向后兼容）
 
-    public static MainWindow? MainWindow => 
+    public static Window? MainWindow => 
         _serviceProvider?.GetService<IWindowManager>()?.MainWindow;
 
     public static void ShowMainWindow()

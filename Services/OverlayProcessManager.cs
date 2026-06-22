@@ -98,11 +98,13 @@ public class OverlayProcessManager : IOverlayProcessManager
         
         try
         {
-            var exePath = Process.GetCurrentProcess().MainModule?.FileName;
+            var exePath = GetApplicationExecutablePath();
             if (string.IsNullOrEmpty(exePath))
             {
                 throw new InvalidOperationException("无法获取应用程序路径");
             }
+            
+            Program.Log($"[悬浮窗管理] 应用程序路径: {exePath}");
             
             var psi = new ProcessStartInfo
             {
@@ -253,6 +255,67 @@ public class OverlayProcessManager : IOverlayProcessManager
         
         Program.Log("[悬浮窗管理] 尝试自动恢复悬浮窗进程...");
         _ = Task.Delay(AutoRecoverDelayMs).ContinueWith(_ => Start());
+    }
+    
+    /// <summary>
+    /// 获取应用程序可执行文件路径
+    /// 处理 dotnet run 调试模式下 MainModule 返回 dotnet.exe 的问题
+    /// </summary>
+    private string? GetApplicationExecutablePath()
+    {
+        try
+        {
+            var process = Process.GetCurrentProcess();
+            var mainModule = process.MainModule;
+            if (mainModule != null)
+            {
+                var modulePath = mainModule.FileName;
+                
+                if (modulePath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
+                {
+                    Program.Log("[悬浮窗管理] 检测到 dotnet run 模式，尝试获取实际应用程序路径");
+                    return GetExecutablePathFromAppContext();
+                }
+                
+                return modulePath;
+            }
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[悬浮窗管理] 从进程模块获取路径失败: {ex.Message}");
+        }
+        
+        return GetExecutablePathFromAppContext();
+    }
+    
+    private string? GetExecutablePathFromAppContext()
+    {
+        try
+        {
+            var baseDir = AppContext.BaseDirectory;
+            var assemblyName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
+            
+            if (!string.IsNullOrEmpty(assemblyName))
+            {
+                var exePath = Path.Combine(baseDir, $"{assemblyName}.exe");
+                if (File.Exists(exePath))
+                {
+                    return exePath;
+                }
+                
+                exePath = Path.Combine(baseDir, "..", "..", "..", $"{assemblyName}.exe");
+                if (File.Exists(exePath))
+                {
+                    return Path.GetFullPath(exePath);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[悬浮窗管理] 从 AppContext 获取路径失败: {ex.Message}");
+        }
+        
+        return null;
     }
     
     #endregion

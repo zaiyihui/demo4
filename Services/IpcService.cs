@@ -256,6 +256,14 @@ public class IpcService : IIpcService
         try
         {
             var json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+            
+            // 限制JSON长度防止反序列化攻击
+            if (json.Length > MaxMessageSize)
+            {
+                Program.Log($"[IPC] Message too large: {json.Length}");
+                return;
+            }
+            
             var message = JsonConvert.DeserializeObject<SecureIpcMessage>(json);
 
             if (message == null || string.IsNullOrEmpty(message.Type))
@@ -264,9 +272,23 @@ public class IpcService : IIpcService
                 return;
             }
 
+            // 验证消息类型，防止注入
+            if (!IsValidMessageType(message.Type))
+            {
+                Program.Log($"[IPC] Invalid message type: {message.Type}");
+                return;
+            }
+
             if (!ValidateMessageSignature(message))
             {
                 Program.Log("[IPC] Message signature validation failed");
+                return;
+            }
+
+            // 验证时间戳，防止重放攻击
+            if (!ValidateTimestamp(message.Timestamp))
+            {
+                Program.Log("[IPC] Message timestamp validation failed (possible replay attack)");
                 return;
             }
 
@@ -293,6 +315,39 @@ public class IpcService : IIpcService
         {
             Program.Log($"[IPC] Failed to process message: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// 验证消息类型是否有效
+    /// </summary>
+    private bool IsValidMessageType(string type)
+    {
+        if (string.IsNullOrWhiteSpace(type)) return false;
+        if (type.Length > 100) return false;
+        
+        // 只允许字母、数字和下划线
+        foreach (var c in type)
+        {
+            if (!char.IsLetterOrDigit(c) && c != '_')
+                return false;
+        }
+        
+        return true;
+    }
+
+    /// <summary>
+    /// 验证时间戳，防止重放攻击
+    /// </summary>
+    private bool ValidateTimestamp(long timestamp)
+    {
+        if (timestamp <= 0) return true; // 如果没有时间戳，跳过验证
+        
+        var messageTime = new DateTime(timestamp, DateTimeKind.Utc);
+        var now = DateTime.UtcNow;
+        var diff = Math.Abs((now - messageTime).TotalMinutes);
+        
+        // 允许5分钟的时间差
+        return diff <= 5;
     }
 
     private bool ValidateMessageSignature(SecureIpcMessage message)

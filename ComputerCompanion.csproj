@@ -8,10 +8,24 @@
     <EnableDefaultAvaloniaXamlItems>true</EnableDefaultAvaloniaXamlItems>
     <DefaultItemExcludes>$(DefaultItemExcludes);Tests/**/*;src/ComputerCompanion.Overlay/**/*</DefaultItemExcludes>
 
+    <!-- 优化构建性能：仅 Windows 64 位 -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+
     <!-- 开发时使用框架依赖模式，减少构建时间和资源占用 -->
     <SelfContained>false</SelfContained>
     <IncludeNativeLibrariesForSelfExtract>false</IncludeNativeLibrariesForSelfExtract>
     <EnableDynamicLoadingSupport>true</EnableDynamicLoadingSupport>
+
+    <!-- Debug 模式优化：减少 PDB 符号加载 -->
+    <DebugType>portable</DebugType>
+    <Optimize>false</Optimize>
+
+    <!-- 内存优化：限制运行时内存使用 -->
+    <GarbageCollectionAdaptationMode>1</GarbageCollectionAdaptationMode>
+
+    <!-- 减少构建输出，降低内存压力 -->
+    <MSBuildWarningsAsMessages>NETSDK1047;AVLN3001</MSBuildWarningsAsMessages>
     
     <!-- 中文本地化和编码配置 -->
     <NeutralLanguage>zh-CN</NeutralLanguage>
@@ -77,6 +91,18 @@
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
         <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
+        
+        <!-- LiveCharts2 图表库 -->
+        <PackageReference Include="LiveChartsCore" Version="2.0.0" />
+        <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0" />
+        <PackageReference Include="LiveChartsCore.SkiaSharpView.Avalonia" Version="2.0.0" />
+        <PackageReference Include="SkiaSharp" Version="2.88.9" />
+        
+        <!-- 音频播放 -->
+        <PackageReference Include="NAudio" Version="2.2.1" />
+        
+        <!-- JSON序列化 -->
+        <PackageReference Include="System.Text.Json" Version="8.0.5" />
     </ItemGroup>
 
   <ItemGroup>

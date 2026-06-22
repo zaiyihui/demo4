@@ -128,6 +128,9 @@ public partial class MainWindow : Window
             case Key.F3:
                 OpenSettings();
                 break;
+            case Key.F4:
+                OpenPerformanceDashboard();
+                break;
         }
     }
 
@@ -363,6 +366,58 @@ public partial class MainWindow : Window
         if (valueData.Length > 1024)
         {
             throw new ArgumentException("注册表值数据长度超过限制");
+        }
+    }
+
+    #endregion
+
+    #region 性能监控面板
+
+    private PerformanceDashboardWindow? _performanceDashboard;
+
+    private void OpenPerformanceDashboard()
+    {
+        SetClickThrough(false);
+
+        try
+        {
+            if (_performanceDashboard == null || !_performanceDashboard.IsVisible)
+            {
+                _performanceDashboard = new PerformanceDashboardWindow();
+
+                var performanceMonitor = App.ServiceProvider.GetService(typeof(Core.Abstractions.IPerformanceMonitorService))
+                    as Core.Abstractions.IPerformanceMonitorService;
+                var hardwareMonitor = App.ServiceProvider.GetService(typeof(IHardwareMonitorService))
+                    as IHardwareMonitorService;
+                var logService = App.ServiceProvider.GetService(typeof(Core.Abstractions.ILogService))
+                    as Core.Abstractions.ILogService;
+                var alertSoundService = App.ServiceProvider.GetService(typeof(IAlertSoundService))
+                    as IAlertSoundService;
+
+                if (performanceMonitor != null && hardwareMonitor != null && logService != null && alertSoundService != null)
+                {
+                    var viewModel = new ViewModels.PerformanceDashboardViewModel(
+                        performanceMonitor,
+                        hardwareMonitor,
+                        logService,
+                        alertSoundService);
+                    _performanceDashboard.SetViewModel(viewModel);
+                }
+
+                _performanceDashboard.Closed += (s, e) => _performanceDashboard = null;
+                _performanceDashboard.Show();
+                _performanceDashboard.Activate();
+
+                Program.Log("[窗口] 性能监控面板已打开");
+            }
+            else
+            {
+                _performanceDashboard.Activate();
+            }
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[窗口] 打开性能监控面板失败: {ex.Message}");
         }
     }
 

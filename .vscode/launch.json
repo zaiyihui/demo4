@@ -6,7 +6,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net8.0/ComputerCompanion.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0-windows/win-x64/ComputerCompanion.dll",  // ← 修改这里
             "args": [],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -21,7 +21,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net8.0/ComputerCompanion.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0-windows/win-x64/ComputerCompanion.dll",  // ← 修改这里
             "args": ["--overlay"],
             "cwd": "${workspaceFolder}",
             "stopAtEntry": false,
@@ -30,11 +30,6 @@
             },
             "console": "internalConsole",
             "justMyCode": true
-        },
-        {
-            "name": ".NET Core Attach",
-            "type": "coreclr",
-            "request": "attach"
         }
     ]
 }

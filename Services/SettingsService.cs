@@ -1,6 +1,7 @@
 using ComputerCompanion.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace ComputerCompanion.Services;
@@ -128,5 +129,69 @@ public class SettingsService : ISettingsService
     {
         _settings = new Settings();
         SaveSettings();
+    }
+
+    public ThemeMode LoadThemeMode()
+    {
+        try
+        {
+            if (_settings != null && _settings.Performance != null)
+            {
+                return _settings.Performance.ThemeMode;
+            }
+        }
+        catch
+        {
+        }
+        return ThemeMode.Dark;
+    }
+
+    public void SaveThemeMode(ThemeMode mode)
+    {
+        try
+        {
+            if (_settings != null)
+            {
+                if (_settings.Performance == null)
+                {
+                    _settings.Performance = new PerformanceSettings();
+                }
+                _settings.Performance.ThemeMode = mode;
+                SaveSettings();
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    public List<AlertRule> LoadAlertRules()
+    {
+        try
+        {
+            var rulesPath = Path.ChangeExtension(_settingsPath, ".rules.json");
+            if (File.Exists(rulesPath))
+            {
+                var json = File.ReadAllText(rulesPath);
+                return JsonConvert.DeserializeObject<List<AlertRule>>(json) ?? new List<AlertRule>();
+            }
+        }
+        catch
+        {
+        }
+        return new List<AlertRule>();
+    }
+
+    public void SaveAlertRules(List<AlertRule> rules)
+    {
+        try
+        {
+            var rulesPath = Path.ChangeExtension(_settingsPath, ".rules.json");
+            var json = JsonConvert.SerializeObject(rules, Formatting.Indented);
+            File.WriteAllText(rulesPath, json);
+        }
+        catch
+        {
+        }
     }
 }

@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using ComputerCompanion.Views;
 using System;
 
 namespace ComputerCompanion.Services;
@@ -13,7 +12,7 @@ public interface IWindowManager
     /// <summary>
     /// 主窗口实例
     /// </summary>
-    MainWindow? MainWindow { get; }
+    Window? MainWindow { get; }
     
     /// <summary>
     /// 主窗口是否可见
@@ -23,7 +22,7 @@ public interface IWindowManager
     /// <summary>
     /// 设置主窗口
     /// </summary>
-    void SetMainWindow(MainWindow window);
+    void SetMainWindow(Window window);
     
     /// <summary>
     /// 显示主窗口

@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using ComputerCompanion.Views;
 using System;
 
 namespace ComputerCompanion.Services;
@@ -12,7 +11,7 @@ public class WindowManager : IWindowManager, IDisposable
 {
     #region 私有字段
     
-    private MainWindow? _mainWindow;
+    private Window? _mainWindow;
     private bool _closeToHideConfigured;
     private bool _isDisposed;
     
@@ -20,7 +19,7 @@ public class WindowManager : IWindowManager, IDisposable
     
     #region 公共属性和事件
     
-    public MainWindow? MainWindow => _mainWindow;
+    public Window? MainWindow => _mainWindow;
     
     public bool IsMainWindowVisible
     {
@@ -36,14 +35,16 @@ public class WindowManager : IWindowManager, IDisposable
             }
         }
     }
-    
+
+    #pragma warning disable CS0067
     public event EventHandler? ExitRequested;
-    
+    #pragma warning restore CS0067
+
     #endregion
     
     #region 公共方法
     
-    public void SetMainWindow(MainWindow window)
+    public void SetMainWindow(Window window)
     {
         if (_mainWindow != null)
         {
