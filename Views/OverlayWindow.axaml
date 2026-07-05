@@ -3,14 +3,14 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:ComputerCompanion.ViewModels"
-        mc:Ignorable="d" d:DesignWidth="180" d:DesignHeight="140"
+        mc:Ignorable="d" d:DesignWidth="180" d:DesignHeight="180"
         x:Class="ComputerCompanion.Views.OverlayWindow"
         x:DataType="vm:OverlayViewModel"
         Title="悬浮窗"
         Width="180"
-        Height="140"
+        Height="200"
         Background="Transparent"
-        TransparencyLevelHint="Transparent"
+        TransparencyLevelHint="Blur"
         ShowInTaskbar="False"
         Topmost="True"
         ExtendClientAreaToDecorationsHint="True"
@@ -19,56 +19,153 @@
     <Window.Styles>
         <Style Selector="TextBlock">
             <Setter Property="FontFamily" Value="Segoe UI, Microsoft YaHei UI, sans-serif"/>
-            <Setter Property="Foreground" Value="#76B900"/>
+        </Style>
+
+        <Style Selector="Border.overlay-glass-panel">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#25ffffff" Offset="0"/>
+                        <GradientStop Color="#1dffffff" Offset="0.4"/>
+                        <GradientStop Color="#15ffffff" Offset="0.7"/>
+                        <GradientStop Color="#10ffffff" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="BoxShadow" Value="0 8 24 0 #40000000"/>
+            <Setter Property="BorderBrush">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#40ffffff" Offset="0"/>
+                        <GradientStop Color="#25ffffff" Offset="0.3"/>
+                        <GradientStop Color="#15ffffff" Offset="0.7"/>
+                        <GradientStop Color="#08ffffff" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Transitions">
+                <Setter.Value>
+                    <Transitions>
+                        <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                    </Transitions>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.overlay-glass-panel:pointerover">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#30ffffff" Offset="0"/>
+                        <GradientStop Color="#25ffffff" Offset="0.4"/>
+                        <GradientStop Color="#1dffffff" Offset="0.7"/>
+                        <GradientStop Color="#15ffffff" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BoxShadow" Value="0 12 32 0 #50000000"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.overlay-drag-handle">
+            <Setter Property="Background" Value="#15ffffff"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Cursor" Value="SizeAll"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Transitions">
+                <Setter.Value>
+                    <Transitions>
+                        <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                    </Transitions>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.overlay-drag-handle:pointerover">
+            <Setter Property="Background" Value="#25ffffff"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Styles>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-
-        <Grid Grid.ColumnSpan="2" Grid.Row="0" Margin="4">
-            <Border 
-                HorizontalAlignment="Left" 
-                VerticalAlignment="Top" 
-                Width="32" 
-                Height="20"
-                Background="#20000000" 
-                CornerRadius="3"
-                Cursor="SizeAll"
-                PointerPressed="OnDragHandlePressed"
-                PointerMoved="OnDragHandleMoved"
-                PointerReleased="OnDragHandleReleased"
-                ToolTip.Tip="拖拽移动">
-                <TextBlock 
-                    Text="≡" 
-                    FontSize="14" 
-                    Foreground="#666" 
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"/>
+    <Border Classes="overlay-glass-panel">
+        <Grid>
+            <Border Height="1" VerticalAlignment="Top" Margin="10,0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#50ffffff" Offset="0"/>
+                        <GradientStop Color="#30ffffff" Offset="0.5"/>
+                        <GradientStop Color="#10ffffff" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
             </Border>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.ColumnSpan="2" Grid.Row="0" Margin="0,0,0,8">
+                    <Border Classes="overlay-drag-handle" HorizontalAlignment="Left"
+                            PointerPressed="OnDragHandlePressed"
+                            PointerMoved="OnDragHandleMoved"
+                            PointerReleased="OnDragHandleReleased"
+                            ToolTip.Tip="拖拽移动">
+                        <TextBlock Text="≡" FontSize="12" Foreground="#667788" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                </Grid>
+
+                <TextBlock Grid.Column="0" Grid.Row="1" Text="FPS" FontSize="10" Foreground="#667788" Margin="4,4,4,2"/>
+                <TextBlock Grid.Column="1" Grid.Row="1" x:DataType="vm:OverlayViewModel" Text="{Binding FpsText}" FontSize="24" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,4,8,2" Foreground="#76B900"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="2" Text="1%" FontSize="10" Foreground="#445566" Margin="4,2,4,2"/>
+                <TextBlock Grid.Column="1" Grid.Row="2" x:DataType="vm:OverlayViewModel" Text="{Binding Fps1PercentLowText}" FontSize="12" HorizontalAlignment="Right" Margin="0,2,8,2" IsVisible="{Binding ShowFpsDetails}" Foreground="#8899aa"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="GPU" FontSize="10" Foreground="#667788" Margin="4,4,4,2" IsVisible="{Binding ShowGpu}"/>
+                <TextBlock Grid.Column="1" Grid.Row="3" x:DataType="vm:OverlayViewModel" Text="{Binding GpuText}" FontSize="14" HorizontalAlignment="Right" Margin="0,4,8,2" IsVisible="{Binding ShowGpu}" Foreground="#a29bfe"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="CPU" FontSize="10" Foreground="#667788" Margin="4,4,4,2" IsVisible="{Binding ShowCpu}"/>
+                <TextBlock Grid.Column="1" Grid.Row="4" x:DataType="vm:OverlayViewModel" Text="{Binding CpuText}" FontSize="14" HorizontalAlignment="Right" Margin="0,4,8,2" IsVisible="{Binding ShowCpu}" Foreground="#4ecdc4"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="5" Text="MEM" FontSize="10" Foreground="#667788" Margin="4,4,4,2" IsVisible="{Binding ShowMemory}"/>
+                <TextBlock Grid.Column="1" Grid.Row="5" x:DataType="vm:OverlayViewModel" Text="{Binding MemoryText}" FontSize="14" HorizontalAlignment="Right" Margin="0,4,8,2" IsVisible="{Binding ShowMemory}" Foreground="#fd79a8"/>
+
+                <TextBlock Grid.Column="0" Grid.Row="6" Text="VRAM" FontSize="10" Foreground="#667788" Margin="4,4,4,4" IsVisible="{Binding ShowVram}"/>
+                <TextBlock Grid.Column="1" Grid.Row="6" x:DataType="vm:OverlayViewModel" Text="{Binding VramText}" FontSize="12" HorizontalAlignment="Right" Margin="0,4,8,4" IsVisible="{Binding ShowVram}" Foreground="#aabbcc"/>
+            </Grid>
         </Grid>
-
-        <TextBlock Grid.Column="0" Grid.Row="1" Text="FPS" FontSize="10" Foreground="#888" Margin="8,4,4,2"/>
-        <TextBlock Grid.Column="1" Grid.Row="1" x:DataType="vm:OverlayViewModel" Text="{Binding FpsText}" FontSize="24" FontWeight="Bold" HorizontalAlignment="Right" Margin="0,4,8,2"/>
-
-        <TextBlock Grid.Column="0" Grid.Row="2" Text="GPU" FontSize="10" Foreground="#888" Margin="8,2,4,2"/>
-        <TextBlock Grid.Column="1" Grid.Row="2" x:DataType="vm:OverlayViewModel" Text="{Binding GpuText}" FontSize="14" HorizontalAlignment="Right" Margin="0,2,8,2"/>
-
-        <TextBlock Grid.Column="0" Grid.Row="3" Text="CPU" FontSize="10" Foreground="#888" Margin="8,2,4,2"/>
-        <TextBlock Grid.Column="1" Grid.Row="3" x:DataType="vm:OverlayViewModel" Text="{Binding CpuText}" FontSize="14" HorizontalAlignment="Right" Margin="0,2,8,2"/>
-
-        <TextBlock Grid.Column="0" Grid.Row="4" Text="MEM" FontSize="10" Foreground="#888" Margin="8,2,4,4"/>
-        <TextBlock Grid.Column="1" Grid.Row="4" x:DataType="vm:OverlayViewModel" Text="{Binding MemoryText}" FontSize="14" HorizontalAlignment="Right" Margin="0,2,8,4"/>
-    </Grid>
+    </Border>
 </Window>

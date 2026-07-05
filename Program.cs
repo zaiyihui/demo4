@@ -1,9 +1,14 @@
 using Avalonia;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
+using ComputerCompanion.Models;
 using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ComputerCompanion;
 
@@ -11,6 +16,8 @@ sealed class Program
 {
     public const string OverlayModeArg = "--overlay";
     private static string? _logPath;
+    private static int _logSequence;
+    private static readonly object _logLock = new object();
 
     [STAThread]
     public static void Main(string[] args)
@@ -23,6 +30,10 @@ sealed class Program
             Log($"[启动] 运行目录: {AppContext.BaseDirectory}");
             Log($"[启动] 运行时: {RuntimeInformation.FrameworkDescription}");
             Log($"[启动] 平台: {RuntimeInformation.OSDescription}");
+            Log($"[启动] 处理器: {Environment.ProcessorCount} 核心");
+
+            var totalMemory = GC.GetTotalMemory(false);
+            Log($"[启动] 初始内存: {FormatBytes(totalMemory)}");
 
             InitEncoding();
             InitCulture();
@@ -62,19 +73,55 @@ sealed class Program
             .WithInterFont()
             .LogToTrace();
 
+    static Program()
+    {
+        LiveCharts.Configure(config =>
+            config
+                .AddSkiaSharp()
+                .HasMap<ChartPoint>((point, index) => new(index, point.Value))
+        );
+    }
+
     private static void InitDiagnostics()
     {
         try
         {
+            AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+
             var defaultLogDir = GetDefaultDataPath();
             Directory.CreateDirectory(defaultLogDir);
             _logPath = Path.Combine(defaultLogDir, "runtime.log");
 
-            // 限制日志文件大小
             if (File.Exists(_logPath) && new FileInfo(_logPath).Length > 10 * 1024 * 1024)
             {
                 File.Delete(_logPath);
             }
+        }
+        catch { }
+    }
+
+    private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        var ex = e.ExceptionObject as Exception;
+        if (ex != null)
+        {
+            Log($"[未处理异常] 严重程度: {e.IsTerminating}");
+            Log($"[未处理异常] {ex.GetType().Name}: {ex.Message}");
+            Log(ex.StackTrace ?? "无堆栈信息");
+        }
+    }
+
+    private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+    {
+        try
+        {
+            Log($"[任务异常] 异常数量: {e.Exception.InnerExceptions.Count}");
+            foreach (var ex in e.Exception.InnerExceptions)
+            {
+                Log($"[任务异常] {ex.GetType().Name}: {ex.Message}");
+            }
+            e.SetObserved();
         }
         catch { }
     }
@@ -103,19 +150,13 @@ sealed class Program
                 
                 if (_logPath != newLogPath)
                 {
-                    // 如果旧日志文件存在且新日志文件不存在，复制旧日志
-                    if (File.Exists(_logPath) && !File.Exists(newLogPath))
-                    {
-                        File.Copy(_logPath, newLogPath);
-                    }
                     _logPath = newLogPath;
-                    Log($"[日志] 日志路径已更新为: {_logPath}");
                 }
             }
         }
         catch (Exception ex)
         {
-            Log($"[日志] 更新日志路径失败: {ex.Message}");
+            Console.WriteLine($"[日志] 更新日志路径失败: {ex.Message}");
         }
     }
 
@@ -123,11 +164,17 @@ sealed class Program
     {
         try
         {
-            var line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {message}";
-            if (_logPath != null)
+            var sequence = Interlocked.Increment(ref _logSequence);
+            var line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] [{sequence}] {message}";
+            
+            lock (_logLock)
             {
-                File.AppendAllText(_logPath, line + Environment.NewLine);
+                if (_logPath != null)
+                {
+                    File.AppendAllText(_logPath, line + Environment.NewLine);
+                }
             }
+            
             Console.WriteLine(line);
             System.Diagnostics.Debug.WriteLine(line);
         }
@@ -194,5 +241,13 @@ sealed class Program
             Environment.SetEnvironmentVariable("AVALONIA_GL_RENDERER", "direct2d");
             Environment.SetEnvironmentVariable("AVALONIA_NO_ANGLE", "1");
         }
+    }
+
+    private static string FormatBytes(long bytes)
+    {
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+        if (bytes < 1024 * 1024 * 1024) return $"{bytes / (1024.0 * 1024):F1} MB";
+        return $"{bytes / (1024.0 * 1024 * 1024):F1} GB";
     }
 }

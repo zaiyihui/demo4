@@ -1,13 +1,14 @@
 {
   "runtimeOptions": {
     "configProperties": {
-      "System.GC.Server": true,
+      "System.GC.Server": false,
       "System.GC.Concurrent": true,
       "System.GC.HeapHardLimit": 2147483648,
-      "System.GC.HeapHardLimitPercent": 70,
+      "System.GC.HeapHardLimitPercent": 50,
       "System.GC.RetainVM": false,
-      "System.Threading.ThreadPool.MinThreads": 4,
-      "System.Threading.ThreadPool.MaxThreads": 16
+      "System.GC.HeapCompactionMode": 1,
+      "System.Threading.ThreadPool.MinThreads": 2,
+      "System.Threading.ThreadPool.MaxThreads": 8
     }
   }
 }

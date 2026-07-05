@@ -33,8 +33,7 @@ public class SettingsViewModelTests
         _settings.MainWindow.BackgroundOpacity = 0.8;
         _settings.MainWindow.FontSize = 16;
         _settings.Performance.RefreshInterval = 2000;
-        _settings.Performance.GameMode = true;
-        _settings.Performance.GameModeRefreshInterval = 5000;
+        _settings.Performance.AutoBackupEnabled = false;
         _settings.DisplayContent.ShowCpu = false;
         _settings.DisplayContent.ShowGpu = false;
         _settings.DisplayContent.ShowMemory = false;
@@ -64,8 +63,7 @@ public class SettingsViewModelTests
         Assert.Equal(0.8, viewModel.BackgroundOpacity);
         Assert.Equal(16, viewModel.FontSize);
         Assert.Equal(2000, viewModel.RefreshInterval);
-        Assert.True(viewModel.GameMode);
-        Assert.Equal(5000, viewModel.GameModeRefreshInterval);
+        Assert.False(viewModel.AutoBackupEnabled);
         Assert.False(viewModel.ShowCpu);
         Assert.False(viewModel.ShowGpu);
         Assert.False(viewModel.ShowMemory);
@@ -104,8 +102,7 @@ public class SettingsViewModelTests
         viewModel.BackgroundOpacity = 0.75;
         viewModel.FontSize = 15;
         viewModel.RefreshInterval = 1500;
-        viewModel.GameMode = true;
-        viewModel.GameModeRefreshInterval = 4000;
+        viewModel.AutoBackupEnabled = true;
         viewModel.ShowCpu = false;
         viewModel.ShowGpu = true;
         viewModel.ShowMemory = false;
@@ -136,8 +133,7 @@ public class SettingsViewModelTests
         Assert.Equal(0.75, _settings.MainWindow.BackgroundOpacity);
         Assert.Equal(15, _settings.MainWindow.FontSize);
         Assert.Equal(1500, _settings.Performance.RefreshInterval);
-        Assert.True(_settings.Performance.GameMode);
-        Assert.Equal(4000, _settings.Performance.GameModeRefreshInterval);
+        Assert.True(_settings.Performance.AutoBackupEnabled);
         Assert.False(_settings.DisplayContent.ShowCpu);
         Assert.True(_settings.DisplayContent.ShowGpu);
         Assert.False(_settings.DisplayContent.ShowMemory);
@@ -164,12 +160,12 @@ public class SettingsViewModelTests
         // Arrange
         _settings.MainWindow.LayoutMode = LayoutMode.Horizontal;
         _settings.MainWindow.TextColor = "#FF0000";
-        _settings.Performance.GameMode = true;
+        _settings.Performance.AutoBackupEnabled = false;
         
         var viewModel = CreateViewModel();
         viewModel.LayoutMode = LayoutMode.Vertical;
         viewModel.TextColor = "#FFFFFF";
-        viewModel.GameMode = false;
+        viewModel.AutoBackupEnabled = true;
 
         // Act
         viewModel.ResetToDefaults();
@@ -177,9 +173,8 @@ public class SettingsViewModelTests
         // Assert
         Assert.Equal(LayoutMode.Vertical, viewModel.LayoutMode);
         Assert.Equal("#FFFFFF", viewModel.TextColor);
-        Assert.False(viewModel.GameMode);
+        Assert.False(viewModel.AutoBackupEnabled);
         Assert.Equal(1000, viewModel.RefreshInterval);
-        Assert.Equal(3000, viewModel.GameModeRefreshInterval);
         Assert.True(viewModel.ShowCpu);
         Assert.True(viewModel.ShowGpu);
         Assert.True(viewModel.ShowMemory);
@@ -223,26 +218,6 @@ public class SettingsViewModelTests
 
         // Act
         viewModel.TextColor = "#FF0000";
-
-        // Assert
-        Assert.True(propertyChanged);
-    }
-
-    [Fact]
-    public void GameMode_PropertyChanged_RaisesEvent()
-    {
-        // Arrange
-        var viewModel = CreateViewModel();
-        bool propertyChanged = false;
-        
-        viewModel.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(viewModel.GameMode))
-                propertyChanged = true;
-        };
-
-        // Act
-        viewModel.GameMode = true;
 
         // Assert
         Assert.True(propertyChanged);

@@ -7,6 +7,13 @@ using System.Collections.Generic;
 
 namespace ComputerCompanion.ViewModels;
 
+public enum OverlayViewMode
+{
+    Minimal,
+    Standard,
+    Complete
+}
+
 public partial class OverlayViewModel : ObservableObject, IDisposable
 {
     private readonly IHardwareMonitorService _monitor;
@@ -32,6 +39,23 @@ public partial class OverlayViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private string _overlayTextColor;
 
+    [ObservableProperty]
+    private string _fps1PercentLowText;
+
+    [ObservableProperty]
+    private string _vramText;
+
+    [ObservableProperty]
+    private OverlayViewMode _currentViewMode;
+
+    public bool ShowFps => true;
+    public bool ShowFpsDetails => CurrentViewMode != OverlayViewMode.Minimal;
+    public bool ShowGpu => CurrentViewMode != OverlayViewMode.Minimal;
+    public bool ShowCpu => CurrentViewMode != OverlayViewMode.Minimal;
+    public bool ShowMemory => CurrentViewMode == OverlayViewMode.Complete;
+    public bool ShowLatency => CurrentViewMode == OverlayViewMode.Complete;
+    public bool ShowVram => CurrentViewMode == OverlayViewMode.Complete && _monitor.HasGpu;
+
     public OverlayViewModel(
         IHardwareMonitorService monitor, 
         ILatencyMonitorService latencyMonitor,
@@ -50,6 +74,24 @@ public partial class OverlayViewModel : ObservableObject, IDisposable
         _memoryText = "内存: --";
         _latencyText = "延迟: --";
         _overlayTextColor = settings.Overlay.OverlayTextColor;
+        _fps1PercentLowText = "--";
+        _vramText = "--";
+        _currentViewMode = OverlayViewMode.Standard;
+    }
+
+    public void SwitchViewMode()
+    {
+        var modes = Enum.GetValues<OverlayViewMode>();
+        var currentIndex = Array.IndexOf(modes, CurrentViewMode);
+        var nextIndex = (currentIndex + 1) % modes.Length;
+        CurrentViewMode = modes[nextIndex];
+        
+        OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(ShowFpsDetails)));
+        OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(ShowGpu)));
+        OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(ShowCpu)));
+        OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(ShowMemory)));
+        OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(ShowLatency)));
+        OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(ShowVram)));
     }
 
     public void MarkFrame()
@@ -126,6 +168,21 @@ public partial class OverlayViewModel : ObservableObject, IDisposable
         else
         {
             MemoryText = "--";
+        }
+
+        if (_monitor.Fps1PercentLow.HasValue)
+        {
+            Fps1PercentLowText = _monitor.Fps1PercentLow.Value > 0 ? $"1%: {_monitor.Fps1PercentLow.Value:F0}" : "--";
+        }
+
+        if (_monitor.HasGpu && _monitor.GpuVramUsed.HasValue && _monitor.GpuVramTotal.HasValue)
+        {
+            var vramPercent = (_monitor.GpuVramUsed.Value / _monitor.GpuVramTotal.Value) * 100;
+            VramText = $"VRAM: {_monitor.GpuVramUsed.Value:F1}GB/{_monitor.GpuVramTotal.Value:F1}GB ({vramPercent:F0}%)";
+        }
+        else
+        {
+            VramText = "--";
         }
     }
 

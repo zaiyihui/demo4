@@ -56,9 +56,9 @@
 
   <!-- 资源文件 - 确保 UTF-8 编码 -->
   <ItemGroup>
-    <None Include="**/*.md" CopyToOutputDirectory="PreserveNewest">
-      <Exclude>bin\**;obj\**</Exclude>
-    </None>
+    <None Include="README.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="docs\**/*.md" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="CONTRIBUTING.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- 确保所有源文件使用 UTF-8 编码 -->

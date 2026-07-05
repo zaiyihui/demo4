@@ -12,6 +12,11 @@ public class TrayIconService : IDisposable
     private Thread? _messageLoopThread;
     private bool _messageLoopRunning;
 
+    /// <summary>
+    /// 打开设置窗口事件
+    /// </summary>
+    public event EventHandler? OpenSettings;
+
     public TrayIconService()
     {
     }
@@ -55,8 +60,16 @@ public class TrayIconService : IDisposable
             };
 
             var menu = new ContextMenuStrip();
+            
+            // 显示主窗口
             menu.Items.Add("显示主窗口", null, (s, e) => SafeRaise(ShowMainWindow));
             menu.Items.Add("-");
+            
+            // 设置
+            menu.Items.Add("设置", null, (s, e) => SafeRaise(OpenSettings));
+            menu.Items.Add("-");
+            
+            // 退出程序
             menu.Items.Add("退出程序", null, (s, e) => SafeRaise(ExitApplication));
 
             _notifyIcon.ContextMenuStrip = menu;

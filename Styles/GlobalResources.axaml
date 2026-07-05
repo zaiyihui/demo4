@@ -1,0 +1,370 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ===== 监控卡片渐变（MainWindow 与 PerformanceDashboardWindow 共享） ===== -->
+
+    <!-- CPU 渐变 -->
+    <LinearGradientBrush x:Key="CpuGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#4ecdc4" Offset="0"/>
+        <GradientStop Color="#2a9d8f" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CpuGradient2" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#4ecdc4" Offset="0"/>
+        <GradientStop Color="#3ba69d" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- GPU 渐变 -->
+    <LinearGradientBrush x:Key="GpuGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#a29bfe" Offset="0"/>
+        <GradientStop Color="#6c5ce7" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="GpuGradient2" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#a29bfe" Offset="0"/>
+        <GradientStop Color="#6c5ce7" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 内存渐变 -->
+    <LinearGradientBrush x:Key="MemoryGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#fd79a8" Offset="0"/>
+        <GradientStop Color="#e84393" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="MemoryGradient2" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#fd79a8" Offset="0"/>
+        <GradientStop Color="#e84393" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 网络渐变 -->
+    <LinearGradientBrush x:Key="NetworkGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#ffeaa7" Offset="0"/>
+        <GradientStop Color="#fdcb6e" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 磁盘渐变 -->
+    <LinearGradientBrush x:Key="DiskGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#dfe6e9" Offset="0"/>
+        <GradientStop Color="#b2bec3" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="DiskGradient2" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#dfe6e9" Offset="0"/>
+        <GradientStop Color="#b2bec3" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 电池渐变 -->
+    <LinearGradientBrush x:Key="BatteryGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#00b894" Offset="0"/>
+        <GradientStop Color="#00a085" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BatteryGradient2" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#00b894" Offset="0"/>
+        <GradientStop Color="#00a085" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ===== 液态玻璃色彩隔离层 ===== -->
+
+    <!-- 色彩隔离层 - 纯白去饱和缓冲，防止高饱和背景色渗透 -->
+    <LinearGradientBrush x:Key="ColorIsolationLayer" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#18fafafa" Offset="0"/>
+        <GradientStop Color="#14f8f8f8" Offset="0.3"/>
+        <GradientStop Color="#10f5f5f5" Offset="0.6"/>
+        <GradientStop Color="#0cf2f2f2" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 中性灰基底缓冲层 - 低饱和度灰色，吸收高饱和背景色溢出 -->
+    <LinearGradientBrush x:Key="NeutralGrayBuffer" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0aeeeeee" Offset="0"/>
+        <GradientStop Color="#08e8e8e8" Offset="0.5"/>
+        <GradientStop Color="#06e0e0e0" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 色彩净化层 - 极淡冷白，进一步隔离彩色背景 -->
+    <LinearGradientBrush x:Key="ColorPurifyLayer" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#08fefefe" Offset="0"/>
+        <GradientStop Color="#06fafafa" Offset="0.5"/>
+        <GradientStop Color="#04f5f5f5" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ===== 厚玻璃效果资源（外层窗口专用） ===== -->
+
+    <!-- 厚玻璃基底 - 高不透明度冷白，实现重度磨砂质感 -->
+    <LinearGradientBrush x:Key="ThickGlassBase" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#a0f0f0f8" Offset="0"/>
+        <GradientStop Color="#90ebebeb" Offset="0.25"/>
+        <GradientStop Color="#80e6e6e8" Offset="0.5"/>
+        <GradientStop Color="#70e0e0e5" Offset="0.75"/>
+        <GradientStop Color="#60dcdce0" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 厚玻璃边框 - 更明显的边框，增强层次感 -->
+    <LinearGradientBrush x:Key="ThickGlassBorder" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#b0f5f5fc" Offset="0"/>
+        <GradientStop Color="#a0f0f0f8" Offset="0.25"/>
+        <GradientStop Color="#90ebebeb" Offset="0.5"/>
+        <GradientStop Color="#80e6e6e8" Offset="0.75"/>
+        <GradientStop Color="#70e0e0e5" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 厚玻璃阴影 - 更深的阴影，增强空间层次 -->
+    <!-- 使用纯色而非渐变，因为BoxShadow不支持渐变 -->
+
+    <!-- 厚玻璃顶部高光 - 更强的反光效果 -->
+    <LinearGradientBrush x:Key="ThickGlassHighlight" StartPoint="0,0" EndPoint="0,0.4">
+        <GradientStop Color="#60ffffff" Offset="0"/>
+        <GradientStop Color="#45ffffff" Offset="0.2"/>
+        <GradientStop Color="#30ffffff" Offset="0.4"/>
+        <GradientStop Color="#15ffffff" Offset="0.6"/>
+        <GradientStop Color="#00000000" Offset="0.8"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 厚玻璃底部暗化层 - 增强立体感 -->
+    <LinearGradientBrush x:Key="ThickGlassBottomDark" StartPoint="0,0.8" EndPoint="0,1">
+        <GradientStop Color="#00000000" Offset="0"/>
+        <GradientStop Color="#08000000" Offset="0.3"/>
+        <GradientStop Color="#10000000" Offset="0.6"/>
+        <GradientStop Color="#15000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ===== 液态玻璃核心资源 ===== -->
+
+    <!-- 液态玻璃透明底色 - 半透明冷白渐变，实现真实玻璃质感 -->
+    <LinearGradientBrush x:Key="LiquidGlassBase" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#70fafafa" Offset="0"/>
+        <GradientStop Color="#60f5f5f7" Offset="0.25"/>
+        <GradientStop Color="#50f0f0f2" Offset="0.5"/>
+        <GradientStop Color="#40ebebeb" Offset="0.75"/>
+        <GradientStop Color="#35e8e8ea" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 液态玻璃悬浮态底色 -->
+    <LinearGradientBrush x:Key="LiquidGlassHover" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#80fcfcfc" Offset="0"/>
+        <GradientStop Color="#70f9f9f9" Offset="0.25"/>
+        <GradientStop Color="#60f4f4f4" Offset="0.5"/>
+        <GradientStop Color="#50efefef" Offset="0.75"/>
+        <GradientStop Color="#40eaeaea" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 液态玻璃按下态底色 -->
+    <LinearGradientBrush x:Key="LiquidGlassPressed" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#50f0f0f0" Offset="0"/>
+        <GradientStop Color="#45ebebeb" Offset="0.25"/>
+        <GradientStop Color="#3ae6e6e6" Offset="0.5"/>
+        <GradientStop Color="#30e0e0e0" Offset="0.75"/>
+        <GradientStop Color="#28dadada" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ===== 卡片选中/未选中状态资源（液态玻璃标准模板）===== -->
+
+    <!-- 选中态 - 液态玻璃：极低透明度配合渐变高光 -->
+    <LinearGradientBrush x:Key="CardSelectedBase" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#18ffffff" Offset="0"/>
+        <GradientStop Color="#10ffffff" Offset="0.3"/>
+        <GradientStop Color="#0cffffff" Offset="0.6"/>
+        <GradientStop Color="#08ffffff" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 未选中态 - 磨砂玻璃：更低透明度 -->
+    <LinearGradientBrush x:Key="CardUnselectedBase" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#0dffffff" Offset="0"/>
+        <GradientStop Color="#09ffffff" Offset="0.3"/>
+        <GradientStop Color="#06ffffff" Offset="0.6"/>
+        <GradientStop Color="#04ffffff" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 选中态边框 - 高亮 #60FFFFFF -->
+    <LinearGradientBrush x:Key="CardSelectedBorder" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#60ffffff" Offset="0"/>
+        <GradientStop Color="#50ffffff" Offset="0.5"/>
+        <GradientStop Color="#40ffffff" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 未选中态边框 - 暗淡 #30FFFFFF -->
+    <LinearGradientBrush x:Key="CardUnselectedBorder" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#30ffffff" Offset="0"/>
+        <GradientStop Color="#25ffffff" Offset="0.5"/>
+        <GradientStop Color="#20ffffff" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ===== 光学玻璃渐变反光（去饱和版本） ===== -->
+
+    <!-- 顶部高光渐变 - 纯白色去饱和，模拟玻璃表面反光，不受背景色影响 -->
+    <LinearGradientBrush x:Key="GlassHighlightTop" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#55ffffff" Offset="0"/>
+        <GradientStop Color="#38ffffff" Offset="0.12"/>
+        <GradientStop Color="#20ffffff" Offset="0.28"/>
+        <GradientStop Color="#08ffffff" Offset="0.45"/>
+        <GradientStop Color="#00000000" Offset="0.6"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 顶部边缘高光 - 更薄的边缘反光，纯白色 -->
+    <LinearGradientBrush x:Key="GlassHighlightEdge" StartPoint="0,0" EndPoint="0,0.06">
+        <GradientStop Color="#65ffffff" Offset="0"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 边缘高光 - 左侧边缘反光，低饱和度 -->
+    <LinearGradientBrush x:Key="GlassHighlightLeft" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#40ffffff" Offset="0"/>
+        <GradientStop Color="#25ffffff" Offset="0.1"/>
+        <GradientStop Color="#10ffffff" Offset="0.22"/>
+        <GradientStop Color="#00000000" Offset="0.35"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 边缘高光 - 右侧边缘反光，更微弱 -->
+    <LinearGradientBrush x:Key="GlassHighlightRight" StartPoint="1,0" EndPoint="0,0">
+        <GradientStop Color="#30ffffff" Offset="0"/>
+        <GradientStop Color="#15ffffff" Offset="0.08"/>
+        <GradientStop Color="#08ffffff" Offset="0.18"/>
+        <GradientStop Color="#00000000" Offset="0.28"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 角落高光 - 左上角，纯白色 -->
+    <LinearGradientBrush x:Key="GlassHighlightCorner" StartPoint="0,0" EndPoint="0.35,0.35">
+        <GradientStop Color="#48ffffff" Offset="0"/>
+        <GradientStop Color="#30ffffff" Offset="0.25"/>
+        <GradientStop Color="#15ffffff" Offset="0.5"/>
+        <GradientStop Color="#00000000" Offset="0.75"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ===== 色散效果（低饱和度版本） ===== -->
+
+    <!-- 色散反光效果 - 低饱和度彩色，模拟玻璃折射但防止色溢 -->
+    <LinearGradientBrush x:Key="GlassDispersion" StartPoint="0,0" EndPoint="1,0.5">
+        <GradientStop Color="#10e0f0f5" Offset="0"/>
+        <GradientStop Color="#0ce8e8f0" Offset="0.3"/>
+        <GradientStop Color="#08f0f0f8" Offset="0.5"/>
+        <GradientStop Color="#05f5f5fc" Offset="0.7"/>
+        <GradientStop Color="#03fafaff" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 色散边缘效果 - 顶部边缘微弱色散，极淡冷色调 -->
+    <LinearGradientBrush x:Key="GlassDispersionEdge" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#0ae8f0f8" Offset="0"/>
+        <GradientStop Color="#08f0f5ff" Offset="0.35"/>
+        <GradientStop Color="#06f5faff" Offset="0.65"/>
+        <GradientStop Color="#04fafbff" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 微透光渐变 - 带微弱冷色调通透感，防止暖色渗透 -->
+    <LinearGradientBrush x:Key="GlassMicroLight" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#12f5f8f8" Offset="0"/>
+        <GradientStop Color="#0de8ebeb" Offset="0.25"/>
+        <GradientStop Color="#0af0f2f2" Offset="0.5"/>
+        <GradientStop Color="#0de0e2e2" Offset="0.75"/>
+        <GradientStop Color="#10e8eaea" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 微透光渐变 - 悬浮态增强版 -->
+    <LinearGradientBrush x:Key="GlassMicroLightHover" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#18f8fafa" Offset="0"/>
+        <GradientStop Color="#12ebecec" Offset="0.25"/>
+        <GradientStop Color="#0ff2f4f4" Offset="0.5"/>
+        <GradientStop Color="#12e5e7e7" Offset="0.75"/>
+        <GradientStop Color="#15ebecea" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ===== 玻璃边框（色彩通道约束） ===== -->
+
+    <!-- 玻璃边框渐变 - 低饱和度冷白色，约束色彩通道防止溢色 -->
+    <LinearGradientBrush x:Key="GlassBorder" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#70f5f5f8" Offset="0"/>
+        <GradientStop Color="#60f0f0f5" Offset="0.25"/>
+        <GradientStop Color="#50ebebeb" Offset="0.5"/>
+        <GradientStop Color="#45e6e6ea" Offset="0.75"/>
+        <GradientStop Color="#3ae0e0e5" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 玻璃边框悬浮态 - 增强但保持低饱和度 -->
+    <LinearGradientBrush x:Key="GlassBorderHover" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#80f8f8fb" Offset="0"/>
+        <GradientStop Color="#70f5f5f8" Offset="0.25"/>
+        <GradientStop Color="#60f0f0f5" Offset="0.5"/>
+        <GradientStop Color="#50ebebeb" Offset="0.75"/>
+        <GradientStop Color="#45e6e6ea" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 玻璃边框 - 高亮态 -->
+    <LinearGradientBrush x:Key="GlassBorderActive" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#5afafafc" Offset="0"/>
+        <GradientStop Color="#45f8f8fb" Offset="0.25"/>
+        <GradientStop Color="#35f5f5f8" Offset="0.5"/>
+        <GradientStop Color="#25f0f0f5" Offset="0.75"/>
+        <GradientStop Color="#1aebebeb" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ===== 内部发光（去饱和版本） ===== -->
+
+    <!-- 内部柔和发光 - 纯白色低饱和 -->
+    <LinearGradientBrush x:Key="GlassInnerGlow" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Color="#12ffffff" Offset="0"/>
+        <GradientStop Color="#0dffffff" Offset="0.3"/>
+        <GradientStop Color="#08ffffff" Offset="0.6"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 内部径向发光 - 纯白色 -->
+    <RadialGradientBrush x:Key="GlassRadialGlow" Center="0.2,0.2" RadiusX="60%" RadiusY="60%">
+        <GradientStop Color="#18ffffff" Offset="0"/>
+        <GradientStop Color="#10ffffff" Offset="0.4"/>
+        <GradientStop Color="#06ffffff" Offset="0.7"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </RadialGradientBrush>
+
+    <!-- ===== 控件专用玻璃渐变（色彩隔离版本） ===== -->
+
+    <!-- CPU 玻璃渐变 - 低饱和度冷色调 -->
+    <LinearGradientBrush x:Key="CpuGlassGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#18e0f0f5" Offset="0"/>
+        <GradientStop Color="#10d0e0eb" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- GPU 玻璃渐变 - 低饱和度冷紫色 -->
+    <LinearGradientBrush x:Key="GpuGlassGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#18e8e8fa" Offset="0"/>
+        <GradientStop Color="#10d8d8f0" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 内存玻璃渐变 - 低饱和度冷粉色 -->
+    <LinearGradientBrush x:Key="MemoryGlassGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#18f0e8f0" Offset="0"/>
+        <GradientStop Color="#10e8d8e8" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- FPS 玻璃渐变 - 低饱和度冷绿色 -->
+    <LinearGradientBrush x:Key="FpsGlassGradient" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#18e8f0ea" Offset="0"/>
+        <GradientStop Color="#10d8e0da" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 按钮专用玻璃渐变 - 纯白色垂直渐变 -->
+    <LinearGradientBrush x:Key="ButtonGlassGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#2df5f5f8" Offset="0"/>
+        <GradientStop Color="#20f0f0f5" Offset="0.5"/>
+        <GradientStop Color="#18ebebeb" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 按钮悬浮态玻璃渐变 -->
+    <LinearGradientBrush x:Key="ButtonGlassHoverGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#3af8f8fb" Offset="0"/>
+        <GradientStop Color="#2df5f5f8" Offset="0.5"/>
+        <GradientStop Color="#20f0f0f5" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ===== 系统状态颜色 ===== -->
+
+    <SolidColorBrush x:Key="StatusNormal" Color="#00b894"/>
+    <SolidColorBrush x:Key="StatusWarning" Color="#fdcb6e"/>
+    <SolidColorBrush x:Key="StatusError" Color="#ff6b6b"/>
+
+    <!-- ===== 文本颜色 ===== -->
+
+    <SolidColorBrush x:Key="TextPrimary" Color="#ffffff"/>
+    <SolidColorBrush x:Key="TextSecondary" Color="#e8eef5"/>
+    <SolidColorBrush x:Key="TextTertiary" Color="#a0a8b5"/>
+    <SolidColorBrush x:Key="TextDisabled" Color="#6a7080"/>
+
+</ResourceDictionary>

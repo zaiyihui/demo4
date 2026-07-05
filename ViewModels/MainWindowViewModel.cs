@@ -44,9 +44,6 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
     private bool _showBattery = true;
 
     [ObservableProperty]
-    private bool _gameMode = false;
-
-    [ObservableProperty]
     private double _cpuUsagePercent = 0;
 
     [ObservableProperty]
@@ -284,23 +281,13 @@ public partial class MainWindowViewModel : ObservableObject, IDisposable
         return "电池: --";
     }
 
-    public void ToggleGameMode()
-    {
-        GameMode = !GameMode;
-        _settings.Performance.GameMode = GameMode;
-        _settingsService.SaveSettings();
-        
-        _monitor.Stop();
-        _monitor.Start(GameMode ? _settings.Performance.GameModeRefreshInterval : _settings.Performance.RefreshInterval);
-    }
-
     public void UpdateSettings(Settings settings)
     {
         _settings = settings;
         _settingsService.SaveSettings();
         
         _monitor.Stop();
-        _monitor.Start(_settings.Performance.GameMode ? _settings.Performance.GameModeRefreshInterval : _settings.Performance.RefreshInterval);
+        _monitor.Start(_settings.Performance.RefreshInterval);
     }
 
     public void Dispose()

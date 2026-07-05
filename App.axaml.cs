@@ -102,6 +102,15 @@ public partial class App : Application
             // 告警规则服务
             services.AddSingleton<IAlertRuleService, AlertRuleService>();
 
+            // 导航服务
+            services.AddSingleton<INavigationService, NavigationService>();
+
+            // 全局热键服务
+            services.AddSingleton<IGlobalHotkeyService, GlobalHotkeyService>();
+
+            // 性能日志服务
+            services.AddSingleton<IPerformanceLoggerService, PerformanceLoggerService>();
+
         _serviceProvider = services.BuildServiceProvider();
     }
 
@@ -135,7 +144,9 @@ public partial class App : Application
             settingsService.UpdateSettingsPath(settingsPath);
             Program.Log($"[应用] 设置文件路径: {settingsPath}");
             
+            Program.Log("[应用] 更新日志路径前");
             Program.UpdateLogPath(dataStorageService.GetLogPath());
+            Program.Log("[应用] 更新日志路径后");
 
             if (IsOverlayMode)
             {
@@ -215,12 +226,51 @@ public partial class App : Application
         }
     }
 
+    /// <summary>
+    /// 打开设置窗口
+    /// </summary>
+    private void OpenSettingsWindow()
+    {
+        try
+        {
+            Program.Log("[应用] 打开设置窗口（通过导航服务）");
+            
+            var navigationService = ServiceProvider.GetService<INavigationService>();
+            if (navigationService != null)
+            {
+                navigationService.ShowSettings();
+            }
+            else
+            {
+                Program.Log("[应用] OpenSettingsWindow: INavigationService 获取失败，回退到直接创建");
+                
+                var settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
+                var settings = settingsService.GetSettings();
+                
+                var settingsWindow = new Views.SettingsWindow(settings, (updatedSettings) => {
+                    settingsService.SaveSettings();
+                });
+                
+                settingsWindow.Show();
+                settingsWindow.Activate();
+            }
+            
+            Program.Log("[应用] 设置窗口已打开");
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[应用] 打开设置窗口失败: {ex.Message}");
+        }
+    }
+
     private void InitializeMainMode(Settings settings)
     {
+        Program.Log("[应用] InitializeMainMode 开始");
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             try
             {
+                Program.Log("[应用] 获取 desktop lifetime");
                 _desktopLifetime = desktop;
                 
                 Program.Log("[应用] 获取性能监控服务");
@@ -240,35 +290,40 @@ public partial class App : Application
                 
                 Program.Log("[应用] 创建性能监控面板窗口");
                 var dashboardWindow = new PerformanceDashboardWindow();
+                Program.Log("[应用] 窗口已创建");
                 dashboardWindow.SetViewModel(viewModel);
+                Program.Log("[应用] ViewModel已设置");
 
-                // 使用窗口管理器
                 var windowManager = ServiceProvider.GetRequiredService<IWindowManager>();
                 windowManager.SetMainWindow(dashboardWindow);
+                Program.Log("[应用] 窗口已设置到窗口管理器");
+
+                var navigationService = ServiceProvider.GetRequiredService<INavigationService>();
+                navigationService.SetMainWindow(dashboardWindow);
 
                 desktop.MainWindow = dashboardWindow;
                 desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
+                Program.Log("[应用] 窗口已设置为MainWindow");
 
-                // 显示窗口
                 dashboardWindow.Show();
+                Program.Log("[应用] 窗口已调用Show()");
                 dashboardWindow.Activate();
+                Program.Log("[应用] 窗口已调用Activate()");
                 Program.Log("[应用] 性能监控面板已显示");
 
-                // IPC 服务和路由器
                 var ipcService = ServiceProvider.GetRequiredService<IIpcService>();
                 var router = ServiceProvider.GetRequiredService<IIpcMessageRouter>();
                 
-                // 注册主窗口模式的 IPC 消息处理器
                 RegisterMainModeMessageHandlers(router);
                 
                 router.Start();
                 _ = StartIpcServerAsync(ipcService);
 
-                // 托盘图标
                 try
                 {
                     var trayIconService = ServiceProvider.GetRequiredService<TrayIconService>();
                     trayIconService.ShowMainWindow += (s, e) => windowManager.ShowMainWindow();
+                    trayIconService.OpenSettings += (s, e) => navigationService.ShowSettings();
                     trayIconService.ExitApplication += (s, e) => ExitApplication();
                     trayIconService.Initialize();
                     Program.Log("[应用] 托盘图标服务已初始化");
@@ -278,7 +333,6 @@ public partial class App : Application
                     Program.Log($"[应用] 托盘初始化失败（忽略）: {ex.Message}");
                 }
 
-                // 悬浮窗进程管理
                 var overlayManager = ServiceProvider.GetRequiredService<IOverlayProcessManager>();
                 overlayManager.ProcessExited += OnOverlayProcessExited;
                 
@@ -288,13 +342,52 @@ public partial class App : Application
                     overlayManager.Start();
                 }
 
+                var hotkeyService = ServiceProvider.GetRequiredService<IGlobalHotkeyService>() as GlobalHotkeyService;
+                if (hotkeyService != null)
+                {
+                    try
+                    {
+                        var platformImpl = dashboardWindow.PlatformImpl;
+                        var handle = platformImpl != null ? GetWindowHandle(platformImpl) : IntPtr.Zero;
+                        if (handle != IntPtr.Zero)
+                        {
+                            hotkeyService.Initialize(handle);
+                            
+                            hotkeyService.ToggleOverlay += () => 
+                            {
+                                if (overlayManager.IsRunning)
+                                {
+                                    overlayManager.Stop();
+                                }
+                                else
+                                {
+                                    overlayManager.Start();
+                                }
+                            };
+                            hotkeyService.SwitchViewMode += () => 
+                            {
+                                var navigationService = ServiceProvider.GetService<INavigationService>();
+                                navigationService?.SwitchOverlayViewMode();
+                            };
+                            hotkeyService.RegisterHotkeys();
+                        }
+                        else
+                        {
+                            Program.Log("[热键] 无法获取窗口句柄，热键功能不可用");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Program.Log($"[热键] 初始化失败: {ex.Message}");
+                    }
+                }
+
                 Program.Log("[应用] 性能监控面板模式初始化完成");
             }
             catch (Exception ex)
             {
                 Program.Log($"[应用] 主窗口初始化失败: {ex.GetType().Name}: {ex.Message}");
                 Program.Log(ex.StackTrace ?? "无堆栈信息");
-                // 尝试显示一个简单的错误窗口
                 try
                 {
                     var dashboardWindow = new PerformanceDashboardWindow();
@@ -351,6 +444,12 @@ public partial class App : Application
         router.RegisterHandler(IpcMessageTypes.ShowMainWindow, msg =>
         {
             windowManager?.ShowMainWindow();
+        });
+        
+        router.RegisterHandler(IpcMessageTypes.ShowSettings, msg =>
+        {
+            var navigationService = ServiceProvider.GetService<INavigationService>();
+            navigationService?.ShowSettings();
         });
         
         router.RegisterHandler(IpcMessageTypes.ExitApplication, msg =>
@@ -484,6 +583,27 @@ public partial class App : Application
         catch { }
 
         Environment.Exit(0);
+    }
+
+    private IntPtr GetWindowHandle(object platformImpl)
+    {
+        try
+        {
+            var handleProperty = platformImpl.GetType().GetProperty("Handle");
+            if (handleProperty != null)
+            {
+                return (IntPtr)handleProperty.GetValue(platformImpl)!;
+            }
+            
+            var handleField = platformImpl.GetType().GetField("Handle", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            if (handleField != null)
+            {
+                return (IntPtr)handleField.GetValue(platformImpl)!;
+            }
+        }
+        catch { }
+        
+        return IntPtr.Zero;
     }
 
     #endregion

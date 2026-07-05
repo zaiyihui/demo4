@@ -8,12 +8,13 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "D:\\BC\\xiangmu\\demo4\\ComputerCompanion.csproj",
-        "projectName": "电脑伴侣",
+        "projectName": "ComputerCompanion",
         "projectPath": "D:\\BC\\xiangmu\\demo4\\ComputerCompanion.csproj",
-        "packagesPath": "C:\\Users\\17819\\.nuget\\packages\\",
+        "packagesPath": "D:\\BC\\xiangmu\\demo4\\.nuget\\packages",
         "outputPath": "D:\\BC\\xiangmu\\demo4\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
+          "D:\\BC\\xiangmu\\demo4\\NuGet.Config",
           "C:\\Users\\17819\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
@@ -72,13 +73,37 @@
               "target": "Package",
               "version": "[0.9.6, )"
             },
+            "LiveChartsCore": {
+              "target": "Package",
+              "version": "[2.0.0, )"
+            },
+            "LiveChartsCore.SkiaSharpView": {
+              "target": "Package",
+              "version": "[2.0.0, )"
+            },
+            "LiveChartsCore.SkiaSharpView.Avalonia": {
+              "target": "Package",
+              "version": "[2.0.0, )"
+            },
             "Microsoft.Extensions.DependencyInjection": {
               "target": "Package",
               "version": "[8.0.0, )"
             },
+            "NAudio": {
+              "target": "Package",
+              "version": "[2.2.1, )"
+            },
             "Newtonsoft.Json": {
               "target": "Package",
               "version": "[13.0.3, )"
+            },
+            "SkiaSharp": {
+              "target": "Package",
+              "version": "[2.88.9, )"
+            },
+            "System.Text.Json": {
+              "target": "Package",
+              "version": "[8.0.5, )"
             }
           },
           "imports": [
@@ -92,20 +117,6 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Runtime.win-x64",
-              "version": "[8.0.27, 8.0.27]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Runtime.win-x64",
-              "version": "[8.0.27, 8.0.27]"
-            },
-            {
-              "name": "Microsoft.WindowsDesktop.App.Runtime.win-x64",
-              "version": "[8.0.27, 8.0.27]"
-            }
-          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
@@ -132,10 +143,11 @@
         "projectUniqueName": "D:\\BC\\xiangmu\\demo4\\Tests\\ComputerCompanion.Tests.csproj",
         "projectName": "ComputerCompanion.Tests",
         "projectPath": "D:\\BC\\xiangmu\\demo4\\Tests\\ComputerCompanion.Tests.csproj",
-        "packagesPath": "C:\\Users\\17819\\.nuget\\packages\\",
+        "packagesPath": "D:\\BC\\xiangmu\\demo4\\.nuget\\packages",
         "outputPath": "D:\\BC\\xiangmu\\demo4\\Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
+          "D:\\BC\\xiangmu\\demo4\\NuGet.Config",
           "C:\\Users\\17819\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [

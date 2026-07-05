@@ -293,26 +293,6 @@ public class Settings
     }
 
     /// <summary>
-    /// 是否启用游戏模式
-    /// </summary>
-    [System.Obsolete("请使用 Performance.GameMode")]
-    public bool GameMode
-    {
-        get => Performance.GameMode;
-        set => Performance.GameMode = value;
-    }
-
-    /// <summary>
-    /// 游戏模式刷新间隔
-    /// </summary>
-    [System.Obsolete("请使用 Performance.GameModeRefreshInterval")]
-    public int GameModeRefreshInterval
-    {
-        get => Performance.GameModeRefreshInterval;
-        set => Performance.GameModeRefreshInterval = value;
-    }
-
-    /// <summary>
     /// 开机自动启动
     /// </summary>
     [System.Obsolete("请使用 Startup.AutoStart")]

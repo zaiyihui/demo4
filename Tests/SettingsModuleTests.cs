@@ -162,23 +162,6 @@ public class SettingsModuleTests
 
         // Assert
         Assert.Equal(1000, settings.RefreshInterval);
-        Assert.False(settings.GameMode);
-        Assert.Equal(3000, settings.GameModeRefreshInterval);
-    }
-
-    [Fact]
-    public void PerformanceSettings_CanConfigureGameMode()
-    {
-        // Arrange
-        var settings = new PerformanceSettings();
-
-        // Act
-        settings.GameMode = true;
-        settings.GameModeRefreshInterval = 5000;
-
-        // Assert
-        Assert.True(settings.GameMode);
-        Assert.Equal(5000, settings.GameModeRefreshInterval);
     }
 
     #endregion
@@ -272,13 +255,9 @@ public class SettingsModuleTests
 
         // Act - 使用废弃的属性
         settings.RefreshInterval = 2000;
-        settings.GameMode = true;
-        settings.GameModeRefreshInterval = 4000;
 
         // Assert
         Assert.Equal(2000, settings.Performance.RefreshInterval);
-        Assert.True(settings.Performance.GameMode);
-        Assert.Equal(4000, settings.Performance.GameModeRefreshInterval);
     }
 
     [Fact]

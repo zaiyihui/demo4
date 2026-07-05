@@ -22,6 +22,8 @@ public interface IHardwareMonitorService : IDisposable
     float? DiskTotalSpace { get; }
     
     float? Fps { get; }
+    float? Fps1PercentLow { get; }
+    float? Fps01PercentLow { get; }
     
     bool HasGpu { get; }
     

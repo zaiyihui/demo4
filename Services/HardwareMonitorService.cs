@@ -1,5 +1,6 @@
 using LibreHardwareMonitor.Hardware;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Timers;
@@ -13,12 +14,18 @@ public class HardwareMonitorService : IHardwareMonitorService
     private Computer? _computer;
     private System.Timers.Timer? _dataTimer;
     private bool _isRunning;
+    private IPerformanceLoggerService? _performanceLogger;
     
     private long _frameCount = 0;
     private long _lastFpsUpdateTime = 0;
     private float _currentFps = 0;
     private readonly long _ticksPerSecond = TimeSpan.TicksPerSecond;
     private bool _fpsInitialized = false;
+    
+    private readonly Queue<float> _fpsHistory = new();
+    private const int MaxFpsHistorySize = 600;
+    public float? Fps1PercentLow { get; private set; }
+    public float? Fps01PercentLow { get; private set; }
 
     public float? CpuUsage { get; private set; }
     public float? CpuTemp { get; private set; }
@@ -42,6 +49,32 @@ public class HardwareMonitorService : IHardwareMonitorService
     public bool HasGpu => GpuUsage.HasValue;
 
     public event Action? DataUpdated;
+
+    private float _lastCpuUsage = 0;
+    private float _lastGpuUsage = 0;
+    private float _lastMemoryUsage = 0;
+    private float _lastCpuTemp = 0;
+    private float _lastGpuTemp = 0;
+    private const float UpdateThreshold = 0.5f;
+    private const float TempUpdateThreshold = 1.0f;
+    
+    private long _diskUpdateCounter = 0;
+    private const long DiskUpdateInterval = 10;
+
+    private static readonly HashSet<string> _cpuTempNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "CPU Package", "Core (Tctl/Tdie)", "CPU Core", "Core #1", "CPU", "Package"
+    };
+
+    private static readonly HashSet<string> _gpuLoadNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "GPU Core", "GPU Load"
+    };
+
+    private static readonly HashSet<string> _gpuTempNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "GPU Core", "GPU Temperature"
+    };
 
     public void Start(int intervalMs = 1000)
     {
@@ -90,6 +123,19 @@ public class HardwareMonitorService : IHardwareMonitorService
         {
             Program.Log($"[硬件] 定时器启动失败: {ex.Message}");
         }
+
+        try
+        {
+            _performanceLogger = (IPerformanceLoggerService?)App.ServiceProvider?.GetService(typeof(IPerformanceLoggerService));
+            if (_performanceLogger != null)
+            {
+                Program.Log("[硬件] 性能日志服务已连接");
+            }
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[硬件] 获取性能日志服务失败: {ex.Message}");
+        }
     }
 
     private async void OnDataTimerElapsed(object? sender, ElapsedEventArgs e)
@@ -104,14 +150,9 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
     }
 
-    private float _lastCpuUsage = 0;
-    private float _lastGpuUsage = 0;
-    private float _lastMemoryUsage = 0;
-    private const float UpdateThreshold = 0.5f;
-
-    private bool ShouldUpdateUI(float currentValue, float lastValue)
+    private bool ShouldUpdateUI(float currentValue, float lastValue, float threshold = UpdateThreshold)
     {
-        return Math.Abs(currentValue - lastValue) > UpdateThreshold;
+        return Math.Abs(currentValue - lastValue) > threshold;
     }
 
     public void Stop()
@@ -154,8 +195,32 @@ public class HardwareMonitorService : IHardwareMonitorService
         {
             _currentFps = (float)(_frameCount * _ticksPerSecond) / elapsedTicks;
             Fps = _currentFps;
+            
+            UpdateFpsPercentiles(_currentFps);
+            
             _frameCount = 0;
             _lastFpsUpdateTime = currentTime;
+        }
+    }
+
+    private void UpdateFpsPercentiles(float fps)
+    {
+        _fpsHistory.Enqueue(fps);
+        
+        while (_fpsHistory.Count > MaxFpsHistorySize)
+        {
+            _fpsHistory.Dequeue();
+        }
+        
+        if (_fpsHistory.Count >= 100)
+        {
+            var sortedFps = _fpsHistory.OrderBy(f => f).ToArray();
+            
+            var index1Percent = (int)(_fpsHistory.Count * 0.01);
+            Fps1PercentLow = sortedFps[Math.Min(index1Percent, sortedFps.Length - 1)];
+            
+            var index01Percent = (int)(_fpsHistory.Count * 0.001);
+            Fps01PercentLow = sortedFps[Math.Min(index01Percent, sortedFps.Length - 1)];
         }
     }
 
@@ -168,48 +233,21 @@ public class HardwareMonitorService : IHardwareMonitorService
     {
         try
         {
-            UpdateHardwareData();
-            UpdateDiskData();
-
-            bool needUpdate = false;
+            bool needUpdate = UpdateHardwareData();
             
-            if (CpuUsage.HasValue && ShouldUpdateUI(CpuUsage.Value, _lastCpuUsage))
+            _diskUpdateCounter++;
+            if (_diskUpdateCounter >= DiskUpdateInterval)
             {
-                needUpdate = true;
-                _lastCpuUsage = CpuUsage.Value;
-            }
-            
-            if (GpuUsage.HasValue && ShouldUpdateUI(GpuUsage.Value, _lastGpuUsage))
-            {
-                needUpdate = true;
-                _lastGpuUsage = GpuUsage.Value;
-            }
-            
-            if (MemoryUsed.HasValue && MemoryTotal.HasValue)
-            {
-                var currentMemoryUsage = (MemoryUsed.Value / MemoryTotal.Value) * 100;
-                if (ShouldUpdateUI(currentMemoryUsage, _lastMemoryUsage))
-                {
-                    needUpdate = true;
-                    _lastMemoryUsage = currentMemoryUsage;
-                }
+                UpdateDiskData();
+                _diskUpdateCounter = 0;
             }
 
             if (needUpdate)
             {
-                var handler = Volatile.Read(ref DataUpdated);
-                if (handler != null)
-                {
-                    try
-                    {
-                        handler();
-                    }
-                    catch (Exception ex)
-                    {
-                        Program.Log($"[硬件] DataUpdated事件处理时发生错误: {ex.Message}");
-                    }
-                }
+                RaiseDataUpdated();
             }
+
+            LogPerformanceData();
         }
         catch (Exception ex)
         {
@@ -217,67 +255,100 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
     }
 
-    private void UpdateHardwareData()
+    private void LogPerformanceData()
     {
-        if (_computer == null) return;
+        if (_performanceLogger?.IsRecording != true)
+            return;
 
         try
         {
-            var previousMemoryUsed = MemoryUsed;
-            var previousMemoryTotal = MemoryTotal;
-            MemoryUsed = null;
-            MemoryTotal = null;
-            
+            var entry = new PerformanceLogEntry
+            {
+                Timestamp = DateTime.Now,
+                Fps = Fps,
+                Fps1PercentLow = Fps1PercentLow,
+                Fps01PercentLow = Fps01PercentLow,
+                CpuUsage = CpuUsage,
+                CpuTemp = CpuTemp,
+                GpuUsage = GpuUsage,
+                GpuTemp = GpuTemp,
+                GpuVramUsed = GpuVramUsed,
+                MemoryUsed = MemoryUsed,
+                MemoryTotal = MemoryTotal
+            };
+
+            _performanceLogger.AddLogEntry(entry);
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[日志] 记录性能数据失败: {ex.Message}");
+        }
+    }
+
+    private bool UpdateHardwareData()
+    {
+        if (_computer == null) return false;
+
+        bool needUpdate = false;
+        
+        try
+        {
             foreach (var hardware in _computer.Hardware)
             {
                 hardware.Update();
-                ProcessHardware(hardware);
+                needUpdate |= ProcessHardware(hardware);
             }
             
             if (!MemoryTotal.HasValue || MemoryTotal.Value <= 0)
             {
                 MemoryTotal = GetTotalPhysicalMemory();
-                Program.Log($"[硬件] 使用系统API获取内存总量: {MemoryTotal?.ToString("F2")} GB");
             }
             
             if (MemoryTotal.HasValue && !MemoryUsed.HasValue)
             {
                 MemoryUsed = GetUsedPhysicalMemory();
-                Program.Log($"[硬件] 使用系统API获取内存已使用: {MemoryUsed?.ToString("F2")} GB");
             }
         }
         catch (Exception ex)
         {
             Program.Log($"[硬件] 更新硬件数据失败: {ex.Message}");
         }
+
+        return needUpdate;
     }
 
-    private void ProcessHardware(IHardware hardware)
+    private bool ProcessHardware(IHardware hardware)
     {
+        bool needUpdate = false;
+
         foreach (var sensor in hardware.Sensors)
         {
-            ProcessSensor(sensor, hardware.HardwareType);
+            if (sensor.Value == null)
+                continue;
+
+            needUpdate |= ProcessSensor(sensor, hardware.HardwareType);
         }
 
         foreach (var subHardware in hardware.SubHardware)
         {
             subHardware.Update();
-            ProcessHardware(subHardware);
+            needUpdate |= ProcessHardware(subHardware);
         }
+
+        return needUpdate;
     }
 
-    private void ProcessSensor(ISensor sensor, HardwareType hardwareType)
+    private bool ProcessSensor(ISensor sensor, HardwareType hardwareType)
     {
-        if (sensor.Value == null)
-            return;
+        bool needUpdate = false;
         
         switch (sensor.SensorType)
         {
             case SensorType.Load:
-                ProcessLoadSensor(sensor, hardwareType);
+                needUpdate |= ProcessLoadSensor(sensor, hardwareType);
                 break;
             case SensorType.Temperature:
-                ProcessTemperatureSensor(sensor, hardwareType);
+                needUpdate |= ProcessTemperatureSensor(sensor, hardwareType);
                 break;
             case SensorType.Fan:
                 ProcessFanSensor(sensor, hardwareType);
@@ -289,37 +360,70 @@ public class HardwareMonitorService : IHardwareMonitorService
                 ProcessClockSensor(sensor, hardwareType);
                 break;
         }
+        
+        return needUpdate;
     }
 
-    private void ProcessLoadSensor(ISensor sensor, HardwareType hardwareType)
+    private bool ProcessLoadSensor(ISensor sensor, HardwareType hardwareType)
     {
+        bool needUpdate = false;
+        
         if (hardwareType == HardwareType.Cpu && sensor.Name == "CPU Total")
-            CpuUsage = sensor.Value;
-        else if (IsGpuType(hardwareType) && sensor.Name == "GPU Core")
-            GpuUsage = sensor.Value;
+        {
+            if (ShouldUpdateUI((float)sensor.Value, _lastCpuUsage))
+            {
+                CpuUsage = sensor.Value;
+                _lastCpuUsage = (float)sensor.Value;
+                needUpdate = true;
+            }
+        }
+        else if (IsGpuType(hardwareType) && _gpuLoadNames.Contains(sensor.Name))
+        {
+            if (ShouldUpdateUI((float)sensor.Value, _lastGpuUsage))
+            {
+                GpuUsage = sensor.Value;
+                _lastGpuUsage = (float)sensor.Value;
+                needUpdate = true;
+            }
+        }
+        
+        return needUpdate;
     }
 
-    private void ProcessTemperatureSensor(ISensor sensor, HardwareType hardwareType)
+    private bool ProcessTemperatureSensor(ISensor sensor, HardwareType hardwareType)
     {
+        bool needUpdate = false;
+        
         if (hardwareType == HardwareType.Cpu)
         {
-            var cpuTempNames = new[] { "CPU Package", "Core (Tctl/Tdie)", "CPU Core", "Core #1", "CPU", "Package" };
-            bool isPrioritySensor = cpuTempNames.Any(name => 
+            bool isPrioritySensor = _cpuTempNames.Any(name => 
                 sensor.Name.Equals(name, StringComparison.OrdinalIgnoreCase) ||
                 sensor.Name.Contains(name));
             
             if (isPrioritySensor || !CpuTemp.HasValue)
             {
-                CpuTemp = sensor.Value;
+                if (!CpuTemp.HasValue || ShouldUpdateUI((float)sensor.Value, _lastCpuTemp, TempUpdateThreshold))
+                {
+                    CpuTemp = sensor.Value;
+                    _lastCpuTemp = (float)sensor.Value;
+                    needUpdate = true;
+                }
             }
         }
         else if (IsGpuType(hardwareType))
         {
-            if (sensor.Name == "GPU Core" || !GpuTemp.HasValue)
+            if (_gpuTempNames.Contains(sensor.Name) || !GpuTemp.HasValue)
             {
-                GpuTemp = sensor.Value;
+                if (!GpuTemp.HasValue || ShouldUpdateUI((float)sensor.Value, _lastGpuTemp, TempUpdateThreshold))
+                {
+                    GpuTemp = sensor.Value;
+                    _lastGpuTemp = (float)sensor.Value;
+                    needUpdate = true;
+                }
             }
         }
+        
+        return needUpdate;
     }
 
     private void ProcessFanSensor(ISensor sensor, HardwareType hardwareType)
@@ -345,7 +449,6 @@ public class HardwareMonitorService : IHardwareMonitorService
             if (sensorName.Contains("used"))
             {
                 MemoryUsed = sensor.Value / 1024;
-                Program.Log($"[硬件] 内存已使用: {MemoryUsed?.ToString("F2")} GB (传感器: {sensor.Name})");
             }
             else if (sensorName.Contains("available"))
             {
@@ -358,18 +461,6 @@ public class HardwareMonitorService : IHardwareMonitorService
             else if (sensorName.Contains("total"))
             {
                 MemoryTotal = sensor.Value / 1024;
-            }
-            
-            if (MemoryUsed.HasValue && !MemoryTotal.HasValue)
-            {
-                try
-                {
-                    var totalPhysicalMemory = GC.GetGCMemoryInfo().TotalAvailableMemoryBytes;
-                    MemoryTotal = (float)(totalPhysicalMemory / (1024.0 * 1024.0 * 1024.0));
-                }
-                catch
-                {
-                }
             }
         }
         else if (IsGpuType(hardwareType))
@@ -476,6 +567,22 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
         
         return null;
+    }
+
+    private void RaiseDataUpdated()
+    {
+        var handler = Volatile.Read(ref DataUpdated);
+        if (handler != null)
+        {
+            try
+            {
+                handler();
+            }
+            catch (Exception ex)
+            {
+                Program.Log($"[硬件] DataUpdated事件处理时发生错误: {ex.Message}");
+            }
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]

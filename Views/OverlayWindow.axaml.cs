@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Threading;
 using ComputerCompanion;
@@ -22,6 +23,7 @@ public partial class OverlayWindow : Window
     public OverlayWindow()
     {
         InitializeComponent();
+        PointerPressed += OnPointerPressed;
     }
 
     public void Initialize(OverlayViewModel viewModel)
@@ -36,12 +38,33 @@ public partial class OverlayWindow : Window
         _frameTimer.Tick += OnFrameTick;
         _frameTimer.Start();
 
+        RegisterIpcHandlers();
+
         // 等待窗口完全加载后再设置位置
         this.Loaded += (s, e) =>
         {
             _isInitialized = true;
             PositionWindow();
         };
+    }
+
+    private void RegisterIpcHandlers()
+    {
+        try
+        {
+            var router = App.ServiceProvider.GetService(typeof(IIpcMessageRouter)) as IIpcMessageRouter;
+            if (router != null)
+            {
+                router.RegisterHandler(IpcMessageTypes.SwitchViewMode, msg =>
+                {
+                    Dispatcher.UIThread.Post(() => _viewModel?.SwitchViewMode());
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[悬浮窗] 注册IPC处理器失败: {ex.Message}");
+        }
     }
 
     private void PositionWindow()
@@ -180,5 +203,70 @@ public partial class OverlayWindow : Window
         _frameTimer?.Stop();
         _frameTimer = null;
         base.OnClosing(e);
+    }
+
+    private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed)
+        {
+            ShowContextMenu(e.GetPosition(this));
+            e.Handled = true;
+        }
+    }
+
+    private void ShowContextMenu(Point position)
+    {
+        var menu = new ContextMenu
+        {
+            Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#2d2d2d")),
+            Foreground = Avalonia.Media.Brushes.White,
+            BorderBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#444")),
+            BorderThickness = new Avalonia.Thickness(1),
+            CornerRadius = new Avalonia.CornerRadius(6),
+            Padding = new Avalonia.Thickness(4)
+        };
+
+        var showMainWindowItem = new MenuItem
+        {
+            Header = "显示主窗口"
+        };
+        showMainWindowItem.Click += (s, e) => SendIpcMessage(IpcMessageTypes.ShowMainWindow);
+
+        var openSettingsItem = new MenuItem
+        {
+            Header = "打开设置"
+        };
+        openSettingsItem.Click += (s, e) => SendIpcMessage(IpcMessageTypes.ShowSettings);
+
+        var separator = new Separator();
+
+        var exitItem = new MenuItem
+        {
+            Header = "退出"
+        };
+        exitItem.Click += (s, e) => SendIpcMessage(IpcMessageTypes.ExitApplication);
+
+        menu.Items.Add(showMainWindowItem);
+        menu.Items.Add(openSettingsItem);
+        menu.Items.Add(separator);
+        menu.Items.Add(exitItem);
+
+        menu.Open(this);
+    }
+
+    private void SendIpcMessage(string messageType)
+    {
+        try
+        {
+            var ipcService = App.ServiceProvider.GetService(typeof(IIpcService)) as IIpcService;
+            if (ipcService != null && ipcService.IsConnected)
+            {
+                _ = App.SendIpcMessageAsync(ipcService, messageType);
+            }
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[悬浮窗] 发送IPC消息失败: {ex.Message}");
+        }
     }
 }

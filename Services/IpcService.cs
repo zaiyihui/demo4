@@ -503,6 +503,7 @@ public static class IpcMessageTypes
     // 基础控制消息
     public const string SettingsChanged = "SettingsChanged";
     public const string ShowMainWindow = "ShowMainWindow";
+    public const string ShowSettings = "ShowSettings";
     public const string ExitApplication = "ExitApplication";
     public const string OverlayReady = "OverlayReady";
     public const string SessionKey = "SessionKey";
@@ -515,5 +516,6 @@ public static class IpcMessageTypes
     public const string VisibilityChanged = "VisibilityChanged";  // 可见性变更
     public const string RefreshIntervalChanged = "RefreshIntervalChanged";  // 刷新频率变更
     public const string ToggleOverlay = "ToggleOverlay";       // 切换悬浮窗
+    public const string SwitchViewMode = "SwitchViewMode";       // 切换视图模式
     public const string Error = "Error";                        // 错误信息
 }

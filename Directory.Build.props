@@ -32,6 +32,17 @@
     <!-- 禁用 MSBuild 节点重用，减少内存泄漏风险 -->
     <NodeReuse>false</NodeReuse>
 
+    <!-- 【关键】GC 堆内存硬限制 - 限制构建进程最大内存使用 -->
+    <!-- 设置为 2GB (0x80000000 = 2147483648 bytes) -->
+    <GCHeapHardLimit>0x80000000</GCHeapHardLimit>
+    <GCHeapHardLimitPercent>50</GCHeapHardLimitPercent>
+
+    <!-- 【关键】启用 GC 堆压缩，减少内存碎片 -->
+    <GCHeapCompaction>true</GCHeapCompaction>
+
+    <!-- 【关键】限制 GC 工作站模式，减少内存分配 -->
+    <GCServer>false</GCServer>
+
     <!-- 启用增量构建检查 -->
     <DisableFastUpToDateCheck>false</DisableFastUpToDateCheck>
     <EnableIncrementalBuild>true</EnableIncrementalBuild>

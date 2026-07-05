@@ -42,7 +42,6 @@ public class MainWindowViewModelTests
         Assert.Equal("延迟: --", viewModel.LatencyInfo);
         Assert.False(viewModel.ShowGpu);
         Assert.False(viewModel.ShowBattery);
-        Assert.False(viewModel.GameMode);
     }
 
     [Fact]
@@ -206,50 +205,11 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public void ToggleGameMode_TogglesGameModeProperty()
-    {
-        // Arrange
-        var viewModel = new MainWindowViewModel(
-            _monitorMock.Object, 
-            _defaultSettings, 
-            _settingsServiceMock.Object);
-
-        // Act
-        viewModel.ToggleGameMode();
-
-        // Assert
-        Assert.True(viewModel.GameMode);
-        Assert.True(_defaultSettings.GameMode);
-        _settingsServiceMock.Verify(s => s.SaveSettings(), Times.Once);
-        _monitorMock.Verify(m => m.Stop(), Times.Once);
-        _monitorMock.Verify(m => m.Start(_defaultSettings.GameModeRefreshInterval), Times.Once);
-    }
-
-    [Fact]
-    public void ToggleGameMode_TogglesBackToFalse()
-    {
-        // Arrange
-        _defaultSettings.GameMode = true;
-        var viewModel = new MainWindowViewModel(
-            _monitorMock.Object, 
-            _defaultSettings, 
-            _settingsServiceMock.Object);
-
-        // Act
-        viewModel.ToggleGameMode();
-
-        // Assert
-        Assert.False(viewModel.GameMode);
-        Assert.False(_defaultSettings.GameMode);
-        _monitorMock.Verify(m => m.Start(_defaultSettings.RefreshInterval), Times.Once);
-    }
-
-    [Fact]
     public void UpdateSettings_UpdatesSettingsProperty()
     {
         // Arrange
         var newSettings = new Settings();
-        newSettings.GameMode = true;
+        newSettings.Performance.RefreshInterval = 2000;
         
         var viewModel = new MainWindowViewModel(
             _monitorMock.Object, 
@@ -262,7 +222,7 @@ public class MainWindowViewModelTests
         // Assert
         _settingsServiceMock.Verify(s => s.SaveSettings(), Times.Once);
         _monitorMock.Verify(m => m.Stop(), Times.Once);
-        _monitorMock.Verify(m => m.Start(newSettings.GameModeRefreshInterval), Times.Once);
+        _monitorMock.Verify(m => m.Start(newSettings.Performance.RefreshInterval), Times.Once);
     }
 
     [Fact]

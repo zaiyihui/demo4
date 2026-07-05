@@ -1,6 +1,6 @@
-using ComputerCompanion.Core.Abstractions;
 using ComputerCompanion.Core.Models;
 using ComputerCompanion.Core.Services;
+using ComputerCompanion.Services;
 using Xunit;
 
 namespace ComputerCompanion.Tests.Services;
@@ -147,4 +147,8 @@ internal class MockSettingsService : ISettingsService
     public void LoadSettings() { }
     public void UpdateSettingsPath(string newPath) { }
     public void ResetToDefaults() { }
+    public ThemeMode LoadThemeMode() => ThemeMode.Dark;
+    public void SaveThemeMode(ThemeMode mode) { }
+    public List<ComputerCompanion.Services.AlertRule> LoadAlertRules() => new List<ComputerCompanion.Services.AlertRule>();
+    public void SaveAlertRules(List<ComputerCompanion.Services.AlertRule> rules) { }
 }

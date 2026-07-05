@@ -10,37 +10,38 @@ using System.Threading.Tasks;
 
 namespace ComputerCompanion.Core.Services;
 
-/// <summary>
-/// 性能监控服务 - 实现实时性能监控、告警、历史数据
-/// </summary>
 public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
 {
     private readonly Timer _monitorTimer;
-    private readonly object _metricsLock = new object();
     private readonly ConcurrentDictionary<string, List<MetricDataPoint>> _historicalMetrics = new();
     private readonly List<AlertRule> _alertRules = new();
-    private readonly List<AlertTriggeredEventArgs> _triggeredAlerts = new();
-
+    
     private PerformanceMetrics _currentMetrics = new();
     private readonly Stopwatch _operationTimer = new();
 
     private const int MaxHistoryPoints = 1000;
     private const int DefaultIntervalMs = 1000;
 
-    public PerformanceMetrics CurrentMetrics => _currentMetrics;
+    private double _lastCpuUsage = 0;
+    private DateTime _lastCpuUpdate = DateTime.UtcNow;
+    private TimeSpan _lastTotalProcessorTime;
+    private int _processorCount;
+
+    public PerformanceMetrics CurrentMetrics => Volatile.Read(ref _currentMetrics);
 
     public event EventHandler<MetricsUpdatedEventArgs>? MetricsUpdated;
     public event EventHandler<AlertTriggeredEventArgs>? AlertTriggered;
 
     public PerformanceMonitorService()
     {
+        _processorCount = Environment.ProcessorCount;
+        
         _monitorTimer = new Timer(
             _ => _ = UpdateMetricsAsync(),
             null,
             Timeout.Infinite,
             Timeout.Infinite);
 
-        // 初始化默认告警规则
         InitializeDefaultAlertRules();
     }
 
@@ -123,43 +124,35 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
         return base.StopAsync();
     }
 
-    /// <summary>
-    /// 更新性能指标
-    /// </summary>
     private async Task UpdateMetricsAsync()
     {
         try
         {
             var process = Process.GetCurrentProcess();
 
-            // 获取CPU使用率
-            var cpuUsage = await GetCpuUsageAsync();
+            var cpuUsage = CalculateCpuUsage(process);
 
-            // 获取内存信息
             var memoryUsed = process.WorkingSet64 / (1024.0 * 1024.0);
             var memoryTotal = GetTotalPhysicalMemory() / (1024.0 * 1024.0);
 
-            lock (_metricsLock)
+            var newMetrics = new PerformanceMetrics
             {
-                _currentMetrics = new PerformanceMetrics
-                {
-                    Timestamp = DateTime.UtcNow,
-                    CpuUsagePercent = cpuUsage,
-                    MemoryUsedMB = memoryUsed,
-                    MemoryTotalMB = memoryTotal,
-                    AverageResponseTimeMs = _currentMetrics.AverageResponseTimeMs,
-                    P95ResponseTimeMs = _currentMetrics.P95ResponseTimeMs,
-                    P99ResponseTimeMs = _currentMetrics.P99ResponseTimeMs,
-                    Fps = _currentMetrics.Fps,
-                    ErrorsPerMinute = _currentMetrics.ErrorsPerMinute
-                };
-            }
+                Timestamp = DateTime.UtcNow,
+                CpuUsagePercent = cpuUsage,
+                MemoryUsedMB = memoryUsed,
+                MemoryTotalMB = memoryTotal,
+                AverageResponseTimeMs = _currentMetrics.AverageResponseTimeMs,
+                P95ResponseTimeMs = _currentMetrics.P95ResponseTimeMs,
+                P99ResponseTimeMs = _currentMetrics.P99ResponseTimeMs,
+                Fps = _currentMetrics.Fps,
+                ErrorsPerMinute = _currentMetrics.ErrorsPerMinute
+            };
 
-            // 记录历史数据
+            Interlocked.Exchange(ref _currentMetrics, newMetrics);
+
             RecordMetric("CpuUsagePercent", cpuUsage, MetricType.Gauge);
-            RecordMetric("MemoryUsagePercent", _currentMetrics.MemoryUsagePercent, MetricType.Gauge);
+            RecordMetric("MemoryUsagePercent", newMetrics.MemoryUsagePercent, MetricType.Gauge);
 
-            // 检查告警规则
             var triggeredAlerts = CheckAlertRules();
             if (triggeredAlerts.Count > 0)
             {
@@ -169,10 +162,9 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
                 }
             }
 
-            // 触发更新事件
             MetricsUpdated?.Invoke(this, new MetricsUpdatedEventArgs
             {
-                Metrics = _currentMetrics,
+                Metrics = newMetrics,
                 TriggeredAlerts = triggeredAlerts
             });
         }
@@ -182,31 +174,30 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
         }
     }
 
-    private async Task<double> GetCpuUsageAsync()
+    private double CalculateCpuUsage(Process process)
     {
-        return await Task.Run(() =>
+        try
         {
-            try
+            var currentTime = DateTime.UtcNow;
+            var currentTotalProcessorTime = process.TotalProcessorTime;
+
+            var elapsedTime = currentTime - _lastCpuUpdate;
+            var elapsedProcessorTime = currentTotalProcessorTime - _lastTotalProcessorTime;
+
+            if (elapsedTime.TotalSeconds > 0.1)
             {
-                var startTime = DateTime.UtcNow;
-                var startCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
-
-                Thread.Sleep(100);
-
-                var endTime = DateTime.UtcNow;
-                var endCpuUsage = Process.GetCurrentProcess().TotalProcessorTime;
-
-                var cpuUsedMs = (endCpuUsage - startCpuUsage).TotalMilliseconds;
-                var totalMsPassed = (endTime - startTime).TotalMilliseconds;
-                var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
-
-                return cpuUsageTotal * 100;
+                var cpuUsage = (elapsedProcessorTime.TotalSeconds / elapsedTime.TotalSeconds) / _processorCount * 100;
+                _lastCpuUsage = Math.Max(0, Math.Min(100, cpuUsage));
+                _lastCpuUpdate = currentTime;
+                _lastTotalProcessorTime = currentTotalProcessorTime;
             }
-            catch
-            {
-                return 0;
-            }
-        });
+
+            return _lastCpuUsage;
+        }
+        catch
+        {
+            return _lastCpuUsage;
+        }
     }
 
     private long GetTotalPhysicalMemory()
@@ -221,12 +212,9 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
         }
         catch { }
 
-        return 16L * 1024 * 1024 * 1024; // 默认16GB
+        return 16L * 1024 * 1024 * 1024;
     }
 
-    /// <summary>
-    /// 记录自定义指标
-    /// </summary>
     public void RecordMetric(string name, double value, MetricType type = MetricType.Gauge)
     {
         var dataPoint = new MetricDataPoint
@@ -241,18 +229,18 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
             _historicalMetrics[name] = new List<MetricDataPoint>();
         }
 
-        _historicalMetrics[name].Add(dataPoint);
-
-        // 限制历史数据量
-        if (_historicalMetrics[name].Count > MaxHistoryPoints)
+        var metrics = _historicalMetrics[name];
+        lock (metrics)
         {
-            _historicalMetrics[name].RemoveAt(0);
+            metrics.Add(dataPoint);
+
+            while (metrics.Count > MaxHistoryPoints)
+            {
+                metrics.RemoveAt(0);
+            }
         }
     }
 
-    /// <summary>
-    /// 开始计时操作
-    /// </summary>
     public IDisposable BeginTiming(string operationName)
     {
         return new OperationTimer(this, operationName);
@@ -262,9 +250,8 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
     {
         RecordMetric($"Operation.{operationName}.Duration", elapsedMs, MetricType.Histogram);
 
-        lock (_metricsLock)
+        try
         {
-            // 更新响应时间统计
             var values = _historicalMetrics
                 .Where(kv => kv.Key.StartsWith("Operation.") && kv.Key.EndsWith(".Duration"))
                 .SelectMany(kv => kv.Value)
@@ -274,16 +261,29 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
 
             if (values.Count > 0)
             {
-                _currentMetrics.AverageResponseTimeMs = values.Average();
-                _currentMetrics.P95ResponseTimeMs = values.Count > 0 ? values[(int)(values.Count * 0.95)] : 0;
-                _currentMetrics.P99ResponseTimeMs = values.Count > 0 ? values[(int)(values.Count * 0.99)] : 0;
+                var currentMetrics = _currentMetrics;
+                var newMetrics = new PerformanceMetrics
+                {
+                    Timestamp = currentMetrics.Timestamp,
+                    CpuUsagePercent = currentMetrics.CpuUsagePercent,
+                    MemoryUsedMB = currentMetrics.MemoryUsedMB,
+                    MemoryTotalMB = currentMetrics.MemoryTotalMB,
+                    AverageResponseTimeMs = values.Average(),
+                    P95ResponseTimeMs = values[(int)(values.Count * 0.95)],
+                    P99ResponseTimeMs = values[(int)(values.Count * 0.99)],
+                    Fps = currentMetrics.Fps,
+                    ErrorsPerMinute = currentMetrics.ErrorsPerMinute
+                };
+
+                Interlocked.Exchange(ref _currentMetrics, newMetrics);
             }
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[性能] 更新响应时间统计失败: {ex.Message}");
         }
     }
 
-    /// <summary>
-    /// 获取历史指标
-    /// </summary>
     public IEnumerable<MetricDataPoint> GetHistoricalMetrics(string metricName, TimeSpan? duration = null)
     {
         if (!_historicalMetrics.TryGetValue(metricName, out var metrics))
@@ -293,12 +293,12 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
             ? DateTime.UtcNow - duration.Value
             : DateTime.MinValue;
 
-        return metrics.Where(m => m.Timestamp >= cutoff).OrderBy(m => m.Timestamp);
+        lock (metrics)
+        {
+            return metrics.Where(m => m.Timestamp >= cutoff).OrderBy(m => m.Timestamp).ToList();
+        }
     }
 
-    /// <summary>
-    /// 添加告警规则
-    /// </summary>
     public void AddAlertRule(AlertRule rule)
     {
         if (!_alertRules.Any(r => r.Name == rule.Name))
@@ -308,9 +308,6 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
         }
     }
 
-    /// <summary>
-    /// 移除告警规则
-    /// </summary>
     public void RemoveAlertRule(string ruleName)
     {
         var rule = _alertRules.FirstOrDefault(r => r.Name == ruleName);
@@ -321,64 +318,59 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
         }
     }
 
-    /// <summary>
-    /// 检查告警规则
-    /// </summary>
     private List<AlertTriggeredEventArgs> CheckAlertRules()
     {
         var triggeredAlerts = new List<AlertTriggeredEventArgs>();
+        var currentMetrics = _currentMetrics;
 
-        lock (_metricsLock)
+        foreach (var rule in _alertRules.Where(r => r.IsEnabled))
         {
-            foreach (var rule in _alertRules.Where(r => r.IsEnabled))
-            {
-                var currentValue = GetMetricValue(rule.MetricName);
-                if (currentValue == null)
-                    continue;
+            var currentValue = GetMetricValue(rule.MetricName, currentMetrics);
+            if (currentValue == null)
+                continue;
 
-                var isViolation = rule.Operator switch
+            var isViolation = rule.Operator switch
+            {
+                ComparisonOperator.GreaterThan => currentValue.Value > rule.Threshold,
+                ComparisonOperator.GreaterThanOrEqual => currentValue.Value >= rule.Threshold,
+                ComparisonOperator.LessThan => currentValue.Value < rule.Threshold,
+                ComparisonOperator.LessThanOrEqual => currentValue.Value <= rule.Threshold,
+                ComparisonOperator.Equal => Math.Abs(currentValue.Value - rule.Threshold) < 0.001,
+                ComparisonOperator.NotEqual => Math.Abs(currentValue.Value - rule.Threshold) >= 0.001,
+                _ => false
+            };
+
+            if (isViolation)
+            {
+                var alert = new AlertTriggeredEventArgs
                 {
-                    ComparisonOperator.GreaterThan => currentValue.Value > rule.Threshold,
-                    ComparisonOperator.GreaterThanOrEqual => currentValue.Value >= rule.Threshold,
-                    ComparisonOperator.LessThan => currentValue.Value < rule.Threshold,
-                    ComparisonOperator.LessThanOrEqual => currentValue.Value <= rule.Threshold,
-                    ComparisonOperator.Equal => Math.Abs(currentValue.Value - rule.Threshold) < 0.001,
-                    ComparisonOperator.NotEqual => Math.Abs(currentValue.Value - rule.Threshold) >= 0.001,
-                    _ => false
+                    Rule = rule,
+                    CurrentValue = currentValue.Value,
+                    TriggeredAt = DateTime.UtcNow
                 };
 
-                if (isViolation)
-                {
-                    var alert = new AlertTriggeredEventArgs
-                    {
-                        Rule = rule,
-                        CurrentValue = currentValue.Value,
-                        TriggeredAt = DateTime.UtcNow
-                    };
-
-                    triggeredAlerts.Add(alert);
-                    Program.Log($"[性能] 触发告警: {rule.Name} = {currentValue.Value} (阈值: {rule.Threshold})");
-                }
+                triggeredAlerts.Add(alert);
+                Program.Log($"[性能] 触发告警: {rule.Name} = {currentValue.Value} (阈值: {rule.Threshold})");
             }
         }
 
         return triggeredAlerts;
     }
 
-    private double? GetMetricValue(string metricName)
+    private double? GetMetricValue(string metricName, PerformanceMetrics metrics)
     {
         return metricName switch
         {
-            "CpuUsagePercent" => _currentMetrics.CpuUsagePercent,
-            "CpuTemperature" => _currentMetrics.CpuTemperature,
-            "GpuUsagePercent" => _currentMetrics.GpuUsagePercent,
-            "GpuTemperature" => _currentMetrics.GpuTemperature,
-            "MemoryUsagePercent" => _currentMetrics.MemoryUsagePercent,
-            "MemoryUsedMB" => _currentMetrics.MemoryUsedMB,
-            "Fps" => _currentMetrics.Fps,
-            "AverageResponseTimeMs" => _currentMetrics.AverageResponseTimeMs,
-            "P95ResponseTimeMs" => _currentMetrics.P95ResponseTimeMs,
-            "P99ResponseTimeMs" => _currentMetrics.P99ResponseTimeMs,
+            "CpuUsagePercent" => metrics.CpuUsagePercent,
+            "CpuTemperature" => metrics.CpuTemperature,
+            "GpuUsagePercent" => metrics.GpuUsagePercent,
+            "GpuTemperature" => metrics.GpuTemperature,
+            "MemoryUsagePercent" => metrics.MemoryUsagePercent,
+            "MemoryUsedMB" => metrics.MemoryUsedMB,
+            "Fps" => metrics.Fps,
+            "AverageResponseTimeMs" => metrics.AverageResponseTimeMs,
+            "P95ResponseTimeMs" => metrics.P95ResponseTimeMs,
+            "P99ResponseTimeMs" => metrics.P99ResponseTimeMs,
             _ => null
         };
     }
@@ -393,9 +385,6 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
     }
 }
 
-/// <summary>
-/// 操作计时器
-/// </summary>
 internal class OperationTimer : IDisposable
 {
     private readonly PerformanceMonitorService _service;

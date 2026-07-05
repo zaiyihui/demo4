@@ -108,11 +108,6 @@ public static class Strings
     public const string Latency = "延迟";
 
     /// <summary>
-    /// 游戏模式
-    /// </summary>
-    public const string GameMode = "游戏模式";
-
-    /// <summary>
     /// 鼠标穿透
     /// </summary>
     public const string MousePassthrough = "鼠标穿透";
@@ -379,16 +374,6 @@ public static class Strings
     /// 标准模式间隔
     /// </summary>
     public const string StandardModeInterval = "标准模式间隔";
-
-    /// <summary>
-    /// 启用游戏模式
-    /// </summary>
-    public const string EnableGameMode = "启用游戏模式";
-
-    /// <summary>
-    /// 游戏模式间隔
-    /// </summary>
-    public const string GameModeInterval = "游戏模式间隔";
 
     /// <summary>
     /// 提示：降低刷新间隔会增加 CPU 占用，但数据更新更及时。

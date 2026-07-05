@@ -1,0 +1,134 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style Selector="Button.nav-button">
+        <Setter Property="Background" Value="{StaticResource ButtonGlassGradient}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Padding" Value="14,9"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="FontWeight" Value="Medium"/>
+        <Setter Property="Transitions">
+            <Setter.Value>
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                </Transitions>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button.nav-button:pointerover">
+        <Setter Property="Background" Value="{StaticResource ButtonGlassHoverGradient}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource GlassBorderHover}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="BorderThickness" Value="1.5"/>
+    </Style>
+
+    <Style Selector="Button.nav-button:pressed">
+        <Setter Property="Background" Value="{StaticResource LiquidGlassPressed}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style Selector="RadioButton.navItem">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="CornerRadius" Value="12"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="Transparent"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+        <Setter Property="Transitions">
+            <Setter.Value>
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                </Transitions>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="RadioButton.navItem:pointerover">
+        <Setter Property="Background" Value="#15f0f0f0"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+    </Style>
+
+    <Style Selector="RadioButton.navItem:checked">
+        <Setter Property="Background" Value="{StaticResource LiquidGlassBase}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+    </Style>
+
+    <Style Selector="TextBlock.nav-group-title">
+        <Setter Property="FontSize" Value="10"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource TextTertiary}"/>
+        <Setter Property="Margin" Value="12,12,0,8"/>
+    </Style>
+
+    <Style Selector="Border.nav-divider">
+        <Setter Property="Height" Value="1"/>
+        <Setter Property="Background" Value="{StaticResource GlassBorder}"/>
+        <Setter Property="Margin" Value="12,12,12,0"/>
+    </Style>
+
+    <Style Selector="ContextMenu.nav-menu">
+        <Setter Property="Background" Value="{StaticResource LiquidGlassBase}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="CornerRadius" Value="14"/>
+        <Setter Property="Padding" Value="6"/>
+        <Setter Property="MinWidth" Value="150"/>
+        <Setter Property="Transitions">
+            <Setter.Value>
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                </Transitions>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="MenuItem.nav-menu-item">
+        <Setter Property="Padding" Value="12,8"/>
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+    </Style>
+
+    <Style Selector="MenuItem.nav-menu-item:pointerover">
+        <Setter Property="Background" Value="{StaticResource LiquidGlassHover}"/>
+        <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+    </Style>
+
+    <Style Selector="Button.windowButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="10"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="HorizontalAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Transitions">
+            <Setter.Value>
+                <Transitions>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.1"/>
+                </Transitions>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style Selector="Button.windowButton:pointerover">
+        <Setter Property="Background" Value="#25f0f0f0"/>
+    </Style>
+
+    <Style Selector="Button.closeButton:pointerover">
+        <Setter Property="Background" Value="#e74c3c"/>
+    </Style>
+
+</Styles>

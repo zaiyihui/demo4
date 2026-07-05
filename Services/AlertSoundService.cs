@@ -1,4 +1,4 @@
-﻿using NAudio.Wave;
+using NAudio.Wave;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -8,6 +8,7 @@ namespace ComputerCompanion.Services;
 public interface IAlertSoundService
 {
     void PlayAlertSound();
+    void PlayAlertSound(ComputerCompanion.Core.Models.AlertSeverity severity);
     void PlayCustomSound(string soundPath);
     void SetVolume(int volume);
     int GetVolume();
@@ -75,6 +76,11 @@ public class AlertSoundService : IAlertSoundService, IDisposable
 
     public void PlayAlertSound()
     {
+        PlayAlertSound(ComputerCompanion.Core.Models.AlertSeverity.Warning);
+    }
+
+    public void PlayAlertSound(ComputerCompanion.Core.Models.AlertSeverity severity)
+    {
         StopSound();
         
         try
@@ -83,7 +89,15 @@ public class AlertSoundService : IAlertSoundService, IDisposable
             {
                 _reader = new AudioFileReader(_defaultSoundPath);
                 _waveOut = new WaveOutEvent();
-                _waveOut.Volume = _volume / 100.0f;
+                
+                float volumeMultiplier = severity switch
+                {
+                    ComputerCompanion.Core.Models.AlertSeverity.Critical => 1.0f,
+                    ComputerCompanion.Core.Models.AlertSeverity.Error => 0.8f,
+                    _ => 0.6f
+                };
+                _waveOut.Volume = (_volume / 100.0f) * volumeMultiplier;
+                
                 _waveOut.Init(_reader);
                 _waveOut.Play();
                 _waveOut.PlaybackStopped += OnPlaybackStopped;

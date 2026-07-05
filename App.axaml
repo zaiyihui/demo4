@@ -6,15 +6,21 @@
              RequestedThemeVariant="Default">
 
     <Application.Resources>
-        <SolidColorBrush x:Key="PrimaryBrush" Color="#76B900"/>
-        <SolidColorBrush x:Key="BackgroundBrush" Color="#1a1a1a"/>
-        <SolidColorBrush x:Key="SurfaceBrush" Color="#2d2d2d"/>
-        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#ffffff"/>
-        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#aaaaaa"/>
-        
-        <!-- 中文字体配置 - 确保在所有平台上正确显示中文 -->
-        <FontFamily x:Key="ChineseFontFamily">Microsoft YaHei UI, Microsoft YaHei, SimHei, Noto Sans CJK SC, Source Han Sans CN, sans-serif</FontFamily>
-        <FontFamily x:Key="DefaultFontFamily">Segoe UI, Microsoft YaHei UI, Microsoft YaHei, Noto Sans CJK SC, Source Han Sans CN, sans-serif</FontFamily>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://ComputerCompanion/Styles/GlobalResources.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <SolidColorBrush x:Key="PrimaryBrush" Color="#76B900"/>
+            <SolidColorBrush x:Key="BackgroundBrush" Color="#1a1a1a"/>
+            <SolidColorBrush x:Key="SurfaceBrush" Color="#2d2d2d"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush" Color="#ffffff"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#aaaaaa"/>
+
+            <!-- 中文字体配置 - 确保在所有平台上正确显示中文 -->
+            <FontFamily x:Key="ChineseFontFamily">Microsoft YaHei UI, Microsoft YaHei, SimHei, Noto Sans CJK SC, Source Han Sans CN, sans-serif</FontFamily>
+            <FontFamily x:Key="DefaultFontFamily">Segoe UI, Microsoft YaHei UI, Microsoft YaHei, Noto Sans CJK SC, Source Han Sans CN, sans-serif</FontFamily>
+        </ResourceDictionary>
     </Application.Resources>
 
     <Application.DataTemplates>
@@ -25,6 +31,8 @@
         <FluentTheme />
         <!-- 全局字体样式 -->
         <StyleInclude Source="avares://ComputerCompanion/Styles/GlobalStyles.axaml"/>
+        <!-- 全局导航样式规范 -->
+        <StyleInclude Source="avares://ComputerCompanion/Styles/NavigationStyles.axaml"/>
         <StyleInclude Source="avares://ComputerCompanion/Styles/SettingsStyles.axaml"/>
     </Application.Styles>
 </Application>

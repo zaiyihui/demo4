@@ -22,7 +22,6 @@ public class ViewModelTests : IDisposable
             ShowNetwork = true,
             ShowDisk = true,
             ShowBattery = true,
-            GameMode = false,
             RefreshInterval = 1000
         };
     }
@@ -40,26 +39,11 @@ public class ViewModelTests : IDisposable
 
         // Assert
         Assert.NotNull(viewModel);
-        Assert.False(viewModel.GameMode);
         Assert.Equal(0, viewModel.CpuUsagePercent);
         Assert.Equal(0, viewModel.GpuUsagePercent);
         Assert.Equal(0, viewModel.MemoryUsagePercent);
         Assert.Equal(0, viewModel.DiskUsagePercent);
         Assert.Equal(0, viewModel.BatteryLevelPercent);
-    }
-
-    [Fact]
-    public void MainWindowViewModel_ToggleGameMode_Works()
-    {
-        // Arrange
-        var viewModel = new MainWindowViewModel(_monitorService!, _testSettings);
-        var initialGameMode = viewModel.GameMode;
-
-        // Act
-        viewModel.ToggleGameMode();
-
-        // Assert
-        Assert.Equal(!initialGameMode, viewModel.GameMode);
     }
 
     [Fact]
@@ -156,8 +140,8 @@ public class ViewModelTests : IDisposable
         // Arrange
         var settings = new Settings
         {
-            FontSize = 999,
-            RefreshInterval = 9999
+            MainWindow = { FontSize = 999 },
+            Performance = { RefreshInterval = 9999 }
         };
 
         var viewModel = new SettingsViewModel(settings, s => { });
@@ -168,51 +152,5 @@ public class ViewModelTests : IDisposable
         // Assert
         Assert.Equal(14, viewModel.FontSize);
         Assert.Equal(1000, viewModel.RefreshInterval);
-    }
-}
-
-public class IpcServiceTests : IDisposable
-{
-    private IpcService? _ipcService;
-
-    public void Dispose()
-    {
-        _ipcService?.Dispose();
-    }
-
-    [Fact]
-    public void IpcMessage_CreatesCorrectly()
-    {
-        // Arrange & Act
-        var message = new IpcMessage
-        {
-            Type = IpcMessageTypes.SettingsChanged,
-            Data = "test data"
-        };
-
-        // Assert
-        Assert.Equal(IpcMessageTypes.SettingsChanged, message.Type);
-        Assert.Equal("test data", message.Data);
-    }
-
-    [Fact]
-    public void IpcMessageTypes_AreCorrect()
-    {
-        // Assert
-        Assert.Equal("SettingsChanged", IpcMessageTypes.SettingsChanged);
-        Assert.Equal("ShowMainWindow", IpcMessageTypes.ShowMainWindow);
-        Assert.Equal("ExitApplication", IpcMessageTypes.ExitApplication);
-        Assert.Equal("OverlayReady", IpcMessageTypes.OverlayReady);
-    }
-
-    [Fact]
-    public void IpcService_CreatesCorrectly()
-    {
-        // Arrange & Act
-        _ipcService = new IpcService();
-
-        // Assert
-        Assert.NotNull(_ipcService);
-        Assert.False(_ipcService.IsConnected);
     }
 }

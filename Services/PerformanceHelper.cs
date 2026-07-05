@@ -81,18 +81,14 @@ public static class PerformanceHelper
     }
 
     /// <summary>
-    /// 执行垃圾回收并返回回收的内存量（MB）
+    /// 获取当前GC内存使用量（MB）
+    /// 注意：不执行强制GC，依赖.NET运行时自动垃圾回收
     /// </summary>
     public static double CollectGarbage()
     {
-        var before = GC.GetTotalMemory(false);
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
-        GC.Collect();
-        var after = GC.GetTotalMemory(false);
-        
-        _lastGcMemory = after;
-        return (before - after) / (1024.0 * 1024.0);
+        var current = GC.GetTotalMemory(false);
+        _lastGcMemory = current;
+        return current / (1024.0 * 1024.0);
     }
 
     /// <summary>
