@@ -1,6 +1,7 @@
 using LibreHardwareMonitor.Hardware;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Timers;
@@ -13,8 +14,8 @@ public class HardwareMonitorService : IHardwareMonitorService
 {
     private Computer? _computer;
     private System.Timers.Timer? _dataTimer;
+    private System.Timers.Timer? _fpsTimer;
     private bool _isRunning;
-    private IPerformanceLoggerService? _performanceLogger;
     
     private long _frameCount = 0;
     private long _lastFpsUpdateTime = 0;
@@ -26,6 +27,115 @@ public class HardwareMonitorService : IHardwareMonitorService
     private const int MaxFpsHistorySize = 600;
     public float? Fps1PercentLow { get; private set; }
     public float? Fps01PercentLow { get; private set; }
+    
+    private Process? _activeGameProcess;
+    private List<string> _gameProcessNames = new()
+    {
+        "cs2", "csgo", "dota2", "pubg", "fortnite", "apex", "valorant", 
+        "overwatch", "warframe", "eldenring", "cyberpunk2077", "godofwar",
+        "hogwartslegacy", "starfield", "deadspace", "residentevil4",
+        "bf2042", "callofduty", "warzone", "haloinfinite", "destiny2",
+        "genshinimpact", "honkaistarrail", "leagueoflegends", "lol",
+        "worldofwarcraft", "wow", "fifa", "nba2k", "mlbtheshow",
+        "steam", "epicgameslauncher", "origin", "uplay", "battlenet",
+        "goggalaxy", "rockstargames", "ubisoftconnect"
+    };
+    
+    private long _lastProcessCheckTime = 0;
+    private const long ProcessCheckIntervalMs = 2000;
+    
+    private float? _smoothedFps;
+    private const float FpsSmoothingFactor = 0.2f;
+    
+    private bool IsGameRunning => _activeGameProcess != null && !_activeGameProcess.HasExited;
+    
+    private bool IsGraphicsActivityDetected => GpuUsage.HasValue && GpuUsage.Value > 10;
+    
+    private bool ShouldDisplayFps => IsGameRunning || IsGraphicsActivityDetected;
+    
+    public void AddGameProcess(string processName)
+    {
+        if (!string.IsNullOrWhiteSpace(processName) && !_gameProcessNames.Contains(processName.ToLowerInvariant()))
+        {
+            _gameProcessNames.Add(processName.ToLowerInvariant());
+            Program.Log($"[硬件] 添加游戏进程: {processName}");
+        }
+    }
+    
+    public void RemoveGameProcess(string processName)
+    {
+        var removed = _gameProcessNames.Remove(processName.ToLowerInvariant());
+        if (removed)
+        {
+            Program.Log($"[硬件] 移除游戏进程: {processName}");
+        }
+    }
+    
+    public List<string> GetGameProcessNames()
+    {
+        return _gameProcessNames.ToList();
+    }
+    
+    private void CheckGameProcesses()
+    {
+        if (_activeGameProcess != null && !_activeGameProcess.HasExited)
+            return;
+
+        var now = DateTime.UtcNow.Ticks;
+        var elapsedMs = (now - _lastProcessCheckTime) / TimeSpan.TicksPerMillisecond;
+        
+        if (elapsedMs < ProcessCheckIntervalMs)
+        {
+            return;
+        }
+        
+        _lastProcessCheckTime = now;
+
+        try
+        {
+            foreach (var process in Process.GetProcesses())
+            {
+                try
+                {
+                    var processName = process.ProcessName.ToLowerInvariant();
+                    if (_gameProcessNames.Contains(processName))
+                    {
+                        _activeGameProcess = process;
+                        Program.Log($"[硬件] 检测到游戏进程: {process.ProcessName}");
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Program.Log($"[硬件] 访问进程 {process.ProcessName} 失败: {ex.Message}");
+                }
+            }
+            
+            _activeGameProcess = null;
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[硬件] 检测游戏进程失败: {ex.Message}");
+        }
+    }
+    
+    private float SmoothFps(float rawFps)
+    {
+        if (_smoothedFps == null)
+            _smoothedFps = rawFps;
+        
+        _smoothedFps = _smoothedFps.Value * (1 - FpsSmoothingFactor) + rawFps * FpsSmoothingFactor;
+        return _smoothedFps.Value;
+    }
+    
+    public void ResetFpsStatistics()
+    {
+        _fpsHistory.Clear();
+        _smoothedFps = null;
+        Fps1PercentLow = null;
+        Fps01PercentLow = null;
+        Program.Log("[硬件] FPS统计已重置");
+    }
 
     public float? CpuUsage { get; private set; }
     public float? CpuTemp { get; private set; }
@@ -52,7 +162,6 @@ public class HardwareMonitorService : IHardwareMonitorService
 
     private float _lastCpuUsage = 0;
     private float _lastGpuUsage = 0;
-    private float _lastMemoryUsage = 0;
     private float _lastCpuTemp = 0;
     private float _lastGpuTemp = 0;
     private const float UpdateThreshold = 0.5f;
@@ -126,16 +235,16 @@ public class HardwareMonitorService : IHardwareMonitorService
 
         try
         {
-            _performanceLogger = (IPerformanceLoggerService?)App.ServiceProvider?.GetService(typeof(IPerformanceLoggerService));
-            if (_performanceLogger != null)
-            {
-                Program.Log("[硬件] 性能日志服务已连接");
-            }
+            _fpsTimer = new System.Timers.Timer(16);
+            _fpsTimer.Elapsed += OnFpsTimerElapsed;
+            _fpsTimer.AutoReset = true;
+            _fpsTimer.Start();
         }
         catch (Exception ex)
         {
-            Program.Log($"[硬件] 获取性能日志服务失败: {ex.Message}");
+            Program.Log($"[硬件] FPS定时器启动失败: {ex.Message}");
         }
+
     }
 
     private async void OnDataTimerElapsed(object? sender, ElapsedEventArgs e)
@@ -150,6 +259,19 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
     }
 
+    private void OnFpsTimerElapsed(object? sender, ElapsedEventArgs e)
+    {
+        try
+        {
+            CheckGameProcesses();
+            MarkFrame();
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[硬件] FPS更新失败: {ex.Message}");
+        }
+    }
+
     private bool ShouldUpdateUI(float currentValue, float lastValue, float threshold = UpdateThreshold)
     {
         return Math.Abs(currentValue - lastValue) > threshold;
@@ -161,6 +283,9 @@ public class HardwareMonitorService : IHardwareMonitorService
         
         _dataTimer?.Stop();
         _dataTimer?.Dispose();
+        
+        _fpsTimer?.Stop();
+        _fpsTimer?.Dispose();
         
         try
         {
@@ -180,6 +305,16 @@ public class HardwareMonitorService : IHardwareMonitorService
 
     public void MarkFrame()
     {
+        if (!ShouldDisplayFps)
+        {
+            if (Fps.HasValue)
+            {
+                Fps = null;
+                ResetFpsStatistics();
+            }
+            return;
+        }
+
         if (!_fpsInitialized)
         {
             _lastFpsUpdateTime = DateTime.UtcNow.Ticks;
@@ -194,9 +329,13 @@ public class HardwareMonitorService : IHardwareMonitorService
         if (elapsedTicks >= _ticksPerSecond)
         {
             _currentFps = (float)(_frameCount * _ticksPerSecond) / elapsedTicks;
-            Fps = _currentFps;
             
-            UpdateFpsPercentiles(_currentFps);
+            if (_currentFps > 0 && _currentFps < 300)
+            {
+                var smoothedFps = SmoothFps(_currentFps);
+                Fps = smoothedFps;
+                UpdateFpsPercentiles(_currentFps);
+            }
             
             _frameCount = 0;
             _lastFpsUpdateTime = currentTime;
@@ -246,8 +385,6 @@ public class HardwareMonitorService : IHardwareMonitorService
             {
                 RaiseDataUpdated();
             }
-
-            LogPerformanceData();
         }
         catch (Exception ex)
         {
@@ -255,35 +392,7 @@ public class HardwareMonitorService : IHardwareMonitorService
         }
     }
 
-    private void LogPerformanceData()
-    {
-        if (_performanceLogger?.IsRecording != true)
-            return;
 
-        try
-        {
-            var entry = new PerformanceLogEntry
-            {
-                Timestamp = DateTime.Now,
-                Fps = Fps,
-                Fps1PercentLow = Fps1PercentLow,
-                Fps01PercentLow = Fps01PercentLow,
-                CpuUsage = CpuUsage,
-                CpuTemp = CpuTemp,
-                GpuUsage = GpuUsage,
-                GpuTemp = GpuTemp,
-                GpuVramUsed = GpuVramUsed,
-                MemoryUsed = MemoryUsed,
-                MemoryTotal = MemoryTotal
-            };
-
-            _performanceLogger.AddLogEntry(entry);
-        }
-        catch (Exception ex)
-        {
-            Program.Log($"[日志] 记录性能数据失败: {ex.Message}");
-        }
-    }
 
     private bool UpdateHardwareData()
     {

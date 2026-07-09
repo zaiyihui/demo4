@@ -22,57 +22,29 @@
         </Style>
 
         <Style Selector="Border.overlay-glass-panel">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#25ffffff" Offset="0"/>
-                        <GradientStop Color="#1dffffff" Offset="0.4"/>
-                        <GradientStop Color="#15ffffff" Offset="0.7"/>
-                        <GradientStop Color="#10ffffff" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="CornerRadius" Value="16"/>
-            <Setter Property="BoxShadow" Value="0 8 24 0 #40000000"/>
-            <Setter Property="BorderBrush">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#40ffffff" Offset="0"/>
-                        <GradientStop Color="#25ffffff" Offset="0.3"/>
-                        <GradientStop Color="#15ffffff" Offset="0.7"/>
-                        <GradientStop Color="#08ffffff" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Background" Value="{StaticResource LiquidGlassBase}"/>
+            <Setter Property="CornerRadius" Value="18"/>
+            <Setter Property="BoxShadow" Value="0 10 30 0 #45000000, 0 4 12 0 #25000000"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="12"/>
-            <Setter Property="RenderTransform">
-                <Setter.Value>
-                    <ScaleTransform ScaleX="1" ScaleY="1"/>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Padding" Value="14"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="Transitions">
                 <Setter.Value>
                     <Transitions>
-                        <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                        <DoubleTransition Property="Opacity" Duration="0:0:0.25"/>
+                        <BrushTransition Property="Background" Duration="0:0:0.3"/>
+                        <BrushTransition Property="BorderBrush" Duration="0:0:0.3"/>
                     </Transitions>
                 </Setter.Value>
             </Setter>
         </Style>
 
         <Style Selector="Border.overlay-glass-panel:pointerover">
-            <Setter Property="Background">
-                <Setter.Value>
-                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#30ffffff" Offset="0"/>
-                        <GradientStop Color="#25ffffff" Offset="0.4"/>
-                        <GradientStop Color="#1dffffff" Offset="0.7"/>
-                        <GradientStop Color="#15ffffff" Offset="1"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="BoxShadow" Value="0 12 32 0 #50000000"/>
+            <Setter Property="Background" Value="{StaticResource LiquidGlassHover}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GlassBorderHover}"/>
+            <Setter Property="BoxShadow" Value="0 14 40 0 #55000000, 0 6 16 0 #35000000"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
             <Setter Property="RenderTransform">
                 <Setter.Value>
                     <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
@@ -81,27 +53,28 @@
         </Style>
 
         <Style Selector="Border.overlay-drag-handle">
-            <Setter Property="Background" Value="#15ffffff"/>
-            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="{StaticResource LiquidGlassBase}"/>
+            <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Cursor" Value="SizeAll"/>
-            <Setter Property="Padding" Value="8,4"/>
-            <Setter Property="RenderTransform">
-                <Setter.Value>
-                    <ScaleTransform ScaleX="1" ScaleY="1"/>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
+            <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="Transitions">
                 <Setter.Value>
                     <Transitions>
-                        <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                        <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                        <BrushTransition Property="Background" Duration="0:0:0.25"/>
+                        <BrushTransition Property="BorderBrush" Duration="0:0:0.25"/>
                     </Transitions>
                 </Setter.Value>
             </Setter>
         </Style>
 
         <Style Selector="Border.overlay-drag-handle:pointerover">
-            <Setter Property="Background" Value="#25ffffff"/>
+            <Setter Property="Background" Value="{StaticResource LiquidGlassHover}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GlassBorderHover}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
             <Setter Property="RenderTransform">
                 <Setter.Value>
                     <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>

@@ -1,14 +1,16 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using ComputerCompanion.ViewModels;
 using System;
+using Avalonia.Controls.Shapes;
 
 namespace ComputerCompanion.Views;
 
 public partial class PerformanceDashboardWindow : Window
 {
-
+    private const double TitleBarHeight = 70;
 
     public PerformanceDashboardWindow()
     {
@@ -38,7 +40,34 @@ public partial class PerformanceDashboardWindow : Window
 
     private void OnTitleBarPointerPressed(object? sender, Avalonia.Input.PointerPressedEventArgs e)
     {
-        this.BeginMoveDrag(e);
+        var point = e.GetCurrentPoint(this);
+        if (point.Properties.IsLeftButtonPressed)
+        {
+            var element = e.Source as Control;
+            if (element != null)
+            {
+                var current = element;
+                while (current != null)
+                {
+                    if (current is Button btn && btn.Classes.Contains("window-control-button"))
+                    {
+                        return;
+                    }
+                    if (current is Border border && border.Classes.Contains("glass-header-bar"))
+                    {
+                        this.BeginMoveDrag(e);
+                        return;
+                    }
+                    current = current.Parent as Control;
+                }
+            }
+            
+            var position = point.Position;
+            if (position.Y <= TitleBarHeight)
+            {
+                this.BeginMoveDrag(e);
+            }
+        }
     }
 
     private void OnTitleBarDoubleTapped(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
@@ -61,6 +90,18 @@ public partial class PerformanceDashboardWindow : Window
     private void OnCloseClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void OnMaximizeClick(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (WindowState == WindowState.Maximized)
+        {
+            WindowState = WindowState.Normal;
+        }
+        else
+        {
+            WindowState = WindowState.Maximized;
+        }
     }
 
     #endregion
@@ -101,14 +142,6 @@ public partial class PerformanceDashboardWindow : Window
         if (DataContext is PerformanceDashboardViewModel viewModel)
         {
             viewModel.ToggleTheme();
-        }
-    }
-
-    private void OnToggleRecording(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
-    {
-        if (DataContext is PerformanceDashboardViewModel viewModel)
-        {
-            viewModel.ToggleRecording();
         }
     }
 

@@ -33,4 +33,9 @@ public interface IHardwareMonitorService : IDisposable
     void Stop();
     void MarkFrame();
     float? GetSmoothedFps();
+    
+    void AddGameProcess(string processName);
+    void RemoveGameProcess(string processName);
+    System.Collections.Generic.List<string> GetGameProcessNames();
+    void ResetFpsStatistics();
 }

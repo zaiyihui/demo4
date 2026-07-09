@@ -48,10 +48,13 @@
         <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="Padding" Value="16"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
         <Setter Property="Transitions">
             <Setter.Value>
                 <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.25"/>
+                    <BrushTransition Property="Background" Duration="0:0:0.3"/>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.3"/>
                 </Transitions>
             </Setter.Value>
         </Setter>
@@ -61,11 +64,13 @@
         <Setter Property="Background" Value="{StaticResource LiquidGlassHover}"/>
         <Setter Property="BorderBrush" Value="{StaticResource GlassBorderHover}"/>
         <Setter Property="BoxShadow" Value="0 12 40 0 #40000000, 0 4 12 0 #20000000"/>
+        <Setter Property="BorderThickness" Value="1.5"/>
     </Style>
 
     <Style Selector="Border.glass-card:pointerpressed">
         <Setter Property="Background" Value="{StaticResource LiquidGlassPressed}"/>
         <Setter Property="BoxShadow" Value="0 4 20 0 #30000000"/>
+        <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
     <Style Selector="Border.glass-header">
@@ -95,10 +100,14 @@
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
         <Setter Property="Transitions">
             <Setter.Value>
                 <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                    <BrushTransition Property="Background" Duration="0:0:0.25"/>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.25"/>
+                    <BrushTransition Property="Foreground" Duration="0:0:0.2"/>
                 </Transitions>
             </Setter.Value>
         </Setter>
@@ -178,10 +187,13 @@
         <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
         <Setter Property="Transitions">
             <Setter.Value>
                 <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                    <BrushTransition Property="Background" Duration="0:0:0.25"/>
+                    <BrushTransition Property="Foreground" Duration="0:0:0.2"/>
                 </Transitions>
             </Setter.Value>
         </Setter>
@@ -190,6 +202,8 @@
     <Style Selector="RadioButton.nav-item:checked">
         <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
         <Setter Property="Background" Value="{StaticResource LiquidGlassBase}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
+        <Setter Property="BorderThickness" Value="1"/>
     </Style>
 
     <Style Selector="RadioButton.nav-item:pointerover">
@@ -233,7 +247,9 @@
         <Setter Property="Transitions">
             <Setter.Value>
                 <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                    <BrushTransition Property="Background" Duration="0:0:0.25"/>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.25"/>
                 </Transitions>
             </Setter.Value>
         </Setter>
@@ -330,7 +346,9 @@
         <Setter Property="Transitions">
             <Setter.Value>
                 <Transitions>
-                    <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                    <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                    <BrushTransition Property="Background" Duration="0:0:0.25"/>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.25"/>
                 </Transitions>
             </Setter.Value>
         </Setter>

@@ -117,67 +117,48 @@ public class StringToColorConverterStatic : IValueConverter
     }
 }
 
-public class RecordingIconConverter : IValueConverter
-{
-    public static readonly RecordingIconConverter Instance = new();
 
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value is true ? "⏹" : "⏺";
-    }
-
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
-}
-
-public class RecordingTextConverter : IValueConverter
-{
-    public static readonly RecordingTextConverter Instance = new();
-
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        return value is true ? "停止" : "录制";
-    }
-
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
-}
 
 public class SelectedMetricToBackgroundConverter : IValueConverter
 {
     public static readonly SelectedMetricToBackgroundConverter Instance = new();
 
+    private static readonly LinearGradientBrush SelectedBrush = new()
+    {
+        StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+        EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
+        GradientStops = new GradientStops
+        {
+            new GradientStop(Color.Parse("#80ffffff"), 0),
+            new GradientStop(Color.Parse("#68ffffff"), 0.2),
+            new GradientStop(Color.Parse("#55ffffff"), 0.4),
+            new GradientStop(Color.Parse("#45ffffff"), 0.6),
+            new GradientStop(Color.Parse("#38ffffff"), 0.8),
+            new GradientStop(Color.Parse("#2dffffff"), 1)
+        }
+    };
+
+    private static readonly LinearGradientBrush UnselectedBrush = new()
+    {
+        StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+        EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
+        GradientStops = new GradientStops
+        {
+            new GradientStop(Color.Parse("#40ffffff"), 0),
+            new GradientStop(Color.Parse("#35ffffff"), 0.25),
+            new GradientStop(Color.Parse("#2affffff"), 0.5),
+            new GradientStop(Color.Parse("#20ffffff"), 0.75),
+            new GradientStop(Color.Parse("#18ffffff"), 1)
+        }
+    };
+
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is string selectedMetric && parameter is string cardName)
         {
-            var isSelected = selectedMetric == cardName;
-            var brush = new LinearGradientBrush();
-            brush.StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative);
-            brush.EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative);
-            
-            if (isSelected)
-            {
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#18ffffff"), 0));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#10ffffff"), 0.3));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#0cffffff"), 0.6));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#08ffffff"), 1));
-            }
-            else
-            {
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#0dffffff"), 0));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#09ffffff"), 0.3));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#06ffffff"), 0.6));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#04ffffff"), 1));
-            }
-            
-            return brush;
+            return selectedMetric == cardName ? SelectedBrush : UnselectedBrush;
         }
-        return new SolidColorBrush(Color.Parse("#08ffffff"));
+        return UnselectedBrush;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -190,31 +171,41 @@ public class SelectedMetricToBorderConverter : IValueConverter
 {
     public static readonly SelectedMetricToBorderConverter Instance = new();
 
+    private static readonly LinearGradientBrush SelectedBrush = new()
+    {
+        StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+        EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
+        GradientStops = new GradientStops
+        {
+            new GradientStop(Color.Parse("#80ffffff"), 0),
+            new GradientStop(Color.Parse("#65ffffff"), 0.3),
+            new GradientStop(Color.Parse("#50ffffff"), 0.5),
+            new GradientStop(Color.Parse("#3dffffff"), 0.7),
+            new GradientStop(Color.Parse("#2dffffff"), 1)
+        }
+    };
+
+    private static readonly LinearGradientBrush UnselectedBrush = new()
+    {
+        StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
+        EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative),
+        GradientStops = new GradientStops
+        {
+            new GradientStop(Color.Parse("#35ffffff"), 0),
+            new GradientStop(Color.Parse("#28ffffff"), 0.3),
+            new GradientStop(Color.Parse("#20ffffff"), 0.5),
+            new GradientStop(Color.Parse("#18ffffff"), 0.7),
+            new GradientStop(Color.Parse("#10ffffff"), 1)
+        }
+    };
+
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is string selectedMetric && parameter is string cardName)
         {
-            var isSelected = selectedMetric == cardName;
-            var brush = new LinearGradientBrush();
-            brush.StartPoint = new RelativePoint(0, 0, RelativeUnit.Relative);
-            brush.EndPoint = new RelativePoint(1, 1, RelativeUnit.Relative);
-            
-            if (isSelected)
-            {
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#60ffffff"), 0));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#50ffffff"), 0.5));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#40ffffff"), 1));
-            }
-            else
-            {
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#30ffffff"), 0));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#25ffffff"), 0.5));
-                brush.GradientStops.Add(new GradientStop(Color.Parse("#20ffffff"), 1));
-            }
-            
-            return brush;
+            return selectedMetric == cardName ? SelectedBrush : UnselectedBrush;
         }
-        return new SolidColorBrush(Color.Parse("#30ffffff"));
+        return UnselectedBrush;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -227,16 +218,16 @@ public class SelectedMetricToShadowConverter : IValueConverter
 {
     public static readonly SelectedMetricToShadowConverter Instance = new();
 
+    private const string SelectedShadow = "0 20 60 0 #50000000, 0 8 25 0 #35000000";
+    private const string UnselectedShadow = "0 8 20 0 #20000000, 0 3 8 0 #10000000";
+
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is string selectedMetric && parameter is string cardName)
         {
-            var isSelected = selectedMetric == cardName;
-            return isSelected 
-                ? "0 20 60 0 #50000000, 0 8 25 0 #35000000"
-                : "0 8 20 0 #20000000, 0 3 8 0 #10000000";
+            return selectedMetric == cardName ? SelectedShadow : UnselectedShadow;
         }
-        return "0 8 20 0 #20000000";
+        return UnselectedShadow;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -275,6 +266,29 @@ public class SelectedMetricToScaleConverter : IValueConverter
             return selectedMetric == cardName ? 1.02 : 1.0;
         }
         return 1.0;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class FpsValueConverter : IValueConverter
+{
+    public static readonly FpsValueConverter Instance = new();
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is double fps)
+        {
+            if (fps < 0)
+            {
+                return "N/A";
+            }
+            return $"{fps:F0}";
+        }
+        return "N/A";
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

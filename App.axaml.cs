@@ -108,9 +108,6 @@ public partial class App : Application
             // 全局热键服务
             services.AddSingleton<IGlobalHotkeyService, GlobalHotkeyService>();
 
-            // 性能日志服务
-            services.AddSingleton<IPerformanceLoggerService, PerformanceLoggerService>();
-
         _serviceProvider = services.BuildServiceProvider();
     }
 

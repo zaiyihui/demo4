@@ -16,6 +16,7 @@
         MinWidth="800"
         MinHeight="600"
         Background="Transparent"
+        SystemDecorations="BorderOnly"
         TransparencyLevelHint="Blur">
 
     <Window.Styles>
@@ -43,21 +44,23 @@
 
         <Style Selector="Border.metric-card">
             <Setter Property="CornerRadius" Value="16"/>
-            <Setter Property="BorderThickness" Value="0.5"/>
-            <Setter Property="Padding" Value="18"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="Transitions">
                 <Setter.Value>
                     <Transitions>
                         <DoubleTransition Property="Opacity" Duration="0:0:0.3"/>
+                        <BrushTransition Property="Background" Duration="0:0:0.35"/>
+                        <BrushTransition Property="BorderBrush" Duration="0:0:0.35"/>
                     </Transitions>
                 </Setter.Value>
             </Setter>
         </Style>
 
         <Style Selector="Border.metric-card:pointerover">
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
         </Style>
 
         <Style Selector="Border.glass-card-with-highlight">
@@ -67,10 +70,13 @@
             <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
             <Setter Property="BorderThickness" Value="2"/>
             <Setter Property="Padding" Value="18"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="Transitions">
                 <Setter.Value>
                     <Transitions>
-                        <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                        <DoubleTransition Property="Opacity" Duration="0:0:0.25"/>
+                        <BrushTransition Property="Background" Duration="0:0:0.3"/>
+                        <BrushTransition Property="BorderBrush" Duration="0:0:0.3"/>
                     </Transitions>
                 </Setter.Value>
             </Setter>
@@ -80,6 +86,7 @@
             <Setter Property="Background" Value="{StaticResource LiquidGlassHover}"/>
             <Setter Property="BorderBrush" Value="{StaticResource GlassBorderHover}"/>
             <Setter Property="BoxShadow" Value="0 16 50 0 #60000000, 0 6 20 0 #40000000, inset 0 1 0 0 #50ffffff"/>
+            <Setter Property="BorderThickness" Value="2.5"/>
         </Style>
 
         <Style Selector="Border.glass-header-bar">
@@ -96,10 +103,14 @@
             <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Padding" Value="8"/>
             <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="Transitions">
                 <Setter.Value>
                     <Transitions>
-                        <DoubleTransition Property="Opacity" Duration="0:0:0.15"/>
+                        <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
+                        <BrushTransition Property="Background" Duration="0:0:0.25"/>
+                        <BrushTransition Property="BorderBrush" Duration="0:0:0.25"/>
+                        <BrushTransition Property="Foreground" Duration="0:0:0.2"/>
                     </Transitions>
                 </Setter.Value>
             </Setter>
@@ -109,10 +120,41 @@
             <Setter Property="Background" Value="{StaticResource LiquidGlassHover}"/>
             <Setter Property="BorderBrush" Value="{StaticResource GlassBorderHover}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
         </Style>
 
         <Style Selector="Button.glass-action-button:pressed">
             <Setter Property="Background" Value="{StaticResource LiquidGlassPressed}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <!-- 窗口控制按钮样式 -->
+        <Style Selector="Button.window-control-button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Transitions">
+                <Setter.Value>
+                    <Transitions>
+                        <BrushTransition Property="Background" Duration="0:0:0.15"/>
+                        <BrushTransition Property="Foreground" Duration="0:0:0.15"/>
+                    </Transitions>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="Button.window-control-button:pointerover">
+            <Setter Property="Background" Value="#15ffffff"/>
+            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+        </Style>
+
+        <Style Selector="Button.window-control-button.close:pointerover">
+            <Setter Property="Background" Value="#e84343"/>
+            <Setter Property="Foreground" Value="White"/>
         </Style>
 
         <Style Selector="ProgressBar.glass-progress-bar">
@@ -152,13 +194,19 @@
     </Window.Styles>
 
     <Grid>
-        <!-- 外层厚玻璃容器 - 重度磨砂质感 -->
-        <Border Background="{StaticResource ThickGlassBase}"
-                CornerRadius="22"
+        <!-- 外层厚玻璃容器 - 增强的液态玻璃质感 -->
+        <Border Background="{DynamicResource WindowBackground}"
+                CornerRadius="24"
                 BorderBrush="{StaticResource ThickGlassBorder}"
                 BorderThickness="1.5"
-                BoxShadow="0 20 60 0 #40000000, 0 8 24 0 #20000000, inset 0 0 40 0 #10000000"
+                BoxShadow="0 24 70 0 #45000000, 0 10 30 0 #25000000, inset 0 0 50 0 #15000000"
                 Margin="0">
+            <Border.Transitions>
+                <Transitions>
+                    <BrushTransition Property="Background" Duration="0:0:0.4"/>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.3"/>
+                </Transitions>
+            </Border.Transitions>
             <Grid>
                 <!-- 顶部厚玻璃高光层 -->
                 <Border Height="60" VerticalAlignment="Top" Background="{StaticResource ThickGlassHighlight}" Margin="0"/>
@@ -172,67 +220,70 @@
                 <!-- 主内容区域 -->
                 <Grid RowDefinitions="Auto,*,Auto">
                     <!-- 顶部标题栏 -->
-            <Border Grid.Row="0" Classes="glass-header-bar" Padding="20,15">
-                <Grid ColumnDefinitions="Auto,*,Auto">
-                    <StackPanel Orientation="Horizontal" Spacing="15">
-                        <Border Width="40" Height="40" CornerRadius="12" Background="{StaticResource CpuGlassGradient}" 
-                                BoxShadow="0 4 15 0 #204ecdc4">
-                            <Grid>
-                                <Border CornerRadius="12" Background="Transparent" BorderBrush="#40ffffff" BorderThickness="1"/>
-                                <TextBlock Text="⚡" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Grid>
-                        </Border>
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="监控面板" Classes="title"/>
-                            <TextBlock Text="实时系统性能分析与监控" Classes="subtitle" Margin="0,2,0,0"/>
-                        </StackPanel>
-                    </StackPanel>
+                    <Border Grid.Row="0" Classes="glass-header-bar" Padding="0,0,0,0" PointerPressed="OnTitleBarPointerPressed" DoubleTapped="OnTitleBarDoubleTapped">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                            <!-- 左侧：Logo和标题 -->
+                            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" Margin="20,15" VerticalAlignment="Center">
+                                <Border Width="36" Height="36" CornerRadius="10" Background="{StaticResource CpuGlassGradient}" 
+                                        BoxShadow="0 4 12 0 #204ecdc4">
+                                    <Grid>
+                                        <Border CornerRadius="10" Background="Transparent" BorderBrush="#40ffffff" BorderThickness="1"/>
+                                        <TextBlock Text="⚡" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </Border>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="监控面板" Classes="title"/>
+                                    <TextBlock Text="实时系统性能分析与监控" Classes="subtitle" Margin="0,2,0,0"/>
+                                </StackPanel>
+                            </StackPanel>
 
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <Border Classes="glass-card-with-highlight" Padding="12,6" CornerRadius="20">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <Border Width="8" Height="8" CornerRadius="4" Background="{Binding StatusColor}" BoxShadow="0 0 10 0 #4ecdc4"/>
-                                <TextBlock Text="{Binding SystemStatus}" FontSize="13" Foreground="{Binding StatusColor}" VerticalAlignment="Center"/>
+                            <!-- 中间：状态信息 -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Border Classes="glass-card-with-highlight" Padding="12,6" CornerRadius="16">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Width="8" Height="8" CornerRadius="4" Background="{Binding StatusColor}" BoxShadow="0 0 10 0 #4ecdc4"/>
+                                        <TextBlock Text="{Binding SystemStatus}" FontSize="13" Foreground="{Binding StatusColor}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Text="{Binding LastUpdate, StringFormat='最后更新: {0:HH:mm:ss}'}" Classes="label" VerticalAlignment="Center"/>
                             </StackPanel>
-                        </Border>
-                        <TextBlock Text="{Binding LastUpdate, StringFormat='最后更新: {0:HH:mm:ss}'}" Classes="label" VerticalAlignment="Center"/>
-                    </StackPanel>
 
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                        <Button Classes="glass-action-button" ToolTip.Tip="设置 [F3]" Click="OnOpenSettings">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <TextBlock Text="⚙" FontSize="14"/>
-                                <TextBlock Text="设置" FontSize="12"/>
-                                <TextBlock Text="[F3]" FontSize="10" Foreground="{StaticResource TextTertiary}"/>
+                            <!-- 右侧：功能按钮 -->
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <Button Classes="glass-action-button" ToolTip.Tip="刷新数据" Click="OnRefreshClick">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <TextBlock Text="🔄" FontSize="14"/>
+                                        <TextBlock Text="刷新" FontSize="12"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="glass-action-button" ToolTip.Tip="导出数据" Click="OnExportClick">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <TextBlock Text="📥" FontSize="14"/>
+                                        <TextBlock Text="导出" FontSize="12"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button Classes="glass-action-button" ToolTip.Tip="主题切换" Click="OnThemeToggleClick">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <TextBlock Text="🌙" FontSize="14"/>
+                                        <TextBlock Text="主题" FontSize="12"/>
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
-                        </Button>
-                        <Button Classes="glass-action-button" ToolTip.Tip="刷新数据" Click="OnRefreshClick">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <TextBlock Text="🔄" FontSize="14"/>
-                                <TextBlock Text="刷新" FontSize="12"/>
+
+                            <!-- 最右侧：系统窗口控制按钮 -->
+                            <StackPanel Grid.Column="3" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Classes="window-control-button" ToolTip.Tip="最小化" Click="OnMinimizeClick" Width="46" Height="40">
+                                    <TextBlock Text="−" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Button>
+                                <Button Classes="window-control-button" ToolTip.Tip="最大化" Click="OnMaximizeClick" Width="46" Height="40">
+                                    <TextBlock Text="□" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Button>
+                                <Button Classes="window-control-button close" ToolTip.Tip="关闭" Click="OnCloseClick" Width="46" Height="40">
+                                    <TextBlock Text="×" FontSize="16" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Button>
                             </StackPanel>
-                        </Button>
-                        <Button Classes="glass-action-button" ToolTip.Tip="导出数据" Click="OnExportClick">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <TextBlock Text="📥" FontSize="14"/>
-                                <TextBlock Text="导出" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Classes="glass-action-button" ToolTip.Tip="录制日志" Click="OnToggleRecording">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <TextBlock x:DataType="vm:PerformanceDashboardViewModel" Text="{Binding IsRecording, Converter={x:Static converters:RecordingIconConverter.Instance}}" FontSize="14"/>
-                                <TextBlock x:DataType="vm:PerformanceDashboardViewModel" Text="{Binding IsRecording, Converter={x:Static converters:RecordingTextConverter.Instance}}" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-                        <Button Classes="glass-action-button" ToolTip.Tip="主题切换" Click="OnThemeToggleClick">
-                            <StackPanel Orientation="Horizontal" Spacing="5">
-                                <TextBlock Text="🌙" FontSize="14"/>
-                                <TextBlock Text="主题" FontSize="12"/>
-                            </StackPanel>
-                        </Button>
-                    </StackPanel>
-                </Grid>
-            </Border>
+                        </Grid>
+                    </Border>
 
             <!-- 主内容区域 -->
             <Grid Grid.Row="1" ColumnDefinitions="280,*" Margin="15">
@@ -389,7 +440,7 @@
                                         </StackPanel>
                                     </Grid>
 
-                                    <TextBlock Text="{Binding Fps, StringFormat={}{0:F0}}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
+                                    <TextBlock Text="{Binding Fps, Converter={x:Static converters:FpsValueConverter.Instance}}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
                                     <TextBlock Text="帧/秒" Classes="label" Margin="0,-5,0,0"/>
 
                                     <Grid ColumnDefinitions="*,*" Margin="0,5,0,0">
@@ -425,10 +476,10 @@
                 <Grid Grid.Column="1" RowDefinitions="*,Auto" Margin="15,0,0,0">
                     <!-- 图表区域 -->
                     <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Spacing="15">
+                        <StackPanel Spacing="12">
                             <!-- 时间范围选择 -->
-                            <Border Classes="glass-card-with-highlight" Padding="15">
-                                <StackPanel Orientation="Horizontal" Spacing="15">
+                            <Border Classes="glass-card-with-highlight" Padding="16">
+                                <StackPanel Orientation="Horizontal" Spacing="12">
                                     <TextBlock Text="时间范围" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                                     <ComboBox SelectedIndex="2" Width="120" Classes="glass-dropdown" SelectionChanged="OnTimeRangeChanged">
                                         <ComboBoxItem Content="15分钟"/>
@@ -441,29 +492,38 @@
                             </Border>
 
                             <!-- CPU 图表 -->
-                            <Border Classes="glass-card-with-highlight" Padding="15" IsVisible="{Binding ShowCpu}">
-                                <StackPanel Spacing="10">
-                                    <Border Height="1" VerticalAlignment="Top" Background="#404ecdc4" Margin="0,0,0,10"/>
+                            <Border Classes="glass-card-with-highlight" Padding="16" IsVisible="{Binding ShowCpu}">
+                                <StackPanel Spacing="12">
+                                    <Border Height="1" VerticalAlignment="Top" Background="#404ecdc4" Margin="0,0,0,8"/>
                                     <TextBlock Text="CPU 使用率趋势" FontSize="14" FontWeight="SemiBold" Foreground="#4ecdc4"/>
                                     <lvc:CartesianChart Series="{Binding CpuSeries}" XAxes="{Binding DefaultXAxes}" YAxes="{Binding DefaultYAxes}" Height="180" Background="Transparent"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- GPU 图表 -->
-                            <Border Classes="glass-card-with-highlight" Padding="15" IsVisible="{Binding ShowGpu}">
-                                <StackPanel Spacing="10">
-                                    <Border Height="1" VerticalAlignment="Top" Background="#40a29bfe" Margin="0,0,0,10"/>
+                            <Border Classes="glass-card-with-highlight" Padding="16" IsVisible="{Binding ShowGpu}">
+                                <StackPanel Spacing="12">
+                                    <Border Height="1" VerticalAlignment="Top" Background="#40a29bfe" Margin="0,0,0,8"/>
                                     <TextBlock Text="GPU 使用率趋势" FontSize="14" FontWeight="SemiBold" Foreground="#a29bfe"/>
                                     <lvc:CartesianChart Series="{Binding GpuSeries}" XAxes="{Binding DefaultXAxes}" YAxes="{Binding DefaultYAxes}" Height="180" Background="Transparent"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- 内存图表 -->
-                            <Border Classes="glass-card-with-highlight" Padding="15" IsVisible="{Binding ShowMemory}">
-                                <StackPanel Spacing="10">
-                                    <Border Height="1" VerticalAlignment="Top" Background="#40fd79a8" Margin="0,0,0,10"/>
+                            <Border Classes="glass-card-with-highlight" Padding="16" IsVisible="{Binding ShowMemory}">
+                                <StackPanel Spacing="12">
+                                    <Border Height="1" VerticalAlignment="Top" Background="#40fd79a8" Margin="0,0,0,8"/>
                                     <TextBlock Text="内存使用率趋势" FontSize="14" FontWeight="SemiBold" Foreground="#fd79a8"/>
                                     <lvc:CartesianChart Series="{Binding MemorySeries}" XAxes="{Binding DefaultXAxes}" YAxes="{Binding DefaultYAxes}" Height="180" Background="Transparent"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- FPS 图表 -->
+                            <Border Classes="glass-card-with-highlight" Padding="16" IsVisible="{Binding ShowFps}">
+                                <StackPanel Spacing="12">
+                                    <Border Height="1" VerticalAlignment="Top" Background="#4076B900" Margin="0,0,0,8"/>
+                                    <TextBlock Text="FPS 帧率趋势" FontSize="14" FontWeight="SemiBold" Foreground="#76B900"/>
+                                    <lvc:CartesianChart Series="{Binding FpsSeries}" XAxes="{Binding DefaultXAxes}" YAxes="{Binding FpsYAxes}" Height="180" Background="Transparent"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -521,14 +581,11 @@
                         <Border Classes="glass-card-with-highlight" Padding="12,6" CornerRadius="15">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <TextBlock Text="FPS:" Classes="label" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding Fps, StringFormat={}{0:F0}}" FontSize="13" FontWeight="SemiBold" Foreground="#76B900"/>
+                                <TextBlock Text="{Binding Fps, Converter={x:Static converters:FpsValueConverter.Instance}}" FontSize="13" FontWeight="SemiBold" Foreground="#76B900"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="15">
-                        <TextBlock Text="[F3] 设置" Classes="label"/>
-                        <TextBlock Text="[ESC] 最小化" Classes="label"/>
-                    </StackPanel>
+
                 </Grid>
             </Border>
         </Grid>

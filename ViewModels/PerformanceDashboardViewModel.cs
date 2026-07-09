@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace ComputerCompanion.ViewModels;
 
@@ -31,7 +32,7 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
     private readonly IThemeService? _themeService;
     private readonly IDataExportService? _dataExportService;
     private readonly IChartService? _chartService;
-    private readonly IPerformanceLoggerService? _performanceLogger;
+    private readonly Timer? _alertCleanupTimer;
     private bool _disposed;
 
     private const int MaxChartPoints = 60;
@@ -80,12 +81,15 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
     public ObservableCollection<ChartPoint> CpuChartPoints { get; } = new();
     public ObservableCollection<ChartPoint> GpuChartPoints { get; } = new();
     public ObservableCollection<ChartPoint> MemoryChartPoints { get; } = new();
+    public ObservableCollection<ChartPoint> FpsChartPoints { get; } = new();
 
     public ISeries[] CpuSeries { get; private set; } = Array.Empty<ISeries>();
     public ISeries[] GpuSeries { get; private set; } = Array.Empty<ISeries>();
     public ISeries[] MemorySeries { get; private set; } = Array.Empty<ISeries>();
+    public ISeries[] FpsSeries { get; private set; } = Array.Empty<ISeries>();
     public Axis[] DefaultXAxes { get; private set; } = Array.Empty<Axis>();
     public Axis[] DefaultYAxes { get; private set; } = Array.Empty<Axis>();
+    public Axis[] FpsYAxes { get; private set; } = Array.Empty<Axis>();
 
     private void InitializeCharts()
     {
@@ -128,6 +132,19 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
             }
         };
 
+        FpsSeries = new ISeries[]
+        {
+            new LineSeries<ChartPoint>
+            {
+                Name = "FPS",
+                Values = FpsChartPoints,
+                Stroke = new SolidColorPaint(new SKColor(118, 185, 0)) { StrokeThickness = 2 },
+                Fill = null,
+                GeometrySize = 4,
+                LineSmoothness = 0.8
+            }
+        };
+
         DefaultXAxes = new Axis[]
         {
             new Axis
@@ -145,6 +162,16 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
                 Labeler = value => $"{value:F0}%",
                 MinLimit = 0,
                 MaxLimit = 100
+            }
+        };
+
+        FpsYAxes = new Axis[]
+        {
+            new Axis
+            {
+                Labeler = value => $"{value:F0}",
+                MinLimit = 0,
+                MaxLimit = 240
             }
         };
     }
@@ -171,12 +198,6 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
     private string _statusColor = "#00b894";
 
     [ObservableProperty]
-    private bool _isRecording = false;
-
-    [ObservableProperty]
-    private string _logFilePath = "";
-
-    [ObservableProperty]
     private DateTime _lastUpdate = DateTime.Now;
 
     public PerformanceDashboardViewModel(
@@ -186,8 +207,7 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
         IAlertSoundService? alertSoundService = null,
         IThemeService? themeService = null,
         IDataExportService? dataExportService = null,
-        IChartService? chartService = null,
-        IPerformanceLoggerService? performanceLogger = null)
+        IChartService? chartService = null)
     {
         _monitor = monitor ?? throw new ArgumentNullException(nameof(monitor));
         _hardware = hardware ?? throw new ArgumentNullException(nameof(hardware));
@@ -196,13 +216,17 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
         _themeService = themeService;
         _dataExportService = dataExportService;
         _chartService = chartService;
-        _performanceLogger = performanceLogger;
 
         _monitor.MetricsUpdated += OnMetricsUpdated;
         _monitor.AlertTriggered += OnAlertTriggered;
         _hardware.DataUpdated += OnHardwareDataUpdated;
 
         InitializeCharts();
+
+        _alertCleanupTimer = new Timer(60000);
+        _alertCleanupTimer.Elapsed += OnAlertCleanupTimerElapsed;
+        _alertCleanupTimer.AutoReset = true;
+        _alertCleanupTimer.Start();
 
         _ = InitializeAsync();
     }
@@ -245,17 +269,7 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
             if (_hardware.GpuUsage.HasValue)
                 GpuUsage = _hardware.GpuUsage.Value;
 
-            if (_hardware.GpuVramUsed.HasValue && _hardware.GpuVramTotal.HasValue)
-            {
-                var gpuUsagePercent = (_hardware.GpuVramUsed.Value / _hardware.GpuVramTotal.Value) * 100;
-                if (Math.Abs(GpuUsage - gpuUsagePercent) > 1)
-                {
-                    GpuUsage = gpuUsagePercent;
-                }
-            }
-
-            if (_hardware.Fps.HasValue)
-                Fps = _hardware.Fps.Value;
+            Fps = _hardware.Fps.HasValue ? _hardware.Fps.Value : -1;
         }
         catch (Exception ex)
         {
@@ -326,15 +340,16 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
 
     private void AddAlert(AlertTriggeredEventArgs alert)
     {
+        CleanupExpiredAlerts();
+
         var existingAlert = ActiveAlerts.FirstOrDefault(
-            a => a.RuleName == alert.Rule.Name && 
-                 Math.Abs(a.CurrentValue - alert.CurrentValue) < 1 &&
-                 (DateTime.Now - a.TriggeredAt).TotalSeconds < 30);
+            a => a.RuleName == alert.Rule.Name);
 
         if (existingAlert != null)
         {
             existingAlert.CurrentValue = alert.CurrentValue;
             existingAlert.TriggeredAt = alert.TriggeredAt;
+            existingAlert.Message = $"{alert.Rule.Name}: {alert.CurrentValue:F1} (阈值: {alert.Rule.Threshold})";
             return;
         }
 
@@ -356,6 +371,22 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
         _alertSoundService?.PlayAlertSound(alert.Rule.Severity);
     }
 
+    private void CleanupExpiredAlerts()
+    {
+        var expiredAlerts = ActiveAlerts.Where(
+            a => (DateTime.Now - a.TriggeredAt).TotalMinutes > 5).ToList();
+
+        foreach (var alert in expiredAlerts)
+        {
+            ActiveAlerts.Remove(alert);
+        }
+    }
+
+    private void OnAlertCleanupTimerElapsed(object? sender, ElapsedEventArgs e)
+    {
+        CleanupExpiredAlerts();
+    }
+
     private void UpdateChartData(PerformanceMetrics metrics)
     {
         var now = DateTime.Now;
@@ -363,22 +394,21 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
         UpdateChartPoints(CpuChartPoints, metrics.CpuUsagePercent, now);
         UpdateChartPoints(GpuChartPoints, metrics.GpuUsagePercent, now);
         UpdateChartPoints(MemoryChartPoints, metrics.MemoryUsagePercent, now);
+        
+        if (metrics.Fps >= 0)
+        {
+            UpdateChartPoints(FpsChartPoints, metrics.Fps, now);
+        }
     }
 
     private void UpdateChartPoints(ObservableCollection<ChartPoint> points, double value, DateTime time)
     {
-        ChartPoint point;
+        var point = _chartService != null
+            ? _chartService.GetChartPoint()
+            : new ChartPoint();
 
-        if (_chartService != null)
-        {
-            point = _chartService.GetChartPoint();
-            point.Time = time;
-            point.Value = value;
-        }
-        else
-        {
-            point = new ChartPoint { Time = time, Value = value };
-        }
+        point.Time = time;
+        point.Value = value;
 
         points.Add(point);
 
@@ -392,30 +422,28 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
 
     private void UpdateSystemStatus(PerformanceMetrics metrics)
     {
-        string newStatus;
-        string newColor;
-
-        if (metrics.CpuUsagePercent > 90 || metrics.MemoryUsagePercent > 90 || metrics.CpuTemperature > 85)
-        {
-            newStatus = "警告";
-            newColor = "#fdcb6e";
-        }
-        else if (metrics.CpuUsagePercent > 80 || metrics.MemoryUsagePercent > 80 || metrics.CpuTemperature > 75)
-        {
-            newStatus = "注意";
-            newColor = "#ffeaa7";
-        }
-        else
-        {
-            newStatus = "正常";
-            newColor = "#00b894";
-        }
+        var (newStatus, newColor) = GetSystemStatus(metrics);
 
         if (SystemStatus != newStatus)
             SystemStatus = newStatus;
 
         if (StatusColor != newColor)
             StatusColor = newColor;
+    }
+
+    private (string Status, string Color) GetSystemStatus(PerformanceMetrics metrics)
+    {
+        if (metrics.CpuUsagePercent > 90 || metrics.MemoryUsagePercent > 90 || metrics.CpuTemperature > 85)
+        {
+            return ("警告", "#fdcb6e");
+        }
+
+        if (metrics.CpuUsagePercent > 80 || metrics.MemoryUsagePercent > 80 || metrics.CpuTemperature > 75)
+        {
+            return ("注意", "#ffeaa7");
+        }
+
+        return ("正常", "#00b894");
     }
 
     private void LoadHistoricalData()
@@ -437,25 +465,15 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
     private void LoadHistoricalDataForMetric(string metricName, ObservableCollection<MetricDataPointViewModel> collection, TimeSpan duration)
     {
         var data = _monitor.GetHistoricalMetrics(metricName, duration);
-        
+
         foreach (var point in data.TakeLast(MaxChartPoints))
         {
-            MetricDataPointViewModel vm;
+            var vm = _chartService != null
+                ? _chartService.GetMetricDataPoint()
+                : new MetricDataPointViewModel();
 
-            if (_chartService != null)
-            {
-                vm = _chartService.GetMetricDataPoint();
-                vm.Timestamp = point.Timestamp;
-                vm.Value = point.Value;
-            }
-            else
-            {
-                vm = new MetricDataPointViewModel
-                {
-                    Timestamp = point.Timestamp,
-                    Value = point.Value
-                };
-            }
+            vm.Timestamp = point.Timestamp;
+            vm.Value = point.Value;
 
             collection.Add(vm);
         }
@@ -489,11 +507,14 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
             LoadHistoricalData();
 
             _log.Info("[性能面板] 数据已刷新");
-            await Task.CompletedTask;
         }
         catch (Exception ex)
         {
             _log.Error("[性能面板] 刷新数据失败", ex);
+        }
+        finally
+        {
+            await Task.CompletedTask;
         }
     }
 
@@ -507,6 +528,7 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
         ClearChartCollection(CpuChartPoints);
         ClearChartCollection(GpuChartPoints);
         ClearChartCollection(MemoryChartPoints);
+        ClearChartCollection(FpsChartPoints);
     }
 
     private void ClearCollection(ObservableCollection<MetricDataPointViewModel> collection)
@@ -548,27 +570,21 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
 
                 var allData = new List<MetricDataPoint>();
 
-                foreach (var point in CpuHistory)
+                allData.AddRange(CpuHistory.Select(point => new MetricDataPoint
                 {
-                    allData.Add(new MetricDataPoint
-                    {
-                        Timestamp = point.Timestamp,
-                        Value = point.Value,
-                        Unit = "%",
-                        MetricType = MetricType.Gauge
-                    });
-                }
+                    Timestamp = point.Timestamp,
+                    Value = point.Value,
+                    Unit = "%",
+                    MetricType = MetricType.Gauge
+                }));
 
-                foreach (var point in MemoryHistory)
+                allData.AddRange(MemoryHistory.Select(point => new MetricDataPoint
                 {
-                    allData.Add(new MetricDataPoint
-                    {
-                        Timestamp = point.Timestamp,
-                        Value = point.Value,
-                        Unit = "%",
-                        MetricType = MetricType.Gauge
-                    });
-                }
+                    Timestamp = point.Timestamp,
+                    Value = point.Value,
+                    Unit = "%",
+                    MetricType = MetricType.Gauge
+                }));
 
                 _dataExportService.ExportToCsv(allData, exportPath);
                 _log.Info($"[性能面板] 数据已导出到: {exportPath}");
@@ -577,43 +593,14 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
             {
                 _log.Warning("[性能面板] 数据导出服务未初始化");
             }
-            await Task.CompletedTask;
         }
         catch (Exception ex)
         {
             _log.Error("[性能面板] 导出数据失败", ex);
         }
-    }
-
-    [RelayCommand]
-    public void ToggleRecording()
-    {
-        try
+        finally
         {
-            if (_performanceLogger == null)
-            {
-                _log.Warning("[性能面板] 性能日志服务未初始化");
-                return;
-            }
-
-            if (_isRecording)
-            {
-                _performanceLogger.StopRecording();
-                IsRecording = false;
-                LogFilePath = "";
-                _log.Info("[性能面板] 性能日志录制已停止");
-            }
-            else
-            {
-                _performanceLogger.StartRecording();
-                IsRecording = true;
-                LogFilePath = _performanceLogger.LogFilePath;
-                _log.Info($"[性能面板] 性能日志录制已启动: {_performanceLogger.LogFilePath}");
-            }
-        }
-        catch (Exception ex)
-        {
-            _log.Error("[性能面板] 切换录制状态失败", ex);
+            await Task.CompletedTask;
         }
     }
 
@@ -675,6 +662,9 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
         _monitor.MetricsUpdated -= OnMetricsUpdated;
         _monitor.AlertTriggered -= OnAlertTriggered;
         _hardware.DataUpdated -= OnHardwareDataUpdated;
+
+        _alertCleanupTimer?.Stop();
+        _alertCleanupTimer?.Dispose();
 
         ClearCollections();
 

@@ -23,7 +23,8 @@
     <Grid RowDefinitions="Auto,*,Auto">
         <!-- 标题栏 - 玻璃风格 -->
         <Border Grid.Row="0" Padding="20,15" Background="{StaticResource LiquidGlassBase}" 
-                BorderThickness="0,0,0,1" BorderBrush="{StaticResource GlassBorder}">
+                BorderThickness="0,0,0,1" BorderBrush="{StaticResource GlassBorder}"
+                CornerRadius="0">
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <!-- Logo区域 -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
@@ -57,7 +58,8 @@
 
             <!-- 左侧导航栏 - 玻璃风格 -->
             <Border Grid.Column="0" Background="{StaticResource LiquidGlassBase}" 
-                    BorderThickness="0,0,1,0" BorderBrush="{StaticResource GlassBorder}">
+                    BorderThickness="0,0,1,0" BorderBrush="{StaticResource GlassBorder}"
+                    CornerRadius="0">
                 <ScrollViewer>
                     <StackPanel Margin="8">
                         <!-- 系统概览分组 -->
@@ -455,7 +457,8 @@
 
         <!-- 底部按钮栏 - 玻璃风格 -->
         <Border Grid.Row="2" Padding="20,12" Background="{StaticResource LiquidGlassBase}" 
-                BorderThickness="0,1,0,0" BorderBrush="{StaticResource GlassBorder}">
+                BorderThickness="0,1,0,0" BorderBrush="{StaticResource GlassBorder}"
+                CornerRadius="0">
             <Grid ColumnDefinitions="*,Auto,Auto,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="状态: " Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center"/>

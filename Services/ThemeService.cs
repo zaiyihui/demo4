@@ -73,21 +73,19 @@ public class ThemeService : IThemeService
 
     private void ApplyTheme()
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (Application.Current == null) return;
+
+        Application.Current.RequestedThemeVariant = CurrentTheme switch
         {
-            var styles = Application.Current.Styles;
-            
-            foreach (var style in styles)
-            {
-                if (style is IStyle)
-                {
-                    UpdateStyleResources(style);
-                }
-            }
-        }
+            ThemeMode.Dark => ThemeVariant.Dark,
+            ThemeMode.Light => ThemeVariant.Light,
+            _ => ThemeVariant.Default
+        };
+
+        UpdateApplicationResources();
     }
 
-    private void UpdateStyleResources(IStyle style)
+    private void UpdateApplicationResources()
     {
         if (Application.Current == null) return;
 
@@ -102,6 +100,8 @@ public class ThemeService : IThemeService
             resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(136, 136, 136));
             resources["TextTertiary"] = new SolidColorBrush(Color.FromRgb(102, 102, 102));
             resources["GridLine"] = new SolidColorBrush(Color.FromRgb(37, 37, 48));
+            resources["SurfaceBrush"] = new SolidColorBrush(Color.FromRgb(21, 21, 32));
+            resources["BackgroundBrush"] = new SolidColorBrush(Color.FromRgb(10, 10, 20));
         }
         else
         {
@@ -112,6 +112,8 @@ public class ThemeService : IThemeService
             resources["TextSecondary"] = new SolidColorBrush(Color.FromRgb(100, 100, 100));
             resources["TextTertiary"] = new SolidColorBrush(Color.FromRgb(150, 150, 150));
             resources["GridLine"] = new SolidColorBrush(Color.FromRgb(200, 200, 200));
+            resources["SurfaceBrush"] = new SolidColorBrush(Color.FromRgb(255, 255, 255));
+            resources["BackgroundBrush"] = new SolidColorBrush(Color.FromRgb(245, 245, 245));
         }
     }
 }

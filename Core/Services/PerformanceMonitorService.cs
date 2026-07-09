@@ -15,9 +15,9 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
     private readonly Timer _monitorTimer;
     private readonly ConcurrentDictionary<string, List<MetricDataPoint>> _historicalMetrics = new();
     private readonly List<AlertRule> _alertRules = new();
+    private readonly ConcurrentDictionary<string, DateTime> _alertFirstTriggerTimes = new();
     
     private PerformanceMetrics _currentMetrics = new();
-    private readonly Stopwatch _operationTimer = new();
 
     private const int MaxHistoryPoints = 1000;
     private const int DefaultIntervalMs = 1000;
@@ -128,19 +128,22 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
     {
         try
         {
-            var process = Process.GetCurrentProcess();
-
-            var cpuUsage = CalculateCpuUsage(process);
-
-            var memoryUsed = process.WorkingSet64 / (1024.0 * 1024.0);
-            var memoryTotal = GetTotalPhysicalMemory() / (1024.0 * 1024.0);
+            var metricsData = await Task.Run(() =>
+            {
+                var process = Process.GetCurrentProcess();
+                var cpuUsage = CalculateCpuUsage(process);
+                var memoryUsed = process.WorkingSet64 / (1024.0 * 1024.0);
+                var memoryTotal = GetTotalPhysicalMemory() / (1024.0 * 1024.0);
+                
+                return new { CpuUsage = cpuUsage, MemoryUsed = memoryUsed, MemoryTotal = memoryTotal };
+            });
 
             var newMetrics = new PerformanceMetrics
             {
                 Timestamp = DateTime.UtcNow,
-                CpuUsagePercent = cpuUsage,
-                MemoryUsedMB = memoryUsed,
-                MemoryTotalMB = memoryTotal,
+                CpuUsagePercent = metricsData.CpuUsage,
+                MemoryUsedMB = metricsData.MemoryUsed,
+                MemoryTotalMB = metricsData.MemoryTotal,
                 AverageResponseTimeMs = _currentMetrics.AverageResponseTimeMs,
                 P95ResponseTimeMs = _currentMetrics.P95ResponseTimeMs,
                 P99ResponseTimeMs = _currentMetrics.P99ResponseTimeMs,
@@ -150,7 +153,7 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
 
             Interlocked.Exchange(ref _currentMetrics, newMetrics);
 
-            RecordMetric("CpuUsagePercent", cpuUsage, MetricType.Gauge);
+            RecordMetric("CpuUsagePercent", metricsData.CpuUsage, MetricType.Gauge);
             RecordMetric("MemoryUsagePercent", newMetrics.MemoryUsagePercent, MetricType.Gauge);
 
             var triggeredAlerts = CheckAlertRules();
@@ -342,15 +345,30 @@ public class PerformanceMonitorService : ServiceBase, IPerformanceMonitorService
 
             if (isViolation)
             {
-                var alert = new AlertTriggeredEventArgs
+                if (!_alertFirstTriggerTimes.TryGetValue(rule.Name, out var firstTriggerTime))
                 {
-                    Rule = rule,
-                    CurrentValue = currentValue.Value,
-                    TriggeredAt = DateTime.UtcNow
-                };
+                    _alertFirstTriggerTimes[rule.Name] = DateTime.UtcNow;
+                }
+                else
+                {
+                    var duration = DateTime.UtcNow - firstTriggerTime;
+                    if (duration >= rule.Duration)
+                    {
+                        var alert = new AlertTriggeredEventArgs
+                        {
+                            Rule = rule,
+                            CurrentValue = currentValue.Value,
+                            TriggeredAt = DateTime.UtcNow
+                        };
 
-                triggeredAlerts.Add(alert);
-                Program.Log($"[性能] 触发告警: {rule.Name} = {currentValue.Value} (阈值: {rule.Threshold})");
+                        triggeredAlerts.Add(alert);
+                        Program.Log($"[性能] 触发告警: {rule.Name} = {currentValue.Value} (阈值: {rule.Threshold})");
+                    }
+                }
+            }
+            else
+            {
+                _alertFirstTriggerTimes.TryRemove(rule.Name, out _);
             }
         }
 
