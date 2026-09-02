@@ -1,63 +1,94 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
     <!-- ===== 监控卡片渐变（MainWindow 与 PerformanceDashboardWindow 共享） ===== -->
 
-    <!-- CPU 渐变 -->
+    <!-- CPU 渐变：荧光绿强调色 -->
     <LinearGradientBrush x:Key="CpuGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#4ecdc4" Offset="0"/>
-        <GradientStop Color="#2a9d8f" Offset="1"/>
+        <GradientStop Color="#00db78" Offset="0"/>
+        <GradientStop Color="#00b862" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="CpuGradient2" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#4ecdc4" Offset="0"/>
-        <GradientStop Color="#3ba69d" Offset="1"/>
+        <GradientStop Color="#00db78" Offset="0"/>
+        <GradientStop Color="#00c86c" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- GPU 渐变 -->
+    <!-- GPU 渐变：柔和薄荷绿 -->
     <LinearGradientBrush x:Key="GpuGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#a29bfe" Offset="0"/>
-        <GradientStop Color="#6c5ce7" Offset="1"/>
+        <GradientStop Color="#00e8a8" Offset="0"/>
+        <GradientStop Color="#00c090" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="GpuGradient2" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#a29bfe" Offset="0"/>
-        <GradientStop Color="#6c5ce7" Offset="1"/>
+        <GradientStop Color="#00e8a8" Offset="0"/>
+        <GradientStop Color="#00cf94" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- 内存渐变 -->
+    <!-- 内存渐变：青绿色 -->
     <LinearGradientBrush x:Key="MemoryGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#fd79a8" Offset="0"/>
-        <GradientStop Color="#e84393" Offset="1"/>
+        <GradientStop Color="#00d4aa" Offset="0"/>
+        <GradientStop Color="#00a888" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="MemoryGradient2" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#fd79a8" Offset="0"/>
-        <GradientStop Color="#e84393" Offset="1"/>
+        <GradientStop Color="#00d4aa" Offset="0"/>
+        <GradientStop Color="#00ba94" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- 网络渐变 -->
+    <!-- 网络渐变：橄榄绿 -->
     <LinearGradientBrush x:Key="NetworkGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#ffeaa7" Offset="0"/>
-        <GradientStop Color="#fdcb6e" Offset="1"/>
+        <GradientStop Color="#5cd953" Offset="0"/>
+        <GradientStop Color="#46be3d" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- 磁盘渐变 -->
+    <!-- 磁盘渐变：灰绿 -->
     <LinearGradientBrush x:Key="DiskGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#dfe6e9" Offset="0"/>
-        <GradientStop Color="#b2bec3" Offset="1"/>
+        <GradientStop Color="#4ebd80" Offset="0"/>
+        <GradientStop Color="#3aa46b" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="DiskGradient2" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#dfe6e9" Offset="0"/>
-        <GradientStop Color="#b2bec3" Offset="1"/>
+        <GradientStop Color="#4ebd80" Offset="0"/>
+        <GradientStop Color="#42ae74" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- 电池渐变 -->
+    <!-- 电池渐变：翠绿 -->
     <LinearGradientBrush x:Key="BatteryGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#00b894" Offset="0"/>
-        <GradientStop Color="#00a085" Offset="1"/>
+        <GradientStop Color="#00db78" Offset="0"/>
+        <GradientStop Color="#00b464" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="BatteryGradient2" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#00b894" Offset="0"/>
-        <GradientStop Color="#00a085" Offset="1"/>
+        <GradientStop Color="#00db78" Offset="0"/>
+        <GradientStop Color="#00c26c" Offset="1"/>
     </LinearGradientBrush>
+
+    <!-- ===== 新暗黑风格基础色彩系统 ===== -->
+
+    <!-- 主背景：深灰带蓝绿倾向，避免纯黑死板 -->
+    <SolidColorBrush x:Key="BackgroundPrimary" Color="#0d1010"/>
+    <SolidColorBrush x:Key="BackgroundSecondary" Color="#101414"/>
+    <SolidColorBrush x:Key="WindowBackground" Color="#0d1010"/>
+
+    <!-- 卡片背景：中灰 -->
+    <SolidColorBrush x:Key="CardBackground" Color="#1a1e1e"/>
+    <SolidColorBrush x:Key="CardBackgroundHover" Color="#202525"/>
+    <SolidColorBrush x:Key="CardBackgroundActive" Color="#262c2c"/>
+
+    <!-- 强调色：荧光绿 -->
+    <SolidColorBrush x:Key="AccentPrimary" Color="#00db78"/>
+    <SolidColorBrush x:Key="AccentSecondary" Color="#00c86c"/>
+    <SolidColorBrush x:Key="AccentTertiary" Color="#00b462"/>
+    <SolidColorBrush x:Key="AccentSoft" Color="#1a3a2c"/>
+
+    <!-- 微妙半透明白色边框：增强质感 -->
+    <SolidColorBrush x:Key="BorderSubtle" Color="#ffffff" Opacity="0.05"/>
+    <SolidColorBrush x:Key="BorderSubtleStrong" Color="#ffffff" Opacity="0.08"/>
+    <SolidColorBrush x:Key="BorderAccent" Color="#00db78" Opacity="0.3"/>
+
+    <!-- 内阴影/内发光感：卡片底部微妙反光 -->
+    <SolidColorBrush x:Key="InnerGlow" Color="#ffffff" Opacity="0.02"/>
+
+    <!-- 分隔线：极细弱对比 -->
+    <SolidColorBrush x:Key="DividerSubtle" Color="#ffffff" Opacity="0.04"/>
+    <SolidColorBrush x:Key="DividerStrong" Color="#ffffff" Opacity="0.06"/>
 
     <!-- ===== 液态玻璃色彩隔离层 ===== -->
 
@@ -369,57 +400,132 @@
         <GradientStop Color="#00000000" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- ===== 控件专用玻璃渐变（色彩隔离版本） ===== -->
+    <!-- ===== 控件专用玻璃渐变（荧光绿版本） ===== -->
 
-    <!-- CPU 玻璃渐变 - 低饱和度冷色调 -->
+    <!-- CPU 玻璃渐变：荧光绿低透明度（Alpha通道编码透明度） -->
     <LinearGradientBrush x:Key="CpuGlassGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#18e0f0f5" Offset="0"/>
-        <GradientStop Color="#10d0e0eb" Offset="1"/>
+        <GradientStop Color="#4000db78" Offset="0"/>
+        <GradientStop Color="#2e00c86c" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- GPU 玻璃渐变 - 低饱和度冷紫色 -->
+    <!-- GPU 玻璃渐变：薄荷绿低透明度 -->
     <LinearGradientBrush x:Key="GpuGlassGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#18e8e8fa" Offset="0"/>
-        <GradientStop Color="#10d8d8f0" Offset="1"/>
+        <GradientStop Color="#4000e8a8" Offset="0"/>
+        <GradientStop Color="#2e00c090" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- 内存玻璃渐变 - 低饱和度冷粉色 -->
+    <!-- 内存玻璃渐变：青绿低透明度 -->
     <LinearGradientBrush x:Key="MemoryGlassGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#18f0e8f0" Offset="0"/>
-        <GradientStop Color="#10e8d8e8" Offset="1"/>
+        <GradientStop Color="#4000d4aa" Offset="0"/>
+        <GradientStop Color="#2e00a888" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- FPS 玻璃渐变 - 低饱和度冷绿色 -->
+    <!-- FPS 玻璃渐变：翠绿低透明度 -->
     <LinearGradientBrush x:Key="FpsGlassGradient" StartPoint="0,0" EndPoint="1,1">
-        <GradientStop Color="#18e8f0ea" Offset="0"/>
-        <GradientStop Color="#10d8e0da" Offset="1"/>
+        <GradientStop Color="#4700db78" Offset="0"/>
+        <GradientStop Color="#3300c090" Offset="1"/>
     </LinearGradientBrush>
 
-    <!-- 按钮专用玻璃渐变 - 纯白色垂直渐变 -->
+    <!-- 按钮专用玻璃渐变：白色半透明 -->
     <LinearGradientBrush x:Key="ButtonGlassGradient" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#2df5f5f8" Offset="0"/>
-        <GradientStop Color="#20f0f0f5" Offset="0.5"/>
-        <GradientStop Color="#18ebebeb" Offset="1"/>
+        <GradientStop Color="#0fffffff" Offset="0"/>
+        <GradientStop Color="#0affffff" Offset="0.5"/>
+        <GradientStop Color="#05ffffff" Offset="1"/>
     </LinearGradientBrush>
 
     <!-- 按钮悬浮态玻璃渐变 -->
     <LinearGradientBrush x:Key="ButtonGlassHoverGradient" StartPoint="0,0" EndPoint="0,1">
-        <GradientStop Color="#3af8f8fb" Offset="0"/>
-        <GradientStop Color="#2df5f5f8" Offset="0.5"/>
-        <GradientStop Color="#20f0f0f5" Offset="1"/>
+        <GradientStop Color="#17ffffff" Offset="0"/>
+        <GradientStop Color="#0fffffff" Offset="0.5"/>
+        <GradientStop Color="#08ffffff" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 主按钮渐变：荧光绿 -->
+    <LinearGradientBrush x:Key="ButtonPrimaryGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#00db78" Offset="0"/>
+        <GradientStop Color="#00c26c" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- 主按钮悬浮态 -->
+    <LinearGradientBrush x:Key="ButtonPrimaryHoverGradient" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#15e884" Offset="0"/>
+        <GradientStop Color="#00d074" Offset="1"/>
     </LinearGradientBrush>
 
     <!-- ===== 系统状态颜色 ===== -->
 
-    <SolidColorBrush x:Key="StatusNormal" Color="#00b894"/>
-    <SolidColorBrush x:Key="StatusWarning" Color="#fdcb6e"/>
-    <SolidColorBrush x:Key="StatusError" Color="#ff6b6b"/>
+    <SolidColorBrush x:Key="StatusNormal" Color="#00db78"/>
+    <SolidColorBrush x:Key="StatusWarning" Color="#f0c040"/>
+    <SolidColorBrush x:Key="StatusError" Color="#ef5a6f"/>
 
-    <!-- ===== 文本颜色 ===== -->
+    <!-- ===== 文本颜色：明度对比区分层级 ===== -->
 
     <SolidColorBrush x:Key="TextPrimary" Color="#ffffff"/>
-    <SolidColorBrush x:Key="TextSecondary" Color="#e8eef5"/>
-    <SolidColorBrush x:Key="TextTertiary" Color="#a0a8b5"/>
-    <SolidColorBrush x:Key="TextDisabled" Color="#6a7080"/>
+    <SolidColorBrush x:Key="TextSecondary" Color="#b8c0c0"/>
+    <SolidColorBrush x:Key="TextTertiary" Color="#6a7474"/>
+    <SolidColorBrush x:Key="TextDisabled" Color="#404848"/>
+    <SolidColorBrush x:Key="TextAccent" Color="#00db78"/>
+
+    <!-- ===== 间距系统 ===== -->
+
+    <Thickness x:Key="SpacingXS">4</Thickness>
+    <Thickness x:Key="SpacingSM">8</Thickness>
+    <Thickness x:Key="SpacingMD">12</Thickness>
+    <Thickness x:Key="SpacingLG">16</Thickness>
+    <Thickness x:Key="SpacingXL">20</Thickness>
+    <Thickness x:Key="SpacingXXL">24</Thickness>
+    <Thickness x:Key="SpacingXXXL">32</Thickness>
+
+    <!-- 间距值常量 -->
+    <sys:Double x:Key="SpacingXSValue">4</sys:Double>
+    <sys:Double x:Key="SpacingSMValue">8</sys:Double>
+    <sys:Double x:Key="SpacingMDValue">12</sys:Double>
+    <sys:Double x:Key="SpacingLGValue">16</sys:Double>
+    <sys:Double x:Key="SpacingXLValue">20</sys:Double>
+    <sys:Double x:Key="SpacingXXLValue">24</sys:Double>
+    <sys:Double x:Key="SpacingXXXLValue">32</sys:Double>
+
+    <!-- ===== 字体大小系统 ===== -->
+
+    <sys:Double x:Key="FontSizeHint">10</sys:Double>
+    <sys:Double x:Key="FontSizeCaption">11</sys:Double>
+    <sys:Double x:Key="FontSizeBody">12</sys:Double>
+    <sys:Double x:Key="FontSizeBodyLG">13</sys:Double>
+    <sys:Double x:Key="FontSizeSubtitle">14</sys:Double>
+    <sys:Double x:Key="FontSizeTitle">16</sys:Double>
+    <sys:Double x:Key="FontSizeTitleLG">18</sys:Double>
+    <sys:Double x:Key="FontSizeHeading">20</sys:Double>
+    <sys:Double x:Key="FontSizeDisplay">24</sys:Double>
+    <sys:Double x:Key="FontSizeValue">28</sys:Double>
+
+    <!-- ===== 圆角系统 ===== -->
+
+    <CornerRadius x:Key="RadiusSM">8</CornerRadius>
+    <CornerRadius x:Key="RadiusMD">12</CornerRadius>
+    <CornerRadius x:Key="RadiusLG">16</CornerRadius>
+    <CornerRadius x:Key="RadiusXL">20</CornerRadius>
+    <CornerRadius x:Key="RadiusXXL">24</CornerRadius>
+
+    <!-- ===== 阴影系统 ===== -->
+
+    <sys:String x:Key="ShadowSM">0 2 8 0 #15000000</sys:String>
+    <sys:String x:Key="ShadowMD">0 4 12 0 #20000000</sys:String>
+    <sys:String x:Key="ShadowLG">0 8 24 0 #30000000</sys:String>
+    <sys:String x:Key="ShadowXL">0 12 40 0 #40000000</sys:String>
+
+    <!-- ===== 透明度系统 ===== -->
+
+    <sys:Double x:Key="OpacityDisabled">0.4</sys:Double>
+    <sys:Double x:Key="OpacityInactive">0.6</sys:Double>
+    <sys:Double x:Key="OpacityNormal">0.85</sys:Double>
+    <sys:Double x:Key="OpacityActive">1.0</sys:Double>
+
+    <!-- ===== 响应式断点 ===== -->
+
+    <sys:Double x:Key="BreakpointXS">480</sys:Double>
+    <sys:Double x:Key="BreakpointSM">640</sys:Double>
+    <sys:Double x:Key="BreakpointMD">768</sys:Double>
+    <sys:Double x:Key="BreakpointLG">1024</sys:Double>
+    <sys:Double x:Key="BreakpointXL">1280</sys:Double>
 
 </ResourceDictionary>

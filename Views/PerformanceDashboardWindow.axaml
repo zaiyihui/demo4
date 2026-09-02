@@ -20,34 +20,19 @@
         TransparencyLevelHint="Blur">
 
     <Window.Styles>
-        <Style Selector="TextBlock.title">
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-        </Style>
-
-        <Style Selector="TextBlock.subtitle">
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-        </Style>
-
-        <Style Selector="TextBlock.value">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-        </Style>
-
-        <Style Selector="TextBlock.label">
-            <Setter Property="FontSize" Value="11"/>
+        <Style Selector="TextBlock.metric-label">
+            <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}"/>
             <Setter Property="Foreground" Value="{StaticResource TextTertiary}"/>
+            <Setter Property="FontWeight" Value="Medium"/>
         </Style>
 
         <Style Selector="Border.metric-card">
-            <Setter Property="CornerRadius" Value="16"/>
+            <Setter Property="CornerRadius" Value="{StaticResource RadiusLG}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="16"/>
+            <Setter Property="Padding" Value="{StaticResource SpacingLG}"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="MinHeight" Value="140"/>
             <Setter Property="Transitions">
                 <Setter.Value>
                     <Transitions>
@@ -64,12 +49,12 @@
         </Style>
 
         <Style Selector="Border.glass-card-with-highlight">
-            <Setter Property="Background" Value="{StaticResource LiquidGlassBase}"/>
-            <Setter Property="CornerRadius" Value="18"/>
-            <Setter Property="BoxShadow" Value="0 12 40 0 #50000000, 0 4 15 0 #30000000, inset 0 1 0 0 #40ffffff"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
-            <Setter Property="BorderThickness" Value="2"/>
-            <Setter Property="Padding" Value="18"/>
+            <Setter Property="Background" Value="{StaticResource CardBackground}"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="BoxShadow" Value="0 4 16 #18000000"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="16"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="Transitions">
                 <Setter.Value>
@@ -83,33 +68,33 @@
         </Style>
 
         <Style Selector="Border.glass-card-with-highlight:pointerover">
-            <Setter Property="Background" Value="{StaticResource LiquidGlassHover}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorderHover}"/>
-            <Setter Property="BoxShadow" Value="0 16 50 0 #60000000, 0 6 20 0 #40000000, inset 0 1 0 0 #50ffffff"/>
-            <Setter Property="BorderThickness" Value="2.5"/>
+            <Setter Property="Background" Value="{StaticResource CardBackgroundHover}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleStrong}"/>
+            <Setter Property="BoxShadow" Value="0 8 24 #25000000"/>
         </Style>
 
         <Style Selector="Border.glass-header-bar">
-            <Setter Property="Background" Value="{StaticResource LiquidGlassBase}"/>
+            <Setter Property="Background" Value="{StaticResource BackgroundSecondary}"/>
             <Setter Property="CornerRadius" Value="0"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DividerSubtle}"/>
             <Setter Property="BorderThickness" Value="0,0,0,1"/>
         </Style>
 
         <Style Selector="Button.glass-action-button">
-            <Setter Property="Background" Value="{StaticResource LiquidGlassBase}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
+            <Setter Property="Background" Value="{StaticResource CardBackground}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Padding" Value="10,6"/>
             <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+            <Setter Property="FontSize" Value="11"/>
             <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
             <Setter Property="Transitions">
                 <Setter.Value>
                     <Transitions>
                         <DoubleTransition Property="Opacity" Duration="0:0:0.2"/>
-                        <BrushTransition Property="Background" Duration="0:0:0.25"/>
-                        <BrushTransition Property="BorderBrush" Duration="0:0:0.25"/>
+                        <BrushTransition Property="Background" Duration="0:0:0.2"/>
+                        <BrushTransition Property="BorderBrush" Duration="0:0:0.2"/>
                         <BrushTransition Property="Foreground" Duration="0:0:0.2"/>
                     </Transitions>
                 </Setter.Value>
@@ -117,15 +102,13 @@
         </Style>
 
         <Style Selector="Button.glass-action-button:pointerover">
-            <Setter Property="Background" Value="{StaticResource LiquidGlassHover}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorderHover}"/>
+            <Setter Property="Background" Value="{StaticResource CardBackgroundHover}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleStrong}"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
-            <Setter Property="BorderThickness" Value="1.5"/>
         </Style>
 
         <Style Selector="Button.glass-action-button:pressed">
-            <Setter Property="Background" Value="{StaticResource LiquidGlassPressed}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="{StaticResource CardBackgroundActive}"/>
         </Style>
 
         <!-- 窗口控制按钮样式 -->
@@ -158,14 +141,15 @@
         </Style>
 
         <Style Selector="ProgressBar.glass-progress-bar">
-            <Setter Property="Background" Value="#15ffffff"/>
-            <Setter Property="CornerRadius" Value="4"/>
-            <Setter Property="Height" Value="6"/>
+            <Setter Property="Background" Value="{StaticResource BorderSubtleStrong}"/>
+            <Setter Property="CornerRadius" Value="3"/>
+            <Setter Property="Height" Value="5"/>
         </Style>
 
         <Style Selector="CheckBox.glass-checkbox-item">
             <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Padding" Value="6"/>
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="Transitions">
                 <Setter.Value>
                     <Transitions>
@@ -180,26 +164,29 @@
         </Style>
 
         <Style Selector="ComboBox.glass-dropdown">
-            <Setter Property="Background" Value="{StaticResource LiquidGlassBase}"/>
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorder}"/>
+            <Setter Property="Background" Value="{StaticResource CardBackground}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtle}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="CornerRadius" Value="10"/>
-            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Padding" Value="10,8"/>
             <Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="MinHeight" Value="34"/>
         </Style>
 
         <Style Selector="ComboBox.glass-dropdown:pointerover">
-            <Setter Property="BorderBrush" Value="{StaticResource GlassBorderHover}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderSubtleStrong}"/>
+            <Setter Property="Background" Value="{StaticResource CardBackgroundHover}"/>
         </Style>
     </Window.Styles>
 
     <Grid>
-        <!-- 外层厚玻璃容器 - 增强的液态玻璃质感 -->
+        <!-- 外层暗黑容器 - 深灰背景 + 微妙边框 + 空间阴影 -->
         <Border Background="{DynamicResource WindowBackground}"
-                CornerRadius="24"
-                BorderBrush="{StaticResource ThickGlassBorder}"
-                BorderThickness="1.5"
-                BoxShadow="0 24 70 0 #45000000, 0 10 30 0 #25000000, inset 0 0 50 0 #15000000"
+                CornerRadius="20"
+                BorderBrush="{StaticResource BorderSubtle}"
+                BorderThickness="1"
+                BoxShadow="0 24 70 #45000000, 0 10 30 #25000000"
                 Margin="0">
             <Border.Transitions>
                 <Transitions>
@@ -208,44 +195,54 @@
                 </Transitions>
             </Border.Transitions>
             <Grid>
-                <!-- 顶部厚玻璃高光层 -->
-                <Border Height="60" VerticalAlignment="Top" Background="{StaticResource ThickGlassHighlight}" Margin="0"/>
-                
-                <!-- 底部暗化层 -->
-                <Border Height="30" VerticalAlignment="Bottom" Background="{StaticResource ThickGlassBottomDark}" Margin="0"/>
-                
-                <!-- 左侧边缘高光 -->
-                <Border Width="3" HorizontalAlignment="Left" Background="{StaticResource ThickGlassHighlight}" Margin="0"/>
-                
+                <!-- 顶部边缘微光（Alpha通道编码透明度） -->
+                <Border Height="1" VerticalAlignment="Top" Opacity="0.6" Margin="20,0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#2600db78" Offset="0"/>
+                            <GradientStop Color="#14ffffff" Offset="0.5"/>
+                            <GradientStop Color="#2600db78" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+
                 <!-- 主内容区域 -->
                 <Grid RowDefinitions="Auto,*,Auto">
-                    <!-- 顶部标题栏 -->
-                    <Border Grid.Row="0" Classes="glass-header-bar" Padding="0,0,0,0" PointerPressed="OnTitleBarPointerPressed" DoubleTapped="OnTitleBarDoubleTapped">
+                    <!-- 顶部标题栏 - 中灰卡片 + 底部分隔线 -->
+                    <Border Grid.Row="0" Background="{StaticResource BackgroundSecondary}"
+                            BorderBrush="{StaticResource DividerSubtle}"
+                            BorderThickness="0,0,0,1"
+                            Padding="0,0,0,0"
+                            PointerPressed="OnTitleBarPointerPressed"
+                            DoubleTapped="OnTitleBarDoubleTapped">
                         <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                             <!-- 左侧：Logo和标题 -->
                             <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" Margin="20,15" VerticalAlignment="Center">
                                 <Border Width="36" Height="36" CornerRadius="10" Background="{StaticResource CpuGlassGradient}" 
-                                        BoxShadow="0 4 12 0 #204ecdc4">
+                                        BoxShadow="0 4 12 #2000db78">
                                     <Grid>
-                                        <Border CornerRadius="10" Background="Transparent" BorderBrush="#40ffffff" BorderThickness="1"/>
+                                        <Border CornerRadius="10" Background="Transparent" BorderBrush="{StaticResource BorderAccent}" BorderThickness="1"/>
                                         <TextBlock Text="⚡" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                     </Grid>
                                 </Border>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="监控面板" Classes="title"/>
-                                    <TextBlock Text="实时系统性能分析与监控" Classes="subtitle" Margin="0,2,0,0"/>
+                                    <TextBlock Text="实时系统性能分析与监控" Classes="caption" Margin="0,2,0,0"/>
                                 </StackPanel>
                             </StackPanel>
 
                             <!-- 中间：状态信息 -->
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <Border Classes="glass-card-with-highlight" Padding="12,6" CornerRadius="16">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <Border Width="8" Height="8" CornerRadius="4" Background="{Binding StatusColor}" BoxShadow="0 0 10 0 #4ecdc4"/>
-                                        <TextBlock Text="{Binding SystemStatus}" FontSize="13" Foreground="{Binding StatusColor}" VerticalAlignment="Center"/>
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <Border Background="{StaticResource CardBackground}"
+                                        BorderBrush="{StaticResource BorderSubtle}"
+                                        BorderThickness="1"
+                                        Padding="10,5" CornerRadius="10">
+                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                        <Border Width="6" Height="6" CornerRadius="3" Background="{Binding StatusColor}" BoxShadow="0 0 8 #3000db78"/>
+                                        <TextBlock Text="{Binding SystemStatus}" FontSize="11" Foreground="{Binding StatusColor}" VerticalAlignment="Center" FontWeight="Medium"/>
                                     </StackPanel>
                                 </Border>
-                                <TextBlock Text="{Binding LastUpdate, StringFormat='最后更新: {0:HH:mm:ss}'}" Classes="label" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding LastUpdate, StringFormat='最后更新: {0:HH:mm:ss}'}" Classes="caption" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <!-- 右侧：功能按钮 -->
@@ -286,186 +283,279 @@
                     </Border>
 
             <!-- 主内容区域 -->
-            <Grid Grid.Row="1" ColumnDefinitions="280,*" Margin="15">
+            <Grid Grid.Row="1" ColumnDefinitions="280,*,15" Margin="{StaticResource SpacingLG}">
                 <!-- 左侧：实时指标卡片 -->
-                <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                    <StackPanel Spacing="12">
+                <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxWidth="320">
+                    <StackPanel Spacing="{StaticResource SpacingLGValue}">
                         <!-- CPU 指标卡片 -->
-                        <Border Classes="metric-card" IsVisible="{Binding ShowCpu}"
-                                Background="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBackgroundConverter.Instance}, ConverterParameter=CPU}"
-                                BorderBrush="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBorderConverter.Instance}, ConverterParameter=CPU}"
-                                BoxShadow="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToShadowConverter.Instance}, ConverterParameter=CPU}"
-                                Opacity="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToOpacityConverter.Instance}, ConverterParameter=CPU}"
-                                PointerPressed="OnMetricCardClicked" Tag="CPU">
-                            <Border.RenderTransform>
-                                <media:ScaleTransform ScaleX="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=CPU}"
-                                                ScaleY="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=CPU}"/>
-                            </Border.RenderTransform>
-                            <Grid>
-                                <Border Height="1" VerticalAlignment="Top" Background="{StaticResource GlassHighlightTop}" Margin="10,0"/>
-                                <Border Width="1" HorizontalAlignment="Left" Background="{StaticResource GlassHighlightLeft}" Margin="0,10"/>
-                                <StackPanel Spacing="10">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <Border Width="24" Height="24" CornerRadius="8" Background="{StaticResource CpuGlassGradient}">
-                                                <TextBlock Text="C" FontSize="12" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                            <TextBlock Text="CPU" FontSize="14" FontWeight="SemiBold" Foreground="#4ecdc4" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                        <TextBlock Grid.Column="1" Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" FontSize="12" Foreground="#4ecdc4" VerticalAlignment="Center"/>
-                                    </Grid>
+                        <Grid>
+                            <!-- Z轴堆叠底层 -->
+                            <Border Classes="stack-layer-3" Margin="8,10,4,2" RenderTransform="matrix(0.98,0,0,0.98,0,4)"/>
+                            <!-- Z轴堆叠中层 -->
+                            <Border Classes="stack-layer-2" Margin="4,6,2,1" Opacity="0.75" RenderTransform="matrix(0.99,0,0,0.99,0,2)"/>
+                            <!-- 顶层内容卡片 -->
+                            <Border Classes="metric-card" IsVisible="{Binding ShowCpu}"
+                                    Background="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBackgroundConverter.Instance}, ConverterParameter=CPU}"
+                                    BorderBrush="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBorderConverter.Instance}, ConverterParameter=CPU}"
+                                    BoxShadow="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToShadowConverter.Instance}, ConverterParameter=CPU}"
+                                    Opacity="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToOpacityConverter.Instance}, ConverterParameter=CPU}"
+                                    PointerPressed="OnMetricCardClicked" Tag="CPU">
+                                <Border.RenderTransform>
+                                    <media:ScaleTransform ScaleX="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=CPU}"
+                                                    ScaleY="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=CPU}"/>
+                                </Border.RenderTransform>
+                                <Grid>
+                                    <!-- 微弱顶部高光（Alpha通道编码透明度） -->
+                                    <Border Height="1" VerticalAlignment="Top" Opacity="0.35" Margin="12,0">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#0fffffff" Offset="0"/>
+                                                <GradientStop Color="#08ffffff" Offset="0.5"/>
+                                                <GradientStop Color="#00ffffff" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <!-- 微弱左侧高光 -->
+                                    <Border Width="1" HorizontalAlignment="Left" Opacity="0.25" Margin="0,10">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="#0fffffff" Offset="0"/>
+                                                <GradientStop Color="#00ffffff" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <StackPanel Spacing="{StaticResource SpacingMDValue}">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSMValue}">
+                                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource CpuGlassGradient}">
+                                                    <TextBlock Text="C" FontSize="{StaticResource FontSizeBody}" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="CPU" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" FontSize="{StaticResource FontSizeBody}" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
+                                        </Grid>
 
-                                    <TextBlock Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
-                                    <ProgressBar Value="{Binding CpuUsage}" Maximum="100" Classes="glass-progress-bar" Foreground="#4ecdc4"/>
+                                        <TextBlock Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
+                                        <ProgressBar Value="{Binding CpuUsage}" Maximum="100" Classes="glass-progress-bar" Foreground="{StaticResource AccentPrimary}"/>
 
-                                    <Grid ColumnDefinitions="*,*" Margin="0,5,0,0">
-                                        <StackPanel>
-                                            <TextBlock Text="温度" Classes="label"/>
-                                            <TextBlock Text="{Binding CpuTemperature, StringFormat={}{0:F0}°C}" FontSize="13" Foreground="{StaticResource TextSecondary}"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                                            <TextBlock Text="状态" Classes="label"/>
-                                            <TextBlock Text="正常" FontSize="13" Foreground="#00b894"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
+                                        <Grid ColumnDefinitions="*,*" Margin="0,4,0,0">
+                                            <StackPanel>
+                                                <TextBlock Text="温度" Classes="metric-label"/>
+                                                <TextBlock Text="{Binding CpuTemperature, StringFormat={}{0:F0}°C}" FontSize="{StaticResource FontSizeBodyLG}" Foreground="{StaticResource TextSecondary}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                                <TextBlock Text="状态" Classes="metric-label"/>
+                                                <TextBlock Text="正常" FontSize="{StaticResource FontSizeBodyLG}" Foreground="{StaticResource AccentPrimary}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
 
                         <!-- GPU 指标卡片 -->
-                        <Border Classes="metric-card" IsVisible="{Binding ShowGpu}"
-                                Background="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBackgroundConverter.Instance}, ConverterParameter=GPU}"
-                                BorderBrush="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBorderConverter.Instance}, ConverterParameter=GPU}"
-                                BoxShadow="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToShadowConverter.Instance}, ConverterParameter=GPU}"
-                                Opacity="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToOpacityConverter.Instance}, ConverterParameter=GPU}"
-                                PointerPressed="OnMetricCardClicked" Tag="GPU">
-                            <Border.RenderTransform>
-                                <media:ScaleTransform ScaleX="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=GPU}"
-                                                ScaleY="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=GPU}"/>
-                            </Border.RenderTransform>
-                            <Grid>
-                                <Border Height="1" VerticalAlignment="Top" Background="#40a29bfe" Margin="10,0"/>
-                                <Border Width="1" HorizontalAlignment="Left" Background="#20a29bfe" Margin="0,10"/>
-                                <StackPanel Spacing="10">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <Border Width="24" Height="24" CornerRadius="8" Background="{StaticResource GpuGlassGradient}">
-                                                <TextBlock Text="G" FontSize="12" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                            <TextBlock Text="GPU" FontSize="14" FontWeight="SemiBold" Foreground="#a29bfe" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                        <TextBlock Grid.Column="1" Text="{Binding GpuUsage, StringFormat={}{0:F1}%}" FontSize="12" Foreground="#a29bfe" VerticalAlignment="Center"/>
-                                    </Grid>
+                        <Grid>
+                            <!-- Z轴堆叠底层 -->
+                            <Border Classes="stack-layer-3" Margin="8,10,4,2" RenderTransform="matrix(0.98,0,0,0.98,0,4)"/>
+                            <!-- Z轴堆叠中层 -->
+                            <Border Classes="stack-layer-2" Margin="4,6,2,1" Opacity="0.75" RenderTransform="matrix(0.99,0,0,0.99,0,2)"/>
+                            <Border Classes="metric-card" IsVisible="{Binding ShowGpu}"
+                                    Background="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBackgroundConverter.Instance}, ConverterParameter=GPU}"
+                                    BorderBrush="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBorderConverter.Instance}, ConverterParameter=GPU}"
+                                    BoxShadow="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToShadowConverter.Instance}, ConverterParameter=GPU}"
+                                    Opacity="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToOpacityConverter.Instance}, ConverterParameter=GPU}"
+                                    PointerPressed="OnMetricCardClicked" Tag="GPU">
+                                <Border.RenderTransform>
+                                    <media:ScaleTransform ScaleX="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=GPU}"
+                                                    ScaleY="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=GPU}"/>
+                                </Border.RenderTransform>
+                                <Grid>
+                                    <!-- 微弱顶部高光（Alpha通道编码透明度） -->
+                                    <Border Height="1" VerticalAlignment="Top" Opacity="0.35" Margin="12,0">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#0fffffff" Offset="0"/>
+                                                <GradientStop Color="#08ffffff" Offset="0.5"/>
+                                                <GradientStop Color="#00ffffff" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <!-- 微弱左侧高光 -->
+                                    <Border Width="1" HorizontalAlignment="Left" Opacity="0.25" Margin="0,10">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="#0fffffff" Offset="0"/>
+                                                <GradientStop Color="#00ffffff" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <StackPanel Spacing="{StaticResource SpacingMDValue}">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSMValue}">
+                                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource GpuGlassGradient}">
+                                                    <TextBlock Text="G" FontSize="{StaticResource FontSizeBody}" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="GPU" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentSecondary}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding GpuUsage, StringFormat={}{0:F1}%}" FontSize="{StaticResource FontSizeBody}" Foreground="{StaticResource AccentSecondary}" VerticalAlignment="Center"/>
+                                        </Grid>
 
-                                    <TextBlock Text="{Binding GpuUsage, StringFormat={}{0:F1}%}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
-                                    <ProgressBar Value="{Binding GpuUsage}" Maximum="100" Classes="glass-progress-bar" Foreground="#a29bfe"/>
+                                        <TextBlock Text="{Binding GpuUsage, StringFormat={}{0:F1}%}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
+                                        <ProgressBar Value="{Binding GpuUsage}" Maximum="100" Classes="glass-progress-bar" Foreground="{StaticResource AccentSecondary}"/>
 
-                                    <Grid ColumnDefinitions="*,*" Margin="0,5,0,0">
-                                        <StackPanel>
-                                            <TextBlock Text="温度" Classes="label"/>
-                                            <TextBlock Text="{Binding GpuTemperature, StringFormat={}{0:F0}°C}" FontSize="13" Foreground="{StaticResource TextSecondary}"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                                            <TextBlock Text="状态" Classes="label"/>
-                                            <TextBlock Text="正常" FontSize="13" Foreground="#00b894"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
+                                        <Grid ColumnDefinitions="*,*" Margin="0,4,0,0">
+                                            <StackPanel>
+                                                <TextBlock Text="温度" Classes="metric-label"/>
+                                                <TextBlock Text="{Binding GpuTemperature, StringFormat={}{0:F0}°C}" FontSize="{StaticResource FontSizeBodyLG}" Foreground="{StaticResource TextSecondary}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                                <TextBlock Text="状态" Classes="metric-label"/>
+                                                <TextBlock Text="正常" FontSize="{StaticResource FontSizeBodyLG}" Foreground="{StaticResource AccentPrimary}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
 
                         <!-- 内存指标卡片 -->
-                        <Border Classes="metric-card" IsVisible="{Binding ShowMemory}"
-                                Background="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBackgroundConverter.Instance}, ConverterParameter=Memory}"
-                                BorderBrush="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBorderConverter.Instance}, ConverterParameter=Memory}"
-                                BoxShadow="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToShadowConverter.Instance}, ConverterParameter=Memory}"
-                                Opacity="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToOpacityConverter.Instance}, ConverterParameter=Memory}"
-                                PointerPressed="OnMetricCardClicked" Tag="Memory">
-                            <Border.RenderTransform>
-                                <media:ScaleTransform ScaleX="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=Memory}"
-                                                ScaleY="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=Memory}"/>
-                            </Border.RenderTransform>
-                            <Grid>
-                                <Border Height="1" VerticalAlignment="Top" Background="#40fd79a8" Margin="10,0"/>
-                                <Border Width="1" HorizontalAlignment="Left" Background="#20fd79a8" Margin="0,10"/>
-                                <StackPanel Spacing="10">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <Border Width="24" Height="24" CornerRadius="8" Background="{StaticResource MemoryGlassGradient}">
-                                                <TextBlock Text="M" FontSize="12" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                            <TextBlock Text="内存" FontSize="14" FontWeight="SemiBold" Foreground="#fd79a8" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                        <TextBlock Grid.Column="1" Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" FontSize="12" Foreground="#fd79a8" VerticalAlignment="Center"/>
-                                    </Grid>
+                        <Grid>
+                            <!-- Z轴堆叠底层 -->
+                            <Border Classes="stack-layer-3" Margin="8,10,4,2" RenderTransform="matrix(0.98,0,0,0.98,0,4)"/>
+                            <!-- Z轴堆叠中层 -->
+                            <Border Classes="stack-layer-2" Margin="4,6,2,1" Opacity="0.75" RenderTransform="matrix(0.99,0,0,0.99,0,2)"/>
+                            <Border Classes="metric-card" IsVisible="{Binding ShowMemory}"
+                                    Background="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBackgroundConverter.Instance}, ConverterParameter=Memory}"
+                                    BorderBrush="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBorderConverter.Instance}, ConverterParameter=Memory}"
+                                    BoxShadow="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToShadowConverter.Instance}, ConverterParameter=Memory}"
+                                    Opacity="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToOpacityConverter.Instance}, ConverterParameter=Memory}"
+                                    PointerPressed="OnMetricCardClicked" Tag="Memory">
+                                <Border.RenderTransform>
+                                    <media:ScaleTransform ScaleX="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=Memory}"
+                                                    ScaleY="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=Memory}"/>
+                                </Border.RenderTransform>
+                                <Grid>
+                                    <!-- 微弱顶部高光（Alpha通道编码透明度） -->
+                                    <Border Height="1" VerticalAlignment="Top" Opacity="0.35" Margin="12,0">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#0fffffff" Offset="0"/>
+                                                <GradientStop Color="#08ffffff" Offset="0.5"/>
+                                                <GradientStop Color="#00ffffff" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <!-- 微弱左侧高光 -->
+                                    <Border Width="1" HorizontalAlignment="Left" Opacity="0.25" Margin="0,10">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="#0fffffff" Offset="0"/>
+                                                <GradientStop Color="#00ffffff" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <StackPanel Spacing="{StaticResource SpacingMDValue}">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSMValue}">
+                                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource MemoryGlassGradient}">
+                                                    <TextBlock Text="M" FontSize="{StaticResource FontSizeBody}" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="内存" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentTertiary}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" FontSize="{StaticResource FontSizeBody}" Foreground="{StaticResource AccentTertiary}" VerticalAlignment="Center"/>
+                                        </Grid>
 
-                                    <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
-                                    <ProgressBar Value="{Binding MemoryUsage}" Maximum="100" Classes="glass-progress-bar" Foreground="#fd79a8"/>
+                                        <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
+                                        <ProgressBar Value="{Binding MemoryUsage}" Maximum="100" Classes="glass-progress-bar" Foreground="{StaticResource AccentTertiary}"/>
 
-                                    <Grid ColumnDefinitions="*,*" Margin="0,5,0,0">
-                                        <StackPanel>
-                                            <TextBlock Text="已用" Classes="label"/>
-                                            <TextBlock Text="{Binding MemoryUsedGB, StringFormat={}{0:F1} GB}" FontSize="13" Foreground="{StaticResource TextSecondary}"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                                            <TextBlock Text="总计" Classes="label"/>
-                                            <TextBlock Text="{Binding MemoryTotalGB, StringFormat={}{0:F1} GB}" FontSize="13" Foreground="{StaticResource TextSecondary}"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
+                                        <Grid ColumnDefinitions="*,*" Margin="0,4,0,0">
+                                            <StackPanel>
+                                                <TextBlock Text="已用" Classes="metric-label"/>
+                                                <TextBlock Text="{Binding MemoryUsedGB, StringFormat={}{0:F1} GB}" FontSize="{StaticResource FontSizeBodyLG}" Foreground="{StaticResource TextSecondary}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                                <TextBlock Text="总计" Classes="metric-label"/>
+                                                <TextBlock Text="{Binding MemoryTotalGB, StringFormat={}{0:F1} GB}" FontSize="{StaticResource FontSizeBodyLG}" Foreground="{StaticResource TextSecondary}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
 
                         <!-- FPS 指标卡片 -->
-                        <Border Classes="metric-card" IsVisible="{Binding ShowFps}"
-                                Background="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBackgroundConverter.Instance}, ConverterParameter=FPS}"
-                                BorderBrush="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBorderConverter.Instance}, ConverterParameter=FPS}"
-                                BoxShadow="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToShadowConverter.Instance}, ConverterParameter=FPS}"
-                                Opacity="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToOpacityConverter.Instance}, ConverterParameter=FPS}"
-                                PointerPressed="OnMetricCardClicked" Tag="FPS">
-                            <Border.RenderTransform>
-                                <media:ScaleTransform ScaleX="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=FPS}"
-                                                ScaleY="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=FPS}"/>
-                            </Border.RenderTransform>
-                            <Grid>
-                                <Border Height="1" VerticalAlignment="Top" Background="#4076B900" Margin="10,0"/>
-                                <Border Width="1" HorizontalAlignment="Left" Background="#2076B900" Margin="0,10"/>
-                                <StackPanel Spacing="10">
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <Border Width="24" Height="24" CornerRadius="8" Background="{StaticResource FpsGlassGradient}">
-                                                <TextBlock Text="F" FontSize="12" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                            <TextBlock Text="FPS" FontSize="14" FontWeight="SemiBold" Foreground="#76B900" VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                    </Grid>
+                        <Grid>
+                            <!-- Z轴堆叠底层 -->
+                            <Border Classes="stack-layer-3" Margin="8,10,4,2" RenderTransform="matrix(0.98,0,0,0.98,0,4)"/>
+                            <!-- Z轴堆叠中层 -->
+                            <Border Classes="stack-layer-2" Margin="4,6,2,1" Opacity="0.75" RenderTransform="matrix(0.99,0,0,0.99,0,2)"/>
+                            <Border Classes="metric-card" IsVisible="{Binding ShowFps}"
+                                    Background="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBackgroundConverter.Instance}, ConverterParameter=FPS}"
+                                    BorderBrush="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToBorderConverter.Instance}, ConverterParameter=FPS}"
+                                    BoxShadow="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToShadowConverter.Instance}, ConverterParameter=FPS}"
+                                    Opacity="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToOpacityConverter.Instance}, ConverterParameter=FPS}"
+                                    PointerPressed="OnMetricCardClicked" Tag="FPS">
+                                <Border.RenderTransform>
+                                    <media:ScaleTransform ScaleX="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=FPS}"
+                                                    ScaleY="{Binding SelectedMetricCard, Converter={x:Static converters:SelectedMetricToScaleConverter.Instance}, ConverterParameter=FPS}"/>
+                                </Border.RenderTransform>
+                                <Grid>
+                                    <!-- 微弱顶部高光（Alpha通道编码透明度） -->
+                                    <Border Height="1" VerticalAlignment="Top" Opacity="0.35" Margin="12,0">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#0fffffff" Offset="0"/>
+                                                <GradientStop Color="#08ffffff" Offset="0.5"/>
+                                                <GradientStop Color="#00ffffff" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <!-- 微弱左侧高光 -->
+                                    <Border Width="1" HorizontalAlignment="Left" Opacity="0.25" Margin="0,10">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="#0fffffff" Offset="0"/>
+                                                <GradientStop Color="#00ffffff" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <StackPanel Spacing="{StaticResource SpacingMDValue}">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingSMValue}">
+                                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource FpsGlassGradient}">
+                                                    <TextBlock Text="F" FontSize="{StaticResource FontSizeBody}" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <TextBlock Text="FPS" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Grid>
 
-                                    <TextBlock Text="{Binding Fps, Converter={x:Static converters:FpsValueConverter.Instance}}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
-                                    <TextBlock Text="帧/秒" Classes="label" Margin="0,-5,0,0"/>
+                                        <TextBlock Text="{Binding Fps, Converter={x:Static converters:FpsValueConverter.Instance}}" Classes="value" Foreground="{StaticResource TextPrimary}"/>
+                                        <TextBlock Text="帧/秒" Classes="metric-label" Margin="0,-2,0,0"/>
 
-                                    <Grid ColumnDefinitions="*,*" Margin="0,5,0,0">
-                                        <StackPanel>
-                                            <TextBlock Text="响应时间" Classes="label"/>
-                                            <TextBlock Text="{Binding AvgResponseTime, StringFormat={}{0:F1} ms}" FontSize="13" Foreground="{StaticResource TextSecondary}"/>
-                                        </StackPanel>
-                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                                            <TextBlock Text="错误/分钟" Classes="label"/>
-                                            <TextBlock Text="{Binding ErrorsPerMinute}" FontSize="13" Foreground="{StaticResource TextSecondary}"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
+                                        <Grid ColumnDefinitions="*,*" Margin="0,4,0,0">
+                                            <StackPanel>
+                                                <TextBlock Text="响应时间" Classes="metric-label"/>
+                                                <TextBlock Text="{Binding AvgResponseTime, StringFormat={}{0:F1} ms}" FontSize="{StaticResource FontSizeBodyLG}" Foreground="{StaticResource TextSecondary}"/>
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                                <TextBlock Text="错误/分钟" Classes="metric-label"/>
+                                                <TextBlock Text="{Binding ErrorsPerMinute}" FontSize="{StaticResource FontSizeBodyLG}" Foreground="{StaticResource TextSecondary}"/>
+                                            </StackPanel>
+                                        </Grid>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
 
                         <!-- 指标过滤 -->
-                        <Border Classes="glass-card-with-highlight" Padding="15">
-                            <StackPanel Spacing="10">
-                                <TextBlock Text="显示指标" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
-                                <StackPanel Spacing="8">
-                                    <CheckBox Content="CPU" IsChecked="{Binding ShowCpu}" Tag="CPU" Classes="glass-checkbox-item" Foreground="#4ecdc4"/>
-                                    <CheckBox Content="GPU" IsChecked="{Binding ShowGpu}" Tag="GPU" Classes="glass-checkbox-item" Foreground="#a29bfe"/>
-                                    <CheckBox Content="内存" IsChecked="{Binding ShowMemory}" Tag="Memory" Classes="glass-checkbox-item" Foreground="#fd79a8"/>
-                                    <CheckBox Content="FPS" IsChecked="{Binding ShowFps}" Tag="FPS" Classes="glass-checkbox-item" Foreground="#76B900"/>
+                        <Border Classes="glass-card-with-highlight">
+                            <StackPanel Spacing="{StaticResource SpacingMDValue}">
+                                <TextBlock Text="显示指标" FontSize="{StaticResource FontSizeBodyLG}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                <StackPanel Spacing="{StaticResource SpacingXSValue}">
+                                    <CheckBox Content="CPU" IsChecked="{Binding ShowCpu}" Tag="CPU" Classes="glass-checkbox-item" Foreground="{StaticResource AccentPrimary}"/>
+                                    <CheckBox Content="GPU" IsChecked="{Binding ShowGpu}" Tag="GPU" Classes="glass-checkbox-item" Foreground="{StaticResource AccentSecondary}"/>
+                                    <CheckBox Content="内存" IsChecked="{Binding ShowMemory}" Tag="Memory" Classes="glass-checkbox-item" Foreground="{StaticResource AccentTertiary}"/>
+                                    <CheckBox Content="FPS" IsChecked="{Binding ShowFps}" Tag="FPS" Classes="glass-checkbox-item" Foreground="{StaticResource AccentPrimary}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -473,15 +563,15 @@
                 </ScrollViewer>
 
                 <!-- 右侧：图表和告警 -->
-                <Grid Grid.Column="1" RowDefinitions="*,Auto" Margin="15,0,0,0">
+                <Grid Grid.Column="1" RowDefinitions="*,Auto">
                     <!-- 图表区域 -->
                     <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                        <StackPanel Spacing="12">
+                        <StackPanel Spacing="{StaticResource SpacingLGValue}">
                             <!-- 时间范围选择 -->
-                            <Border Classes="glass-card-with-highlight" Padding="16">
-                                <StackPanel Orientation="Horizontal" Spacing="12">
-                                    <TextBlock Text="时间范围" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
-                                    <ComboBox SelectedIndex="2" Width="120" Classes="glass-dropdown" SelectionChanged="OnTimeRangeChanged">
+                            <Border Classes="glass-card-with-highlight">
+                                <StackPanel Orientation="Horizontal" Spacing="{StaticResource SpacingLGValue}" VerticalAlignment="Center">
+                                    <TextBlock Text="时间范围" FontSize="{StaticResource FontSizeBodyLG}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                    <ComboBox SelectedIndex="2" Width="140" Classes="glass-dropdown" SelectionChanged="OnTimeRangeChanged">
                                         <ComboBoxItem Content="15分钟"/>
                                         <ComboBoxItem Content="30分钟"/>
                                         <ComboBoxItem Content="1小时"/>
@@ -492,37 +582,65 @@
                             </Border>
 
                             <!-- CPU 图表 -->
-                            <Border Classes="glass-card-with-highlight" Padding="16" IsVisible="{Binding ShowCpu}">
-                                <StackPanel Spacing="12">
-                                    <Border Height="1" VerticalAlignment="Top" Background="#404ecdc4" Margin="0,0,0,8"/>
-                                    <TextBlock Text="CPU 使用率趋势" FontSize="14" FontWeight="SemiBold" Foreground="#4ecdc4"/>
+                            <Border Classes="glass-card-with-highlight" IsVisible="{Binding ShowCpu}">
+                                <StackPanel Spacing="{StaticResource SpacingMDValue}">
+                                    <Border Height="1" VerticalAlignment="Top" Opacity="0.25" Margin="0,0,0,8">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#00db78" Offset="0"/>
+                                                <GradientStop Color="#4d00db78" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <TextBlock Text="CPU 使用率趋势" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}"/>
                                     <lvc:CartesianChart Series="{Binding CpuSeries}" XAxes="{Binding DefaultXAxes}" YAxes="{Binding DefaultYAxes}" Height="180" Background="Transparent"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- GPU 图表 -->
-                            <Border Classes="glass-card-with-highlight" Padding="16" IsVisible="{Binding ShowGpu}">
-                                <StackPanel Spacing="12">
-                                    <Border Height="1" VerticalAlignment="Top" Background="#40a29bfe" Margin="0,0,0,8"/>
-                                    <TextBlock Text="GPU 使用率趋势" FontSize="14" FontWeight="SemiBold" Foreground="#a29bfe"/>
+                            <Border Classes="glass-card-with-highlight" IsVisible="{Binding ShowGpu}">
+                                <StackPanel Spacing="{StaticResource SpacingMDValue}">
+                                    <Border Height="1" VerticalAlignment="Top" Opacity="0.25" Margin="0,0,0,8">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#00e8a8" Offset="0"/>
+                                                <GradientStop Color="#4d00e8a8" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <TextBlock Text="GPU 使用率趋势" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentSecondary}"/>
                                     <lvc:CartesianChart Series="{Binding GpuSeries}" XAxes="{Binding DefaultXAxes}" YAxes="{Binding DefaultYAxes}" Height="180" Background="Transparent"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- 内存图表 -->
-                            <Border Classes="glass-card-with-highlight" Padding="16" IsVisible="{Binding ShowMemory}">
-                                <StackPanel Spacing="12">
-                                    <Border Height="1" VerticalAlignment="Top" Background="#40fd79a8" Margin="0,0,0,8"/>
-                                    <TextBlock Text="内存使用率趋势" FontSize="14" FontWeight="SemiBold" Foreground="#fd79a8"/>
+                            <Border Classes="glass-card-with-highlight" IsVisible="{Binding ShowMemory}">
+                                <StackPanel Spacing="{StaticResource SpacingMDValue}">
+                                    <Border Height="1" VerticalAlignment="Top" Opacity="0.25" Margin="0,0,0,8">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#00d4aa" Offset="0"/>
+                                                <GradientStop Color="#4d00d4aa" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <TextBlock Text="内存使用率趋势" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentTertiary}"/>
                                     <lvc:CartesianChart Series="{Binding MemorySeries}" XAxes="{Binding DefaultXAxes}" YAxes="{Binding DefaultYAxes}" Height="180" Background="Transparent"/>
                                 </StackPanel>
                             </Border>
 
                             <!-- FPS 图表 -->
-                            <Border Classes="glass-card-with-highlight" Padding="16" IsVisible="{Binding ShowFps}">
-                                <StackPanel Spacing="12">
-                                    <Border Height="1" VerticalAlignment="Top" Background="#4076B900" Margin="0,0,0,8"/>
-                                    <TextBlock Text="FPS 帧率趋势" FontSize="14" FontWeight="SemiBold" Foreground="#76B900"/>
+                            <Border Classes="glass-card-with-highlight" IsVisible="{Binding ShowFps}">
+                                <StackPanel Spacing="{StaticResource SpacingMDValue}">
+                                    <Border Height="1" VerticalAlignment="Top" Opacity="0.25" Margin="0,0,0,8">
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="#00db78" Offset="0"/>
+                                                <GradientStop Color="#4d00db78" Offset="1"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <TextBlock Text="FPS 帧率趋势" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}"/>
                                     <lvc:CartesianChart Series="{Binding FpsSeries}" XAxes="{Binding DefaultXAxes}" YAxes="{Binding FpsYAxes}" Height="180" Background="Transparent"/>
                                 </StackPanel>
                             </Border>
@@ -530,27 +648,30 @@
                     </ScrollViewer>
 
                     <!-- 告警区域 -->
-                    <Border Grid.Row="1" Classes="glass-card-with-highlight" Padding="16" Margin="0,15,0,0" MaxHeight="220">
-                        <StackPanel Spacing="12">
+                    <Border Grid.Row="1" Classes="glass-card-with-highlight" Margin="0,16,0,0" MaxHeight="220">
+                        <StackPanel Spacing="{StaticResource SpacingMDValue}">
                             <Grid ColumnDefinitions="*,Auto">
-                                <TextBlock Text="活动告警" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
-                                <Border Grid.Column="1" Classes="glass-card-with-highlight" Padding="10,5" CornerRadius="10">
-                                    <TextBlock Text="{Binding ActiveAlerts.Count, StringFormat={}{0} 个告警}" FontSize="11" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                <TextBlock Text="活动告警" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                <Border Grid.Column="1" Background="{StaticResource BackgroundSecondary}"
+                                        BorderBrush="{StaticResource BorderSubtle}"
+                                        BorderThickness="1" Padding="8,4" CornerRadius="8">
+                                    <TextBlock Text="{Binding ActiveAlerts.Count, StringFormat={}{0} 个告警}" FontSize="{StaticResource FontSizeCaption}" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
                                 </Border>
                             </Grid>
 
                             <ItemsControl ItemsSource="{Binding ActiveAlerts}" MaxHeight="160">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Margin="0,0,0,8" CornerRadius="12" Background="{StaticResource LiquidGlassBase}" BorderBrush="{StaticResource GlassBorder}" BorderThickness="1" Padding="12,10">
+                                        <Border Margin="0,0,0,6" CornerRadius="10" Background="{StaticResource BackgroundSecondary}"
+                                                BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1" Padding="12">
                                             <Grid ColumnDefinitions="Auto,*,Auto">
-                                                <Border Width="8" Height="8" CornerRadius="4" Background="{Binding SeverityColor}" 
-                                                        BoxShadow="0 0 12 0 #80ff6b6b" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                                <StackPanel Grid.Column="1" Margin="12,0,0,0">
-                                                    <TextBlock Text="{Binding RuleName}" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" TextTrimming="CharacterEllipsis"/>
-                                                    <TextBlock Text="{Binding Message}" FontSize="11" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,0" TextWrapping="Wrap" MaxWidth="280"/>
+                                                <Border Width="6" Height="6" CornerRadius="3" Background="{Binding SeverityColor}" 
+                                                        BoxShadow="0 0 8 #40ff6b6b" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                                                    <TextBlock Text="{Binding RuleName}" FontSize="{StaticResource FontSizeBody}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" TextTrimming="CharacterEllipsis"/>
+                                                    <TextBlock Text="{Binding Message}" FontSize="{StaticResource FontSizeCaption}" Foreground="{StaticResource TextSecondary}" Margin="0,3,0,0" TextWrapping="Wrap" MaxWidth="280"/>
                                                 </StackPanel>
-                                                <TextBlock Grid.Column="2" Text="{Binding TimeAgo}" FontSize="10" Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                                <TextBlock Grid.Column="2" Text="{Binding TimeAgo}" FontSize="{StaticResource FontSizeHint}" Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center" Margin="10,0,0,0"/>
                                             </Grid>
                                         </Border>
                                     </DataTemplate>
@@ -561,33 +682,55 @@
                 </Grid>
             </Grid>
 
-            <!-- 底部状态栏 -->
-            <Border Grid.Row="2" Classes="glass-header-bar" Padding="20,12">
-                <Grid ColumnDefinitions="Auto,*,Auto">
-                    <TextBlock Text="监控面板 v2.0" Classes="label"/>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="20" HorizontalAlignment="Center">
-                        <Border Classes="glass-card-with-highlight" Padding="12,6" CornerRadius="15">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="CPU:" Classes="label" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" FontSize="13" FontWeight="SemiBold" Foreground="#4ecdc4"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Classes="glass-card-with-highlight" Padding="12,6" CornerRadius="15">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="内存:" Classes="label" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" FontSize="13" FontWeight="SemiBold" Foreground="#fd79a8"/>
-                            </StackPanel>
-                        </Border>
-                        <Border Classes="glass-card-with-highlight" Padding="12,6" CornerRadius="15">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <TextBlock Text="FPS:" Classes="label" VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding Fps, Converter={x:Static converters:FpsValueConverter.Instance}}" FontSize="13" FontWeight="SemiBold" Foreground="#76B900"/>
-                            </StackPanel>
-                        </Border>
-                    </StackPanel>
-
-                </Grid>
-            </Border>
+            <!-- 底部状态栏：中灰卡片 + 顶部荧光绿发光渐变（Alpha通道编码透明度） -->
+            <Grid Grid.Row="2">
+                <!-- 顶部发光边缘 -->
+                <Border Height="1" VerticalAlignment="Top" Opacity="0.7">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                            <GradientStop Color="#0000db78" Offset="0"/>
+                            <GradientStop Color="#8000db78" Offset="0.3"/>
+                            <GradientStop Color="#b300e8a8" Offset="0.5"/>
+                            <GradientStop Color="#8000db78" Offset="0.7"/>
+                            <GradientStop Color="#0000db78" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                </Border>
+                <Border Background="{StaticResource BackgroundSecondary}"
+                        BorderBrush="{StaticResource DividerSubtle}"
+                        BorderThickness="0,1,0,0"
+                        Padding="20,10" Margin="0,1,0,0">
+                    <Grid ColumnDefinitions="Auto,*,Auto">
+                        <TextBlock Text="监控面板 v2.0" Classes="metric-label"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center">
+                            <Border Background="{StaticResource CardBackground}"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    BorderThickness="1" Padding="10,4" CornerRadius="8">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="CPU:" Classes="metric-label" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding CpuUsage, StringFormat={}{0:F1}%}" FontSize="{StaticResource FontSizeBodyLG}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="{StaticResource CardBackground}"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    BorderThickness="1" Padding="10,4" CornerRadius="8">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="内存:" Classes="metric-label" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding MemoryUsage, StringFormat={}{0:F1}%}" FontSize="{StaticResource FontSizeBodyLG}" FontWeight="SemiBold" Foreground="{StaticResource AccentTertiary}"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="{StaticResource CardBackground}"
+                                    BorderBrush="{StaticResource BorderSubtle}"
+                                    BorderThickness="1" Padding="10,4" CornerRadius="8">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="FPS:" Classes="metric-label" VerticalAlignment="Center"/>
+                                    <TextBlock Text="{Binding Fps, Converter={x:Static converters:FpsValueConverter.Instance}}" FontSize="{StaticResource FontSizeBodyLG}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
             </Grid>
         </Border>

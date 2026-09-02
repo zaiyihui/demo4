@@ -218,8 +218,8 @@ public class SelectedMetricToShadowConverter : IValueConverter
 {
     public static readonly SelectedMetricToShadowConverter Instance = new();
 
-    private const string SelectedShadow = "0 20 60 0 #50000000, 0 8 25 0 #35000000";
-    private const string UnselectedShadow = "0 8 20 0 #20000000, 0 3 8 0 #10000000";
+    private static readonly BoxShadows SelectedShadow = BoxShadows.Parse("0 20 60 #50000000, 0 8 25 #35000000");
+    private static readonly BoxShadows UnselectedShadow = BoxShadows.Parse("0 8 20 #20000000, 0 3 8 #10000000");
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {

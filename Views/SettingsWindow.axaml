@@ -20,30 +20,38 @@
         <converters:StringToColorConverterStatic x:Key="StringToColorConverterStatic"/>
     </Window.Resources>
 
+    <!-- 外层容器：暗黑风格 -->
+    <Border Background="{StaticResource BackgroundPrimary}"
+            CornerRadius="16"
+            BorderBrush="{StaticResource BorderSubtle}"
+            BorderThickness="1"
+            BoxShadow="0 20 60 #40000000, 0 8 20 #20000000">
     <Grid RowDefinitions="Auto,*,Auto">
-        <!-- 标题栏 - 玻璃风格 -->
-        <Border Grid.Row="0" Padding="20,15" Background="{StaticResource LiquidGlassBase}" 
-                BorderThickness="0,0,0,1" BorderBrush="{StaticResource GlassBorder}"
+        <!-- 标题栏 - 中灰卡片 + 底部分隔线 -->
+        <Border Grid.Row="0" Padding="20,12" Background="{StaticResource BackgroundSecondary}" 
+                BorderThickness="0,0,0,1" BorderBrush="{StaticResource DividerSubtle}"
                 CornerRadius="0">
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <!-- Logo区域 -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12">
-                    <Border Width="36" Height="36" CornerRadius="12" Background="{StaticResource CpuGlassGradient}" 
-                            BoxShadow="0 4 15 0 #204ecdc4" VerticalAlignment="Center">
-                        <TextBlock Text="CC" FontSize="14" FontWeight="Bold" Foreground="White" 
-                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Border Width="36" Height="36" CornerRadius="10" Background="{StaticResource CpuGlassGradient}" 
+                            BoxShadow="0 4 12 #2000db78" VerticalAlignment="Center">
+                        <Border BorderBrush="{StaticResource BorderAccent}" BorderThickness="1" CornerRadius="10">
+                            <TextBlock Text="CC" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold" Foreground="White" 
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
                     </Border>
-                    <TextBlock Text="设置" FontSize="16" Foreground="{StaticResource TextPrimary}" 
+                    <TextBlock Text="设置" FontSize="{StaticResource FontSizeTitle}" Foreground="{StaticResource TextPrimary}" 
                                VerticalAlignment="Center" FontWeight="SemiBold"/>
                 </StackPanel>
 
                 <!-- 窗口控制按钮 -->
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
-                    <Button Click="MinimizeWindow" ToolTip.Tip="最小化" Classes="glass-button" Padding="8">
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+                    <Button Click="MinimizeWindow" ToolTip.Tip="最小化" Classes="glass-button" Padding="8,4">
                         <TextBlock Text="−" FontSize="16" Foreground="{StaticResource TextSecondary}"/>
                     </Button>
-                    <Button Click="CloseWindow" ToolTip.Tip="关闭" Classes="glass-button" Padding="8">
-                        <TextBlock Text="×" FontSize="16" Foreground="#e74c3c"/>
+                    <Button Click="CloseWindow" ToolTip.Tip="关闭" Classes="glass-button" Padding="8,4">
+                        <TextBlock Text="×" FontSize="16" Foreground="#ef5a6f"/>
                     </Button>
                 </StackPanel>
             </Grid>
@@ -52,41 +60,41 @@
         <!-- 主内容区域 -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="240"/>
+                <ColumnDefinition Width="232"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- 左侧导航栏 - 玻璃风格 -->
-            <Border Grid.Column="0" Background="{StaticResource LiquidGlassBase}" 
-                    BorderThickness="0,0,1,0" BorderBrush="{StaticResource GlassBorder}"
+            <!-- 左侧导航栏 - 中灰背景 + 右侧分隔线 -->
+            <Border Grid.Column="0" Background="{StaticResource BackgroundSecondary}" 
+                    BorderThickness="0,0,1,0" BorderBrush="{StaticResource DividerSubtle}"
                     CornerRadius="0">
                 <ScrollViewer>
                     <StackPanel Margin="8">
                         <!-- 系统概览分组 -->
-                        <TextBlock Text="系统" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextTertiary}" Margin="12,10,0,8"/>
+                        <TextBlock Text="系统" FontSize="{StaticResource FontSizeHint}" FontWeight="SemiBold" Foreground="{StaticResource TextTertiary}" Margin="12,8,0,6"/>
                         
                         <RadioButton x:Name="OverviewNav" GroupName="SettingsNav" 
                                      IsChecked="True" Classes="nav-item"
                                      Click="NavItem_Checked" Tag="overview">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <Border Width="24" Height="24" CornerRadius="8" Background="{StaticResource CpuGlassGradient}">
-                                    <TextBlock Text="📊" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource CpuGlassGradient}">
+                                    <TextBlock Text="📊" FontSize="{StaticResource FontSizeBody}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Text="概览" VerticalAlignment="Center"/>
                             </StackPanel>
                         </RadioButton>
 
-                        <!-- 视觉分隔 -->
-                        <Border Height="1" Background="{StaticResource GlassBorder}" Margin="12,8,12,0"/>
+                        <!-- 视觉分隔：细弱分隔线 -->
+                        <Border Height="1" Background="{StaticResource DividerSubtle}" Margin="12,8,12,0"/>
 
                         <!-- 显示设置分组 -->
-                        <TextBlock Text="显示" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextTertiary}" Margin="12,12,0,8"/>
+                        <TextBlock Text="显示" FontSize="{StaticResource FontSizeHint}" FontWeight="SemiBold" Foreground="{StaticResource TextTertiary}" Margin="12,12,0,6"/>
 
                         <RadioButton GroupName="SettingsNav" Classes="nav-item"
                                      Click="NavItem_Checked" Tag="display">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <Border Width="24" Height="24" CornerRadius="8" Background="{StaticResource CpuGlassGradient}">
-                                    <TextBlock Text="💻" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource CpuGlassGradient}">
+                                    <TextBlock Text="💻" FontSize="{StaticResource FontSizeBody}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Text="显示设置" VerticalAlignment="Center"/>
                             </StackPanel>
@@ -94,9 +102,9 @@
 
                         <RadioButton GroupName="SettingsNav" Classes="nav-item"
                                      Click="NavItem_Checked" Tag="appearance">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <Border Width="24" Height="24" CornerRadius="8" Background="{StaticResource GpuGlassGradient}">
-                                    <TextBlock Text="🎨" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource GpuGlassGradient}">
+                                    <TextBlock Text="🎨" FontSize="{StaticResource FontSizeBody}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Text="外观" VerticalAlignment="Center"/>
                             </StackPanel>
@@ -104,25 +112,25 @@
 
                         <RadioButton GroupName="SettingsNav" Classes="nav-item"
                                      Click="NavItem_Checked" Tag="content">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <Border Width="24" Height="24" CornerRadius="8" Background="{StaticResource MemoryGlassGradient}">
-                                    <TextBlock Text="📋" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource MemoryGlassGradient}">
+                                    <TextBlock Text="📋" FontSize="{StaticResource FontSizeBody}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Text="显示内容" VerticalAlignment="Center"/>
                             </StackPanel>
                         </RadioButton>
 
                         <!-- 视觉分隔 -->
-                        <Border Height="1" Background="{StaticResource GlassBorder}" Margin="12,8,12,0"/>
+                        <Border Height="1" Background="{StaticResource DividerSubtle}" Margin="12,8,12,0"/>
 
                         <!-- 高级设置分组 -->
-                        <TextBlock Text="高级" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource TextTertiary}" Margin="12,12,0,8"/>
+                        <TextBlock Text="高级" FontSize="{StaticResource FontSizeHint}" FontWeight="SemiBold" Foreground="{StaticResource TextTertiary}" Margin="12,12,0,6"/>
 
                         <RadioButton GroupName="SettingsNav" Classes="nav-item"
                                      Click="NavItem_Checked" Tag="performance">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <Border Width="24" Height="24" CornerRadius="8" Background="#15ffeaa7">
-                                    <TextBlock Text="⚡" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource FpsGlassGradient}">
+                                    <TextBlock Text="⚡" FontSize="{StaticResource FontSizeBody}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Text="性能" VerticalAlignment="Center"/>
                             </StackPanel>
@@ -130,9 +138,9 @@
 
                         <RadioButton GroupName="SettingsNav" Classes="nav-item"
                                      Click="NavItem_Checked" Tag="startup">
-                            <StackPanel Orientation="Horizontal" Spacing="12">
-                                <Border Width="24" Height="24" CornerRadius="8" Background="#1500b894">
-                                    <TextBlock Text="🚀" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <Border Width="24" Height="24" CornerRadius="{StaticResource RadiusSM}" Background="{StaticResource CpuGlassGradient}">
+                                    <TextBlock Text="🚀" FontSize="{StaticResource FontSizeBody}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <TextBlock Text="启动选项" VerticalAlignment="Center"/>
                             </StackPanel>
@@ -141,38 +149,38 @@
                 </ScrollViewer>
             </Border>
 
-            <!-- 右侧内容区 - 玻璃风格 -->
-            <Border Grid.Column="1" Background="Transparent" Padding="25">
+            <!-- 右侧内容区 -->
+            <Border Grid.Column="1" Background="Transparent" Padding="24">
                 <ScrollViewer>
                     <StackPanel Spacing="20">
                         <!-- 概览面板 -->
                         <StackPanel x:Name="OverviewPanel" IsVisible="True">
-                            <TextBlock Text="概览" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,20"/>
+                            <TextBlock Text="概览" Classes="display" Margin="0,0,0,16"/>
 
-                            <Border Classes="glass-card" Padding="20">
+                            <Border Classes="glass-card">
                                 <StackPanel>
-                                    <TextBlock Text="悬浮窗状态" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="悬浮窗状态" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
 
-                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="150,*">
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="启用状态" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-                                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                                    <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="140,*">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="启用状态" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" FontSize="12"/>
+                                        <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="12">
                                             <Border Background="{Binding EnableOverlay, Converter={x:Static converters:BoolConverters.ToEnabledColor}}"
-                                                    CornerRadius="8" Padding="10,5">
+                                                    CornerRadius="8" Padding="8,5">
                                                 <TextBlock Text="{Binding EnableOverlay, Converter={x:Static converters:BoolConverters.ToEnabledText}}"
-                                                           Foreground="White" FontWeight="SemiBold"/>
+                                                           Foreground="White" FontWeight="SemiBold" FontSize="12"/>
                                             </Border>
                                         </StackPanel>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="位置" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="位置" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,14,0,0" FontSize="12"/>
                                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.ToDisplayName}}"
-                                                   Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                                   Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" Margin="0,14,0,0" FontSize="13"/>
 
-                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="透明度" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="透明度" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,14,0,0" FontSize="12"/>
                                         <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}"
-                                                   Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" Margin="0,12,0,0"/>
+                                                   Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" Margin="0,14,0,0" FontSize="13"/>
 
-                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="显示内容数" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,12,0,0"/>
-                                        <TextBlock Grid.Row="3" Grid.Column="1" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" Margin="0,12,0,0">
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="显示内容数" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,14,0,0" FontSize="12"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="1" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" Margin="0,14,0,0" FontSize="13">
                                             <TextBlock.Text>
                                                 <MultiBinding StringFormat="FPS: {0} | GPU: {1} | CPU: {2} | 内存: {3} | 延迟: {4}">
                                                     <Binding Path="OverlayShowFPS"/>
@@ -187,9 +195,9 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border Classes="glass-card" Padding="20" Margin="0,15,0,0">
+                            <Border Classes="glass-card" Margin="0,12,0,0">
                                 <StackPanel>
-                                    <TextBlock Text="快捷操作" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="快捷操作" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
 
                                     <WrapPanel Orientation="Horizontal">
                                         <Button Content="应用默认设置" Classes="glass-button" Command="{Binding ResetToDefaultsCommand}" Margin="0,0,10,10"/>
@@ -201,29 +209,29 @@
 
                         <!-- 显示设置面板 -->
                         <StackPanel x:Name="DisplayPanel" IsVisible="False">
-                            <TextBlock Text="显示设置" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,20"/>
+                            <TextBlock Text="显示设置" Classes="display" Margin="0,0,0,16"/>
                             
-                            <Border Classes="glass-card" Padding="20">
+                            <Border Classes="glass-card">
                                 <StackPanel>
-                                    <TextBlock Text="基础显示控制" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="基础显示控制" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
                                     
-                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="150,*" Margin="0,0,0,15">
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="启用悬浮窗" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="140,*" Margin="0,0,0,14">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="启用悬浮窗" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" FontSize="12"/>
                                         <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding EnableOverlay}" Margin="0,0,0,10" Classes="glass-checkbox"/>
                                         
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="窗口置顶" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,0,10"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="窗口置顶" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,0,10" FontSize="12"/>
                                         <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding OverlayAlwaysOnTop}" Margin="0,0,0,10" Classes="glass-checkbox"/>
                                     </Grid>
                                     
-                                    <TextBlock Text="悬浮窗位置" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,10,0,10"/>
+                                    <TextBlock Text="悬浮窗位置" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,12,0,12"/>
                                     
                                     <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*,*,*">
                                         <RadioButton Grid.Row="0" Grid.Column="0" GroupName="Position" 
                                                      IsChecked="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.IsTopLeft}, ConverterParameter=TopLeft}"
                                                      Classes="positionButton">
                                             <StackPanel HorizontalAlignment="Center">
-                                                <Border Width="40" Height="30" BorderBrush="#76B900" BorderThickness="1" CornerRadius="2">
-                                                    <Ellipse Width="8" Height="8" Fill="#76B900" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4"/>
+                                                <Border Width="40" Height="30" BorderBrush="{StaticResource AccentPrimary}" BorderThickness="1" CornerRadius="2">
+                                                    <Ellipse Width="8" Height="8" Fill="{StaticResource AccentPrimary}" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="4"/>
                                                 </Border>
                                                 <TextBlock Text="左上" Foreground="{StaticResource TextSecondary}" FontSize="11" HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                             </StackPanel>
@@ -233,8 +241,8 @@
                                                      IsChecked="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.IsTopRight}, ConverterParameter=TopRight}"
                                                      Classes="positionButton">
                                             <StackPanel HorizontalAlignment="Center">
-                                                <Border Width="40" Height="30" BorderBrush="#76B900" BorderThickness="1" CornerRadius="2">
-                                                    <Ellipse Width="8" Height="8" Fill="#76B900" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4"/>
+                                                <Border Width="40" Height="30" BorderBrush="{StaticResource AccentPrimary}" BorderThickness="1" CornerRadius="2">
+                                                    <Ellipse Width="8" Height="8" Fill="{StaticResource AccentPrimary}" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4"/>
                                                 </Border>
                                                 <TextBlock Text="右上" Foreground="{StaticResource TextSecondary}" FontSize="11" HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                             </StackPanel>
@@ -244,8 +252,8 @@
                                                      IsChecked="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.IsBottomLeft}, ConverterParameter=BottomLeft}"
                                                      Classes="positionButton">
                                             <StackPanel HorizontalAlignment="Center">
-                                                <Border Width="40" Height="30" BorderBrush="#76B900" BorderThickness="1" CornerRadius="2">
-                                                    <Ellipse Width="8" Height="8" Fill="#76B900" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4"/>
+                                                <Border Width="40" Height="30" BorderBrush="{StaticResource AccentPrimary}" BorderThickness="1" CornerRadius="2">
+                                                    <Ellipse Width="8" Height="8" Fill="{StaticResource AccentPrimary}" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4"/>
                                                 </Border>
                                                 <TextBlock Text="左下" Foreground="{StaticResource TextSecondary}" FontSize="11" HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                             </StackPanel>
@@ -255,8 +263,8 @@
                                                      IsChecked="{Binding OverlayPosition, Converter={x:Static converters:OverlayPositionConverters.IsBottomRight}, ConverterParameter=BottomRight}"
                                                      Classes="positionButton">
                                             <StackPanel HorizontalAlignment="Center">
-                                                <Border Width="40" Height="30" BorderBrush="#76B900" BorderThickness="1" CornerRadius="2">
-                                                    <Ellipse Width="8" Height="8" Fill="#76B900" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="4"/>
+                                                <Border Width="40" Height="30" BorderBrush="{StaticResource AccentPrimary}" BorderThickness="1" CornerRadius="2">
+                                                    <Ellipse Width="8" Height="8" Fill="{StaticResource AccentPrimary}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="4"/>
                                                 </Border>
                                                 <TextBlock Text="右下" Foreground="{StaticResource TextSecondary}" FontSize="11" HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                             </StackPanel>
@@ -268,48 +276,48 @@
 
                         <!-- 外观面板 -->
                         <StackPanel x:Name="AppearancePanel" IsVisible="False">
-                            <TextBlock Text="外观设置" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,20"/>
+                            <TextBlock Text="外观设置" Classes="display" Margin="0,0,0,16"/>
                             
-                            <Border Classes="glass-card" Padding="20">
+                            <Border Classes="glass-card">
                                 <StackPanel>
-                                    <TextBlock Text="透明度与尺寸" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="透明度与尺寸" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
                                     
-                                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="150,*" Margin="0,0,0,15">
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="背景透明度" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="140,*" Margin="0,0,0,14">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="背景透明度" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" FontSize="12"/>
                                         <StackPanel Grid.Row="0" Grid.Column="1" Spacing="10">
                                             <Slider Minimum="0.1" Maximum="1" Value="{Binding BackgroundOpacity}" 
                                                     IsSnapToTickEnabled="False" TickFrequency="0.1" Classes="glass-slider"/>
-                                            <TextBlock Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}" Foreground="{StaticResource TextPrimary}"/>
+                                            <TextBlock Text="{Binding BackgroundOpacity, StringFormat='{}{0:P0}'}" Foreground="{StaticResource TextPrimary}" FontSize="12"/>
                                         </StackPanel>
                                         
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="字体大小" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,15,0,0"/>
-                                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,15,0,0">
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="字体大小" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,14,0,0" FontSize="12"/>
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" Spacing="10" Margin="0,14,0,0">
                                             <Slider Minimum="10" Maximum="24" Value="{Binding OverlayFontSize}" 
                                                     Width="200" IsSnapToTickEnabled="True" TickFrequency="1" Classes="glass-slider"/>
-                                            <TextBlock Text="{Binding OverlayFontSize, StringFormat='{}{0} px'}" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding OverlayFontSize, StringFormat='{}{0} px'}" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" FontSize="12"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
                             </Border>
                             
-                            <Border Classes="glass-card" Padding="20" Margin="0,15,0,0">
+                            <Border Classes="glass-card" Margin="0,12,0,0">
                                 <StackPanel>
-                                    <TextBlock Text="颜色设置" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="颜色设置" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
                                     
-                                    <Grid RowDefinitions="Auto" ColumnDefinitions="150,*">
-                                        <TextBlock Grid.Column="0" Text="文字颜色" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                    <Grid RowDefinitions="Auto" ColumnDefinitions="140,*">
+                                        <TextBlock Grid.Column="0" Text="文字颜色" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" FontSize="12"/>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
-                                            <Border Width="30" Height="30" CornerRadius="6" 
+                                            <Border Width="30" Height="30" CornerRadius="8" 
                                                     Background="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverter}}" 
-                                                    BorderBrush="{StaticResource GlassBorder}" BorderThickness="1"/>
-                                            <TextBox Text="{Binding OverlayTextColor}" Width="120" Watermark="如: #76B900"/>
+                                                    BorderBrush="{StaticResource BorderSubtleStrong}" BorderThickness="1"/>
+                                            <TextBox Text="{Binding OverlayTextColor}" Width="120" Watermark="如: #00db78"/>
                                             <Button Content="预设" Classes="glass-button" Click="ShowColorPresets"/>
                                         </StackPanel>
                                     </Grid>
                                     
-                                    <StackPanel Orientation="Horizontal" Spacing="5" Margin="150,10,0,0">
-                                        <Border Classes="colorPreset" Background="#76B900" PointerPressed="ColorPreset_Clicked" Tag="#76B900"/>
-                                        <Border Classes="colorPreset" Background="#00FF00" PointerPressed="ColorPreset_Clicked" Tag="#00FF00"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="5" Margin="140,12,0,0">
+                                        <Border Classes="colorPreset" Background="{StaticResource AccentPrimary}" PointerPressed="ColorPreset_Clicked" Tag="#00db78"/>
+                                        <Border Classes="colorPreset" Background="{StaticResource AccentSecondary}" PointerPressed="ColorPreset_Clicked" Tag="#00c86c"/>
                                         <Border Classes="colorPreset" Background="#00BFFF" PointerPressed="ColorPreset_Clicked" Tag="#00BFFF"/>
                                         <Border Classes="colorPreset" Background="#FF6B6B" PointerPressed="ColorPreset_Clicked" Tag="#FF6B6B"/>
                                         <Border Classes="colorPreset" Background="#FFD93D" PointerPressed="ColorPreset_Clicked" Tag="#FFD93D"/>
@@ -321,54 +329,55 @@
 
                         <!-- 显示内容面板 -->
                         <StackPanel x:Name="ContentPanel" IsVisible="False">
-                            <TextBlock Text="显示内容" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,20"/>
+                            <TextBlock Text="显示内容" Classes="display" Margin="0,0,0,16"/>
                             
-                            <Border Classes="glass-card" Padding="20">
+                            <Border Classes="glass-card">
                                 <StackPanel>
-                                    <TextBlock Text="监控指标选择" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
-                                    <TextBlock Text="选择要在悬浮窗中显示的监控指标" Foreground="{StaticResource TextTertiary}" Margin="0,0,0,15"/>
+                                    <TextBlock Text="监控指标选择" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
+                                    <TextBlock Text="选择要在悬浮窗中显示的监控指标" Foreground="{StaticResource TextTertiary}" FontSize="12" Margin="0,0,0,14"/>
                                     
                                     <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" ColumnDefinitions="Auto,*" Margin="0,0,0,10">
-                                        <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding OverlayShowFPS}" Margin="0,0,15,8" Classes="glass-checkbox"/>
+                                        <CheckBox Grid.Row="0" Grid.Column="0" IsChecked="{Binding OverlayShowFPS}" Margin="0,0,12,8" Classes="glass-checkbox"/>
                                         <StackPanel Grid.Row="0" Grid.Column="1">
-                                            <TextBlock Text="FPS (帧率)" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
-                                            <TextBlock Text="实时显示游戏帧率" Foreground="{StaticResource TextTertiary}" FontSize="12"/>
+                                            <TextBlock Text="FPS (帧率)" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="13"/>
+                                            <TextBlock Text="实时显示游戏帧率" Foreground="{StaticResource TextTertiary}" FontSize="11"/>
                                         </StackPanel>
                                         
-                                        <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding OverlayShowCpu}" Margin="0,0,15,8" Classes="glass-checkbox"/>
+                                        <CheckBox Grid.Row="1" Grid.Column="0" IsChecked="{Binding OverlayShowCpu}" Margin="0,0,12,8" Classes="glass-checkbox"/>
                                         <StackPanel Grid.Row="1" Grid.Column="1">
-                                            <TextBlock Text="CPU (处理器)" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
-                                            <TextBlock Text="显示处理器使用率和温度" Foreground="{StaticResource TextTertiary}" FontSize="12"/>
+                                            <TextBlock Text="CPU (处理器)" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="13"/>
+                                            <TextBlock Text="显示处理器使用率和温度" Foreground="{StaticResource TextTertiary}" FontSize="11"/>
                                         </StackPanel>
                                         
-                                        <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding OverlayShowGpu}" Margin="0,0,15,8" Classes="glass-checkbox"/>
+                                        <CheckBox Grid.Row="2" Grid.Column="0" IsChecked="{Binding OverlayShowGpu}" Margin="0,0,12,8" Classes="glass-checkbox"/>
                                         <StackPanel Grid.Row="2" Grid.Column="1">
-                                            <TextBlock Text="GPU (显卡)" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
-                                            <TextBlock Text="显示显卡使用率、温度和显存" Foreground="{StaticResource TextTertiary}" FontSize="12"/>
+                                            <TextBlock Text="GPU (显卡)" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="13"/>
+                                            <TextBlock Text="显示显卡使用率、温度和显存" Foreground="{StaticResource TextTertiary}" FontSize="11"/>
                                         </StackPanel>
                                         
-                                        <CheckBox Grid.Row="3" Grid.Column="0" IsChecked="{Binding OverlayShowMemory}" Margin="0,0,15,8" Classes="glass-checkbox"/>
+                                        <CheckBox Grid.Row="3" Grid.Column="0" IsChecked="{Binding OverlayShowMemory}" Margin="0,0,12,8" Classes="glass-checkbox"/>
                                         <StackPanel Grid.Row="3" Grid.Column="1">
-                                            <TextBlock Text="内存" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
-                                            <TextBlock Text="显示内存使用情况" Foreground="{StaticResource TextTertiary}" FontSize="12"/>
+                                            <TextBlock Text="内存" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="13"/>
+                                            <TextBlock Text="显示内存使用情况" Foreground="{StaticResource TextTertiary}" FontSize="11"/>
                                         </StackPanel>
                                         
-                                        <CheckBox Grid.Row="4" Grid.Column="0" IsChecked="{Binding OverlayShowLatency}" Margin="0,0,15,0" Classes="glass-checkbox"/>
+                                        <CheckBox Grid.Row="4" Grid.Column="0" IsChecked="{Binding OverlayShowLatency}" Margin="0,0,12,0" Classes="glass-checkbox"/>
                                         <StackPanel Grid.Row="4" Grid.Column="1">
-                                            <TextBlock Text="延迟 (LAT)" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold"/>
-                                            <TextBlock Text="显示网络延迟" Foreground="{StaticResource TextTertiary}" FontSize="12"/>
+                                            <TextBlock Text="延迟 (LAT)" Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="13"/>
+                                            <TextBlock Text="显示网络延迟" Foreground="{StaticResource TextTertiary}" FontSize="11"/>
                                         </StackPanel>
                                     </Grid>
                                 </StackPanel>
                             </Border>
                             
-                            <Border Classes="glass-card" Padding="20" Margin="0,15,0,0">
+                            <Border Classes="glass-card" Margin="0,12,0,0">
                                 <StackPanel>
-                                    <TextBlock Text="显示预览" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="显示预览" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
                                     
                                     <Border Background="{Binding BackgroundColor, Converter={StaticResource StringToColorConverter}}" 
-                                            CornerRadius="10" Padding="15" 
-                                            HorizontalAlignment="Left" Opacity="{Binding BackgroundOpacity}">
+                                            CornerRadius="12" Padding="14" 
+                                            HorizontalAlignment="Left" Opacity="{Binding BackgroundOpacity}"
+                                            BorderBrush="{StaticResource BorderSubtle}" BorderThickness="1">
                                         <StackPanel Spacing="5">
                                             <StackPanel Orientation="Horizontal" IsVisible="{Binding OverlayShowFPS}" Spacing="8">
                                                 <TextBlock Text="FPS" Foreground="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}" FontWeight="Bold" FontSize="{Binding OverlayFontSize}"/>
@@ -398,37 +407,37 @@
 
                         <!-- 性能面板 -->
                         <StackPanel x:Name="PerformancePanel" IsVisible="False">
-                            <TextBlock Text="性能设置" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,20"/>
+                            <TextBlock Text="性能设置" Classes="display" Margin="0,0,0,16"/>
                             
-                            <Border Classes="glass-card" Padding="20">
+                            <Border Classes="glass-card">
                                 <StackPanel>
-                                    <TextBlock Text="刷新频率" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="刷新频率" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
                                     
-                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="150,*" Margin="0,0,0,15">
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="标准模式间隔" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                                    <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="140,*" Margin="0,0,0,14">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="标准模式间隔" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" FontSize="12"/>
                                         <StackPanel Grid.Row="0" Grid.Column="1" Spacing="10">
                                             <Slider Minimum="500" Maximum="5000" Value="{Binding RefreshInterval}" 
                                                     IsSnapToTickEnabled="True" TickFrequency="500" Classes="glass-slider"/>
-                                            <TextBlock Text="{Binding RefreshInterval, StringFormat='{}{0} ms'}" Foreground="{StaticResource TextPrimary}"/>
+                                            <TextBlock Text="{Binding RefreshInterval, StringFormat='{}{0} ms'}" Foreground="{StaticResource TextPrimary}" FontSize="12"/>
                                         </StackPanel>
                                         
                                         </Grid>
                                     
                                     <TextBlock Text="提示：降低刷新间隔会增加 CPU 占用，但数据更新更及时。" 
-                                               Foreground="{StaticResource TextTertiary}" FontSize="12" FontStyle="Italic" Margin="0,10,0,0"/>
+                                               Foreground="{StaticResource TextTertiary}" FontSize="{StaticResource FontSizeCaption}" FontStyle="Italic" Margin="0,12,0,0"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
 
                         <!-- 启动选项面板 -->
                         <StackPanel x:Name="StartupPanel" IsVisible="False">
-                            <TextBlock Text="启动选项" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,20"/>
+                            <TextBlock Text="启动选项" Classes="display" Margin="0,0,0,16"/>
                             
-                            <Border Classes="glass-card" Padding="20">
+                            <Border Classes="glass-card">
                                 <StackPanel>
-                                    <TextBlock Text="系统启动" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="系统启动" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
                                     
-                                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="150,*" Margin="0,0,0,15">
+                                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="140,*" Margin="0,0,0,14">
                                         <CheckBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
                                                   IsChecked="{Binding AutoStart}" Content="开机自动启动" Margin="0,0,0,10" Classes="glass-checkbox"/>
                                         
@@ -438,15 +447,15 @@
                                 </StackPanel>
                             </Border>
                             
-                            <Border Classes="glass-card" Padding="20" Margin="0,15,0,0">
+                            <Border Classes="glass-card" Margin="0,12,0,0">
                                 <StackPanel>
-                                    <TextBlock Text="关于" FontSize="16" FontWeight="SemiBold" Foreground="#76B900" Margin="0,0,0,15"/>
+                                    <TextBlock Text="关于" FontSize="{StaticResource FontSizeTitle}" FontWeight="SemiBold" Foreground="{StaticResource AccentPrimary}" Margin="0,0,0,14"/>
                                     
-                                    <TextBlock Foreground="{StaticResource TextSecondary}" Margin="0,0,0,5">
+                                    <TextBlock Foreground="{StaticResource TextSecondary}" FontSize="12" Margin="0,0,0,4">
                                         <Run Text="Computer Companion"/>
                                         <Run Text=" v1.0"/>
                                     </TextBlock>
-                                    <TextBlock Text="硬件监控与游戏悬浮窗工具" Foreground="{StaticResource TextTertiary}"/>
+                                    <TextBlock Text="硬件监控与游戏悬浮窗工具" Foreground="{StaticResource TextTertiary}" FontSize="11"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
@@ -455,23 +464,36 @@
             </Border>
         </Grid>
 
-        <!-- 底部按钮栏 - 玻璃风格 -->
-        <Border Grid.Row="2" Padding="20,12" Background="{StaticResource LiquidGlassBase}" 
-                BorderThickness="0,1,0,0" BorderBrush="{StaticResource GlassBorder}"
-                CornerRadius="0">
-            <Grid ColumnDefinitions="*,Auto,Auto,Auto">
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="状态: " Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center"/>
-                    <TextBlock Text="就绪" Foreground="#76B900" VerticalAlignment="Center"/>
-                </StackPanel>
-                
-                <Button Grid.Column="1" Content="恢复默认" Classes="glass-button" 
-                        Command="{Binding ResetToDefaults}" Margin="0,0,10,0"/>
-                <Button Grid.Column="2" Content="取消" Classes="glass-button" 
-                        Click="CancelWindow" Margin="0,0,10,0"/>
-                <Button Grid.Column="3" Content="应用" Classes="apply-button" 
-                        Click="OnSaveClick"/>
-            </Grid>
-        </Border>
+        <!-- 底部按钮栏：中灰背景 + 顶部发光渐变（Alpha通道编码透明度） -->
+        <Grid Grid.Row="2">
+            <!-- 顶部发光边缘 -->
+            <Border Height="1" VerticalAlignment="Top" Opacity="0.6">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#0000db78" Offset="0"/>
+                        <GradientStop Color="#9900db78" Offset="0.5"/>
+                        <GradientStop Color="#0000db78" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <Border Padding="20,10" Background="{StaticResource BackgroundSecondary}" 
+                    BorderThickness="0,1,0,0" BorderBrush="{StaticResource DividerSubtle}"
+                    CornerRadius="0" Margin="0,1,0,0">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="状态: " Foreground="{StaticResource TextTertiary}" VerticalAlignment="Center" FontSize="11"/>
+                        <TextBlock Text="就绪" Foreground="{StaticResource AccentPrimary}" VerticalAlignment="Center" FontSize="11" FontWeight="Medium"/>
+                    </StackPanel>
+                    
+                    <Button Grid.Column="1" Content="恢复默认" Classes="glass-button" 
+                            Command="{Binding ResetToDefaults}" Margin="0,0,10,0"/>
+                    <Button Grid.Column="2" Content="取消" Classes="glass-button" 
+                            Click="CancelWindow" Margin="0,0,10,0"/>
+                    <Button Grid.Column="3" Content="应用" Classes="apply-button" 
+                            Click="OnSaveClick"/>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
+    </Border>
 </Window>

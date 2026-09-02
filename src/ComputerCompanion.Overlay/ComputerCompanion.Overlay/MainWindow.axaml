@@ -2,8 +2,169 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vm="using:ComputerCompanion.ViewModels"
+        xmlns:converters="using:ComputerCompanion.Converters"
+        mc:Ignorable="d"
         x:Class="ComputerCompanion.Overlay.MainWindow"
-        Title="ComputerCompanion.Overlay">
-    Welcome to Avalonia!
+        x:DataType="vm:OverlayViewModel"
+        Title="ComputerCompanion Overlay"
+        Width="220"
+        Height="180"
+        MinWidth="180"
+        MinHeight="140"
+        Background="Transparent"
+        TransparencyLevelHint="Blur"
+        SystemDecorations="None"
+        WindowStartupLocation="Manual"
+        Topmost="True"
+        ShowInTaskbar="False"
+        PointerPressed="OnWindowPointerPressed"
+        KeyDown="OnKeyDown">
+
+    <Window.Resources>
+        <converters:StringToColorConverterStatic x:Key="StringToColorConverterStatic"/>
+        <!-- 内嵌新暗黑风格颜色系统 -->
+        <SolidColorBrush x:Key="CardBg" Color="#1a1e1e"/>
+        <SolidColorBrush x:Key="CardBgHover" Color="#202525"/>
+        <SolidColorBrush x:Key="BorderThin" Color="#ffffff" Opacity="0.05"/>
+        <SolidColorBrush x:Key="AccentGreen" Color="#00db78"/>
+    </Window.Resources>
+
+    <Window.Styles>
+        <Style Selector="TextBlock">
+            <Setter Property="FontFamily" Value="Inter, Segoe UI, Microsoft YaHei UI, PingFang SC, sans-serif"/>
+        </Style>
+
+        <Style Selector="TextBlock.overlay-label">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}"/>
+            <Setter Property="Opacity" Value="0.65"/>
+        </Style>
+
+        <Style Selector="TextBlock.overlay-value">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}"/>
+        </Style>
+
+        <Style Selector="TextBlock.overlay-fps">
+            <Setter Property="FontSize" Value="26"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontFamily" Value="Inter, Segoe UI, monospace"/>
+            <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+        </Style>
+
+        <Style Selector="TextBlock.overlay-detail">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="Foreground" Value="{Binding OverlayTextColor, Converter={StaticResource StringToColorConverterStatic}}"/>
+            <Setter Property="Opacity" Value="0.55"/>
+        </Style>
+
+        <!-- 悬浮卡片：中灰背景 + 半透明白边 + 微阴影 -->
+        <Style Selector="Border.overlay-card">
+            <Setter Property="Background" Value="{StaticResource CardBg}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderThin}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="BoxShadow" Value="0 10 30 #35000000, 0 4 12 #18000000"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="Transitions">
+                <Setter.Value>
+                    <Transitions>
+                        <BrushTransition Property="Background" Duration="0:0:0.3"/>
+                        <BrushTransition Property="BorderBrush" Duration="0:0:0.3"/>
+                    </Transitions>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style Selector="Border.overlay-card:pointerover">
+            <Setter Property="Background" Value="{StaticResource CardBgHover}"/>
+            <Setter Property="BorderBrush" Color="#ffffff" Opacity="0.08"/>
+            <Setter Property="BoxShadow" Value="0 14 40 #45000000, 0 6 16 #25000000"/>
+        </Style>
+    </Window.Styles>
+
+    <Border Classes="overlay-card" Opacity="0.92">
+        <Grid>
+            <!-- 顶部微弱高光（Alpha通道编码透明度） -->
+            <Border Height="1" VerticalAlignment="Top" Opacity="0.3" Margin="12,0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#14ffffff" Offset="0"/>
+                        <GradientStop Color="#0affffff" Offset="0.5"/>
+                        <GradientStop Color="#00ffffff" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+            <!-- 左侧微弱高光 -->
+            <Border Width="1" HorizontalAlignment="Left" Opacity="0.2" Margin="0,10">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#0fffffff" Offset="0"/>
+                        <GradientStop Color="#00ffffff" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+
+            <StackPanel Spacing="6" Margin="0,2,0,0">
+                <!-- FPS 主显示 -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="FPS" Classes="overlay-label" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <TextBlock Text="{Binding FpsText}" Classes="overlay-fps" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- FPS 详情 -->
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding ShowFpsDetails}" Spacing="12">
+                    <TextBlock Text="{Binding Fps1PercentLowText}" Classes="overlay-detail"/>
+                </StackPanel>
+
+                <!-- 分隔线：极细弱对比 -->
+                <Border Height="1" Background="{StaticResource BorderThin}" Margin="0,5"/>
+
+                <!-- GPU -->
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding ShowGpu}">
+                    <TextBlock Text="GPU" Classes="overlay-label" VerticalAlignment="Center" Width="32"/>
+                    <TextBlock Text="{Binding GpuText}" Classes="overlay-value" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- CPU -->
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding ShowCpu}">
+                    <TextBlock Text="CPU" Classes="overlay-label" VerticalAlignment="Center" Width="32"/>
+                    <TextBlock Text="{Binding CpuText}" Classes="overlay-value" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- 内存 -->
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding ShowMemory}">
+                    <TextBlock Text="MEM" Classes="overlay-label" VerticalAlignment="Center" Width="32"/>
+                    <TextBlock Text="{Binding MemoryText}" Classes="overlay-value" VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- VRAM -->
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding ShowVram}">
+                    <TextBlock Text="VRAM" Classes="overlay-label" VerticalAlignment="Center" Width="32"/>
+                    <TextBlock Text="{Binding VramText}" Classes="overlay-detail" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+
+                <!-- 延迟 -->
+                <StackPanel Orientation="Horizontal" IsVisible="{Binding ShowLatency}">
+                    <TextBlock Text="LAT" Classes="overlay-label" VerticalAlignment="Center" Width="32"/>
+                    <TextBlock Text="{Binding LatencyText}" Classes="overlay-value" VerticalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- 底部微弱发光边缘：荧光绿线性渐变（Alpha通道编码透明度） -->
+            <Border Height="1" VerticalAlignment="Bottom" Opacity="0.5" Margin="14,0">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#0000db78" Offset="0"/>
+                        <GradientStop Color="#9900db78" Offset="0.5"/>
+                        <GradientStop Color="#0000db78" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+            </Border>
+        </Grid>
+    </Border>
 </Window>
