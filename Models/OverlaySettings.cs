@@ -64,6 +64,11 @@ public class OverlaySettings
     /// 是否显示延迟
     /// </summary>
     public bool OverlayShowLatency { get; set; } = true;
+
+    /// <summary>
+    /// 当前皮肤名称
+    /// </summary>
+    public string SkinName { get; set; } = "tech";
 }
 
 /// <summary>

@@ -54,7 +54,20 @@ public partial class App : Application
 
         // 核心服务
         services.AddSingleton<ISecurityService, SecurityService>();
-        services.AddSingleton<IHardwareMonitorService, HardwareMonitorService>();
+        services.AddSingleton<FpsMonitorService>();
+        services.AddSingleton<IHardwareMonitorService>(sp =>
+        {
+            var svc = new HardwareMonitorService();
+            // 注入 ETW FPS 监控（通过反射设置私有字段）
+            var fpsMonitor = sp.GetRequiredService<FpsMonitorService>();
+            var field = typeof(HardwareMonitorService).GetField("_fpsMonitor",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            field?.SetValue(svc, fpsMonitor);
+            return svc;
+        });
+        // GPU 风扇曲线控制服务（在 IHardwareMonitorService 之后注册；
+        // Initialize 在 HardwareMonitorService.Start() 完成后再调用，因为 Computer 对象在 Start() 中创建）
+        services.AddSingleton<FanControlService>();
         services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<IDataStorageService, DataStorageService>();
 
@@ -83,9 +96,8 @@ public partial class App : Application
             new Core.Services.BackupService(
                 sp.GetRequiredService<ISettingsService>()));
         services.AddSingleton<Core.Abstractions.ILocalizationService, Core.Services.LocalizationService>();
-        services.AddSingleton<Core.Abstractions.ICloudSyncService, Core.Services.CloudSyncService>();
-        services.AddSingleton<Core.Abstractions.IAIService>(sp =>
-            new Core.Services.AIService(
+        services.AddSingleton<Core.Abstractions.IInsightService>(sp =>
+            new Core.Services.InsightService(
                 sp.GetRequiredService<Core.Abstractions.IPerformanceMonitorService>(),
                 sp.GetRequiredService<IHardwareMonitorService>()));
         services.AddSingleton<Core.Abstractions.IPluginService, Core.Services.PluginService>();
@@ -164,6 +176,28 @@ public partial class App : Application
                     Program.Log("[应用] 后台启动硬件监控");
                     var hardwareMonitorService = ServiceProvider.GetRequiredService<IHardwareMonitorService>();
                     hardwareMonitorService.Start();
+
+                    // 硬件监控启动后，初始化 GPU 风扇控制服务（Computer 对象在 Start() 中创建）
+                    try
+                    {
+                        var fanControlService = ServiceProvider.GetRequiredService<FanControlService>();
+                        var computerField = typeof(HardwareMonitorService).GetField("_computer",
+                            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        var computer = computerField?.GetValue(hardwareMonitorService) as LibreHardwareMonitor.Hardware.Computer;
+                        if (computer != null)
+                        {
+                            fanControlService.Initialize(computer);
+                            Program.Log($"[应用] 风扇控制服务初始化完成，可用={fanControlService.IsFanControlAvailable}");
+                        }
+                        else
+                        {
+                            Program.Log("[应用] 风扇控制服务初始化跳过：Computer 对象为空");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Program.Log($"[应用] 风扇控制服务初始化失败: {ex.Message}");
+                    }
                     
                     Program.Log("[应用] 后台启动网络监控");
                     var networkMonitorService = ServiceProvider.GetRequiredService<INetworkMonitorService>();
@@ -307,6 +341,19 @@ public partial class App : Application
                 dashboardWindow.Activate();
                 Program.Log("[应用] 窗口已调用Activate()");
                 Program.Log("[应用] 性能监控面板已显示");
+
+                // 管理员权限引导（仅主进程、非管理员时提示一次）
+                if (!Program.IsRunningAsAdmin && settings.Startup != null && settings.Startup.HasShownAdminPrompt)
+                {
+                    _ = ShowAdminPromptAsync(dashboardWindow);
+                    settings.Startup.HasShownAdminPrompt = true;
+                    var settingsService = ServiceProvider.GetRequiredService<ISettingsService>();
+                    settingsService.SaveSettings();
+                }
+                else if (!Program.IsRunningAsAdmin)
+                {
+                    _ = ShowAdminPromptAsync(dashboardWindow);
+                }
 
                 var ipcService = ServiceProvider.GetRequiredService<IIpcService>();
                 var router = ServiceProvider.GetRequiredService<IIpcMessageRouter>();
@@ -527,6 +574,91 @@ public partial class App : Application
         windowManager?.ShowMainWindow();
     }
 
+    /// <summary>
+    /// 管理员权限引导对话框
+    /// </summary>
+    private async Task ShowAdminPromptAsync(Avalonia.Controls.Window owner)
+    {
+        try
+        {
+            await Task.Delay(1500); // 等主窗口渲染完
+
+            var dialog = new Avalonia.Controls.Window
+            {
+                Title = "权限提示",
+                Width = 420,
+                Height = 220,
+                WindowStartupLocation = Avalonia.Controls.WindowStartupLocation.CenterOwner,
+                CanResize = false,
+                ShowInTaskbar = false,
+                Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#1a1a2e"))
+            };
+
+            var panel = new Avalonia.Controls.StackPanel
+            {
+                Margin = new Avalonia.Thickness(24),
+                Spacing = 12
+            };
+
+            var title = new Avalonia.Controls.TextBlock
+            {
+                Text = "管理员权限建议",
+                FontSize = 16,
+                FontWeight = Avalonia.Media.FontWeight.Bold,
+                Foreground = Avalonia.Media.Brushes.White
+            };
+            panel.Children.Add(title);
+
+            var msg = new Avalonia.Controls.TextBlock
+            {
+                Text = "当前未以管理员身份运行，以下功能受限：\n\n• CPU/GPU 温度传感器数据不完整\n• ETW 真实游戏 FPS 监控不可用\n• 风扇转速读取受限\n\n是否以管理员身份重启以获取完整功能？",
+                FontSize = 12,
+                Foreground = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#ccc")),
+                TextWrapping = Avalonia.Media.TextWrapping.Wrap
+            };
+            panel.Children.Add(msg);
+
+            var btnPanel = new Avalonia.Controls.StackPanel
+            {
+                Orientation = Avalonia.Layout.Orientation.Horizontal,
+                HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right,
+                Spacing = 8
+            };
+
+            var btnRestart = new Avalonia.Controls.Button
+            {
+                Content = "以管理员重启",
+                Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#00db78")),
+                Foreground = Avalonia.Media.Brushes.Black
+            };
+            btnRestart.Click += (s, e) =>
+            {
+                Program.RestartAsAdmin();
+                dialog.Close();
+                ExitApplication();
+            };
+            btnPanel.Children.Add(btnRestart);
+
+            var btnSkip = new Avalonia.Controls.Button
+            {
+                Content = "以后再说",
+                Background = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#333")),
+                Foreground = Avalonia.Media.Brushes.White
+            };
+            btnSkip.Click += (s, e) => dialog.Close();
+            btnPanel.Children.Add(btnSkip);
+
+            panel.Children.Add(btnPanel);
+            dialog.Content = panel;
+
+            await dialog.ShowDialog(owner);
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[权限] 管理员引导对话框异常: {ex.Message}");
+        }
+    }
+
     public static void ExitApplication()
     {
         Program.Log("[应用] 正在退出程序");
@@ -556,9 +688,11 @@ public partial class App : Application
             var networkMonitorService = _serviceProvider?.GetService<INetworkMonitorService>();
             var latencyMonitorService = _serviceProvider?.GetService<ILatencyMonitorService>();
             var batteryMonitorService = _serviceProvider?.GetService<IBatteryMonitorService>();
+            var fanControlService = _serviceProvider?.GetService<FanControlService>();
 
             trayIconService?.Dispose();
             ipcService?.Dispose();
+            fanControlService?.Dispose();
             hardwareMonitorService?.Dispose();
             networkMonitorService?.Dispose();
             latencyMonitorService?.Dispose();

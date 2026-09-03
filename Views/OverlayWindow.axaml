@@ -139,6 +139,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -165,21 +166,25 @@
                 <TextBlock Grid.Column="0" Grid.Row="2" Text="1%" Classes="overlay-label" Opacity="0.7" Margin="4,2,4,2"/>
                 <TextBlock Grid.Column="1" Grid.Row="2" x:DataType="vm:OverlayViewModel" Text="{Binding Fps1PercentLowText}" Classes="overlay-fps-detail" HorizontalAlignment="Right" Margin="0,2,6,2" IsVisible="{Binding ShowFpsDetails}"/>
 
+                <!-- Frame Time -->
+                <TextBlock Grid.Column="0" Grid.Row="3" Text="FT" Classes="overlay-label" Opacity="0.7" Margin="4,2,4,2"/>
+                <TextBlock Grid.Column="1" Grid.Row="3" x:DataType="vm:OverlayViewModel" Text="{Binding FrameTimeText}" Classes="overlay-fps-detail" HorizontalAlignment="Right" Margin="0,2,6,2" IsVisible="{Binding ShowFpsDetails}"/>
+
                 <!-- GPU 行 -->
-                <TextBlock Grid.Column="0" Grid.Row="3" Text="GPU" Classes="overlay-label" Margin="4,4,4,2" IsVisible="{Binding ShowGpu}"/>
-                <TextBlock Grid.Column="1" Grid.Row="3" x:DataType="vm:OverlayViewModel" Text="{Binding GpuText}" Classes="overlay-metric-value" HorizontalAlignment="Right" Margin="0,4,6,2" IsVisible="{Binding ShowGpu}" Foreground="{StaticResource AccentSecondary}"/>
+                <TextBlock Grid.Column="0" Grid.Row="4" Text="GPU" Classes="overlay-label" Margin="4,4,4,2" IsVisible="{Binding ShowGpu}"/>
+                <TextBlock Grid.Column="1" Grid.Row="4" x:DataType="vm:OverlayViewModel" Text="{Binding GpuText}" Classes="overlay-metric-value" HorizontalAlignment="Right" Margin="0,4,6,2" IsVisible="{Binding ShowGpu}" Foreground="{StaticResource AccentSecondary}"/>
 
                 <!-- CPU 行 -->
-                <TextBlock Grid.Column="0" Grid.Row="4" Text="CPU" Classes="overlay-label" Margin="4,4,4,2" IsVisible="{Binding ShowCpu}"/>
-                <TextBlock Grid.Column="1" Grid.Row="4" x:DataType="vm:OverlayViewModel" Text="{Binding CpuText}" Classes="overlay-metric-value" HorizontalAlignment="Right" Margin="0,4,6,2" IsVisible="{Binding ShowCpu}" Foreground="{StaticResource AccentPrimary}"/>
+                <TextBlock Grid.Column="0" Grid.Row="5" Text="CPU" Classes="overlay-label" Margin="4,4,4,2" IsVisible="{Binding ShowCpu}"/>
+                <TextBlock Grid.Column="1" Grid.Row="5" x:DataType="vm:OverlayViewModel" Text="{Binding CpuText}" Classes="overlay-metric-value" HorizontalAlignment="Right" Margin="0,4,6,2" IsVisible="{Binding ShowCpu}" Foreground="{StaticResource AccentPrimary}"/>
 
                 <!-- MEM 行 -->
-                <TextBlock Grid.Column="0" Grid.Row="5" Text="MEM" Classes="overlay-label" Margin="4,4,4,2" IsVisible="{Binding ShowMemory}"/>
-                <TextBlock Grid.Column="1" Grid.Row="5" x:DataType="vm:OverlayViewModel" Text="{Binding MemoryText}" Classes="overlay-metric-value" HorizontalAlignment="Right" Margin="0,4,6,2" IsVisible="{Binding ShowMemory}" Foreground="{StaticResource AccentTertiary}"/>
+                <TextBlock Grid.Column="0" Grid.Row="6" Text="MEM" Classes="overlay-label" Margin="4,4,4,2" IsVisible="{Binding ShowMemory}"/>
+                <TextBlock Grid.Column="1" Grid.Row="6" x:DataType="vm:OverlayViewModel" Text="{Binding MemoryText}" Classes="overlay-metric-value" HorizontalAlignment="Right" Margin="0,4,6,2" IsVisible="{Binding ShowMemory}" Foreground="{StaticResource AccentTertiary}"/>
 
                 <!-- VRAM 行 -->
-                <TextBlock Grid.Column="0" Grid.Row="6" Text="VRAM" Classes="overlay-label" Margin="4,4,4,4" IsVisible="{Binding ShowVram}"/>
-                <TextBlock Grid.Column="1" Grid.Row="6" x:DataType="vm:OverlayViewModel" Text="{Binding VramText}" Classes="overlay-vram-value" HorizontalAlignment="Right" Margin="0,4,6,4" IsVisible="{Binding ShowVram}"/>
+                <TextBlock Grid.Column="0" Grid.Row="7" Text="VRAM" Classes="overlay-label" Margin="4,4,4,4" IsVisible="{Binding ShowVram}"/>
+                <TextBlock Grid.Column="1" Grid.Row="7" x:DataType="vm:OverlayViewModel" Text="{Binding VramText}" Classes="overlay-vram-value" HorizontalAlignment="Right" Margin="0,4,6,4" IsVisible="{Binding ShowVram}"/>
             </Grid>
 
             <!-- 底部微弱发光边缘：荧光绿线性渐变（Alpha通道编码透明度） -->

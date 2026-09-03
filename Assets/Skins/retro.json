@@ -1,0 +1,12 @@
+{
+  "Name": "retro",
+  "DisplayName": "复古",
+  "BackgroundColor": "#1a1308ee",
+  "TextColor": "#ffb300",
+  "AccentColor": "#ff8f00",
+  "SecondaryColor": "#ffca28",
+  "FontSize": 15,
+  "BackgroundOpacity": 0.92,
+  "CornerRadius": 6,
+  "Layout": "standard"
+}

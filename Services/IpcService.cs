@@ -517,5 +517,7 @@ public static class IpcMessageTypes
     public const string RefreshIntervalChanged = "RefreshIntervalChanged";  // 刷新频率变更
     public const string ToggleOverlay = "ToggleOverlay";       // 切换悬浮窗
     public const string SwitchViewMode = "SwitchViewMode";       // 切换视图模式
+    public const string FpsData = "FpsData";                     // FPS/帧时间数据
+    public const string AdminPrompt = "AdminPrompt";             // 管理员权限提示
     public const string Error = "Error";                        // 错误信息
 }

@@ -14,4 +14,9 @@ public class StartupSettings
     /// 启动时是否最小化
     /// </summary>
     public bool StartMinimized { get; set; } = false;
+
+    /// <summary>
+    /// 是否已显示过管理员权限引导
+    /// </summary>
+    public bool HasShownAdminPrompt { get; set; } = false;
 }

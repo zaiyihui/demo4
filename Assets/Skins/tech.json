@@ -1,0 +1,12 @@
+{
+  "Name": "tech",
+  "DisplayName": "科技",
+  "BackgroundColor": "#0a0a0fee",
+  "TextColor": "#76B900",
+  "AccentColor": "#00db78",
+  "SecondaryColor": "#4ecdc4",
+  "FontSize": 14,
+  "BackgroundOpacity": 0.9,
+  "CornerRadius": 14,
+  "Layout": "standard"
+}

@@ -19,6 +19,99 @@ sealed class Program
     private static int _logSequence;
     private static readonly object _logLock = new object();
 
+    /// <summary>
+    /// 当前进程是否以管理员权限运行
+    /// </summary>
+    public static bool IsRunningAsAdmin { get; private set; }
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    private static extern bool OpenProcessToken(IntPtr processHandle, uint desiredAccess, out IntPtr tokenHandle);
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    private static extern bool GetTokenInformation(
+        IntPtr tokenHandle, int tokenInformationClass,
+        IntPtr tokenInformation, int tokenInformationLength,
+        out int returnLength);
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern bool DuplicateTokenEx(
+        IntPtr existingTokenHandle, uint desiredAccess,
+        IntPtr tokenAttributes, int impersonationLevel,
+        int tokenType, out IntPtr newTokenHandle);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern IntPtr GetShellWindow();
+
+    [DllImport("advapi32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern bool ShellExecuteWithInfo(ref SHELLEXECUTEINFO info);
+
+    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+    private struct SHELLEXECUTEINFO
+    {
+        public int cbSize;
+        public uint fMask;
+        public IntPtr hwnd;
+        public string lpVerb;
+        public string lpFile;
+        public string lpParameters;
+        public string lpDirectory;
+        public int nShow;
+        public IntPtr hInstApp;
+        public IntPtr lpIDList;
+        public string lpClass;
+        public IntPtr hkeyClass;
+        public uint dwHotKey;
+        public IntPtr hIcon;
+        public IntPtr hProcess;
+    }
+
+    private const int TOKEN_QUERY = 0x0008;
+    private const int TokenElevation = 20;
+    private const uint SEE_MASK_NOCLOSEPROCESS = 0x00000040;
+
+    /// <summary>
+    /// 检查当前进程是否具有管理员权限
+    /// </summary>
+    private static bool CheckAdminPrivilege()
+    {
+        try
+        {
+            using var identity = System.Security.Principal.WindowsIdentity.GetCurrent();
+            var principal = new System.Security.Principal.WindowsPrincipal(identity);
+            return principal.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// 以管理员身份重启程序
+    /// </summary>
+    public static void RestartAsAdmin()
+    {
+        try
+        {
+            var exePath = Environment.ProcessPath ?? System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var info = new SHELLEXECUTEINFO
+            {
+                cbSize = System.Runtime.InteropServices.Marshal.SizeOf<SHELLEXECUTEINFO>(),
+                fMask = SEE_MASK_NOCLOSEPROCESS,
+                lpVerb = "runas",
+                lpFile = exePath,
+                lpParameters = string.Empty,
+                lpDirectory = Environment.CurrentDirectory,
+                nShow = 1 // SW_SHOWNORMAL
+            };
+            ShellExecuteWithInfo(ref info);
+        }
+        catch (Exception ex)
+        {
+            Log($"[权限] 重启为管理员失败: {ex.Message}");
+        }
+    }
+
     [STAThread]
     public static void Main(string[] args)
     {
@@ -34,6 +127,14 @@ sealed class Program
 
             var totalMemory = GC.GetTotalMemory(false);
             Log($"[启动] 初始内存: {FormatBytes(totalMemory)}");
+
+            // 管理员权限检测
+            IsRunningAsAdmin = CheckAdminPrivilege();
+            Log($"[启动] 管理员权限: {IsRunningAsAdmin}");
+            if (!IsRunningAsAdmin)
+            {
+                Log("[启动] 警告: 未以管理员身份运行，传感器数据可能不完整，ETW FPS 监控不可用");
+            }
 
             InitEncoding();
             InitCulture();

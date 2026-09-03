@@ -24,16 +24,18 @@ public interface IHardwareMonitorService : IDisposable
     float? Fps { get; }
     float? Fps1PercentLow { get; }
     float? Fps01PercentLow { get; }
-    
+    float? FrameTimeMs { get; }
+    bool IsRealFpsAvailable { get; }
+
     bool HasGpu { get; }
-    
+
     event Action? DataUpdated;
-    
+
     void Start(int intervalMs = 1000);
     void Stop();
     void MarkFrame();
     float? GetSmoothedFps();
-    
+
     void AddGameProcess(string processName);
     void RemoveGameProcess(string processName);
     System.Collections.Generic.List<string> GetGameProcessNames();

@@ -338,53 +338,9 @@ public interface ILocalizationService : IServiceBase
 }
 
 /// <summary>
-/// 云同步服务接口
+/// 智能建议服务接口（基于规则引擎，非 AI/ML）
 /// </summary>
-public interface ICloudSyncService : IServiceBase
-{
-    /// <summary>
-    /// 同步状态
-    /// </summary>
-    SyncStatus CurrentStatus { get; }
-
-    /// <summary>
-    /// 上次同步时间
-    /// </summary>
-    DateTime? LastSyncTime { get; }
-
-    /// <summary>
-    /// 执行同步
-    /// </summary>
-    Task<SyncResult> SyncAsync();
-
-    /// <summary>
-    /// 上传数据
-    /// </summary>
-    Task<bool> UploadAsync(string dataType, string data);
-
-    /// <summary>
-    /// 下载数据
-    /// </summary>
-    Task<string?> DownloadAsync(string dataType);
-
-    /// <summary>
-    /// 解决冲突
-    /// </summary>
-    Task<ConflictResolution> ResolveConflictAsync(SyncConflict conflict);
-
-    /// <summary>
-    /// 同步事件
-    /// </summary>
-    event EventHandler<SyncEventArgs>? SyncStarted;
-    event EventHandler<SyncEventArgs>? SyncCompleted;
-    event EventHandler<SyncEventArgs>? SyncFailed;
-    event EventHandler<SyncEventArgs>? ConflictDetected;
-}
-
-/// <summary>
-/// AI服务接口
-/// </summary>
-public interface IAIService : IServiceBase
+public interface IInsightService : IServiceBase
 {
     /// <summary>
     /// 隐私级别
@@ -392,7 +348,7 @@ public interface IAIService : IServiceBase
     PrivacyLevel CurrentPrivacyLevel { get; set; }
 
     /// <summary>
-    /// 获取智能建议
+    /// 获取智能建议（基于阈值规则的性能建议）
     /// </summary>
     Task<IEnumerable<AISuggestion>> GetSuggestionsAsync();
 

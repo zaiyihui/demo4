@@ -1,0 +1,12 @@
+{
+  "Name": "night",
+  "DisplayName": "暗夜",
+  "BackgroundColor": "#0d0019ee",
+  "TextColor": "#b388ff",
+  "AccentColor": "#7c4dff",
+  "SecondaryColor": "#651fff",
+  "FontSize": 14,
+  "BackgroundOpacity": 0.94,
+  "CornerRadius": 16,
+  "Layout": "complete"
+}

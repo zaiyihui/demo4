@@ -562,11 +562,12 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
         {
             if (_dataExportService != null)
             {
-                var exportPath = Path.Combine(
+                var exportDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    "ComputerCompanion",
-                    $"performance_data_{DateTime.Now:yyyyMMdd_HHmmss}.csv"
-                );
+                    "ComputerCompanion");
+                Directory.CreateDirectory(exportDir);
+
+                var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
                 var allData = new List<MetricDataPoint>();
 
@@ -586,8 +587,20 @@ public partial class PerformanceDashboardViewModel : ObservableObject, IDisposab
                     MetricType = MetricType.Gauge
                 }));
 
-                _dataExportService.ExportToCsv(allData, exportPath);
-                _log.Info($"[性能面板] 数据已导出到: {exportPath}");
+                // CSV 导出
+                var csvPath = Path.Combine(exportDir, $"performance_data_{timestamp}.csv");
+                _dataExportService.ExportToCsv(allData, csvPath);
+                _log.Info($"[性能面板] CSV 已导出: {csvPath}");
+
+                // JSON 导出
+                var jsonPath = Path.Combine(exportDir, $"performance_data_{timestamp}.json");
+                _dataExportService.ExportToJson(allData, jsonPath);
+                _log.Info($"[性能面板] JSON 已导出: {jsonPath}");
+
+                // HTML 报告
+                var htmlPath = Path.Combine(exportDir, $"performance_report_{timestamp}.html");
+                _dataExportService.ExportToHtml(allData, htmlPath);
+                _log.Info($"[性能面板] HTML 报告已导出: {htmlPath}");
             }
             else
             {

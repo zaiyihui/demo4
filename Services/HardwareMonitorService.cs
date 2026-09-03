@@ -46,6 +46,11 @@ public class HardwareMonitorService : IHardwareMonitorService
     
     private float? _smoothedFps;
     private const float FpsSmoothingFactor = 0.2f;
+
+    // ETW-based real FPS monitor (PresentMon 同款方案)
+    private readonly FpsMonitorService? _fpsMonitor;
+    public float? FrameTimeMs => _fpsMonitor?.FrameTimeMs;
+    public bool IsRealFpsAvailable => _fpsMonitor?.IsEtwAvailable == true;
     
     private bool IsGameRunning => _activeGameProcess != null && !_activeGameProcess.HasExited;
     
@@ -101,7 +106,9 @@ public class HardwareMonitorService : IHardwareMonitorService
                     if (_gameProcessNames.Contains(processName))
                     {
                         _activeGameProcess = process;
-                        Program.Log($"[硬件] 检测到游戏进程: {process.ProcessName}");
+                        Program.Log($"[硬件] 检测到游戏进程: {process.ProcessName} (PID: {process.Id})");
+                        // 将游戏进程 PID 传给 ETW FPS 监控
+                        _fpsMonitor?.SetTargetProcess(process.Id);
                         return;
                     }
                 }
@@ -193,6 +200,20 @@ public class HardwareMonitorService : IHardwareMonitorService
         _isRunning = true;
         Program.Log("[硬件] 开始初始化硬件监控服务");
 
+        // 启动 ETW 真实 FPS 监控
+        try
+        {
+            _fpsMonitor?.Start();
+            if (_fpsMonitor?.IsEtwAvailable == true)
+                Program.Log("[硬件] ETW 真实 FPS 监控已启用");
+            else
+                Program.Log("[硬件] ETW 不可用，回退到渲染帧率统计");
+        }
+        catch (Exception ex)
+        {
+            Program.Log($"[硬件] ETW FPS 监控启动失败: {ex.Message}");
+        }
+
         try
         {
             _computer = new Computer
@@ -280,13 +301,15 @@ public class HardwareMonitorService : IHardwareMonitorService
     public void Stop()
     {
         _isRunning = false;
-        
+
         _dataTimer?.Stop();
         _dataTimer?.Dispose();
-        
+
         _fpsTimer?.Stop();
         _fpsTimer?.Dispose();
-        
+
+        _fpsMonitor?.Stop();
+
         try
         {
             _computer?.Close();
@@ -305,6 +328,20 @@ public class HardwareMonitorService : IHardwareMonitorService
 
     public void MarkFrame()
     {
+        // ETW 真实 FPS 优先
+        if (_fpsMonitor?.IsEtwAvailable == true && _fpsMonitor.CurrentFps.HasValue)
+        {
+            var realFps = _fpsMonitor.CurrentFps.Value;
+            if (realFps > 0)
+            {
+                Fps = realFps;
+                if (_fpsMonitor.Fps1PercentLow.HasValue)
+                    Fps1PercentLow = _fpsMonitor.Fps1PercentLow;
+            }
+            return;
+        }
+
+        // 回退到原有渲染帧率统计
         if (!ShouldDisplayFps)
         {
             if (Fps.HasValue)

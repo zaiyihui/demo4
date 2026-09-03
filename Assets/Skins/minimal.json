@@ -1,0 +1,12 @@
+{
+  "Name": "minimal",
+  "DisplayName": "极简",
+  "BackgroundColor": "#2b2b2bee",
+  "TextColor": "#d0d0d0",
+  "AccentColor": "#a0a0a0",
+  "SecondaryColor": "#808080",
+  "FontSize": 12,
+  "BackgroundOpacity": 0.8,
+  "CornerRadius": 8,
+  "Layout": "minimal"
+}

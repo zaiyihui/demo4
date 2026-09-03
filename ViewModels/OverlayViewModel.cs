@@ -43,6 +43,9 @@ public partial class OverlayViewModel : ObservableObject, IDisposable
     private string _fps1PercentLowText;
 
     [ObservableProperty]
+    private string _frameTimeText;
+
+    [ObservableProperty]
     private string _vramText;
 
     [ObservableProperty]
@@ -75,8 +78,21 @@ public partial class OverlayViewModel : ObservableObject, IDisposable
         _latencyText = "延迟: --";
         _overlayTextColor = settings.Overlay.OverlayTextColor;
         _fps1PercentLowText = "--";
+        _frameTimeText = "--";
         _vramText = "--";
         _currentViewMode = OverlayViewMode.Standard;
+
+        ApplySkinSettings();
+    }
+
+    private void ApplySkinSettings()
+    {
+        // 根据 settings.Overlay.SkinName 应用预设
+        var skin = SkinService.GetBuiltInSkin(_settings.Overlay.SkinName);
+        if (skin != null)
+        {
+            _overlayTextColor = skin.TextColor;
+        }
     }
 
     public void SwitchViewMode()
@@ -173,6 +189,16 @@ public partial class OverlayViewModel : ObservableObject, IDisposable
         if (_monitor.Fps1PercentLow.HasValue)
         {
             Fps1PercentLowText = _monitor.Fps1PercentLow.Value > 0 ? $"1%: {_monitor.Fps1PercentLow.Value:F0}" : "--";
+        }
+
+        // 帧生成时间 (Frame Time)
+        if (_monitor.FrameTimeMs.HasValue)
+        {
+            FrameTimeText = $"FT: {_monitor.FrameTimeMs.Value:F1}ms";
+        }
+        else
+        {
+            FrameTimeText = "--";
         }
 
         if (_monitor.HasGpu && _monitor.GpuVramUsed.HasValue && _monitor.GpuVramTotal.HasValue)

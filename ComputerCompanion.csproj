@@ -57,7 +57,6 @@
   <!-- 资源文件 - 确保 UTF-8 编码 -->
   <ItemGroup>
     <None Include="README.md" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="docs\**/*.md" CopyToOutputDirectory="PreserveNewest" />
     <None Include="CONTRIBUTING.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

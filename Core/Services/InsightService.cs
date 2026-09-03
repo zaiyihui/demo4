@@ -9,9 +9,10 @@ using System.Threading.Tasks;
 namespace ComputerCompanion.Core.Services;
 
 /// <summary>
-/// AI服务 - 实现智能建议、硬件分析、异常预测
+/// 智能建议服务 - 基于阈值规则引擎实现性能建议、硬件分析、异常预测
+/// （非 AI/ML，仅规则匹配）
 /// </summary>
-public class AIService : ServiceBase, IAIService
+public class InsightService : ServiceBase, IInsightService
 {
     private readonly IPerformanceMonitorService _performanceMonitor;
     private readonly IHardwareMonitorService _hardwareMonitor;
@@ -29,7 +30,7 @@ public class AIService : ServiceBase, IAIService
     public event EventHandler<AISuggestion>? SuggestionGenerated;
     public event EventHandler<AnomalyPrediction>? AnomalyPredicted;
 
-    public AIService(
+    public InsightService(
         IPerformanceMonitorService performanceMonitor,
         IHardwareMonitorService hardwareMonitor)
     {
@@ -40,16 +41,15 @@ public class AIService : ServiceBase, IAIService
     public override Task InitializeAsync()
     {
         base.InitializeAsync();
-        Program.Log($"[AI] AI服务已初始化，隐私级别: {_currentPrivacyLevel}");
+        Program.Log($"[智能建议] 服务已初始化，隐私级别: {_currentPrivacyLevel}");
         return Task.CompletedTask;
     }
 
     /// <summary>
-    /// 获取智能建议
+    /// 获取智能建议（基于阈值规则）
     /// </summary>
     public async Task<IEnumerable<AISuggestion>> GetSuggestionsAsync()
     {
-        // 每5分钟更新一次建议
         if ((DateTime.UtcNow - _lastSuggestionUpdate).TotalMinutes < 5 && _cachedSuggestions.Count > 0)
         {
             return _cachedSuggestions;
@@ -59,10 +59,8 @@ public class AIService : ServiceBase, IAIService
 
         try
         {
-            // 分析性能数据
             var metrics = _performanceMonitor.CurrentMetrics;
 
-            // 基于CPU使用率建议
             if (metrics.CpuUsagePercent > 80)
             {
                 suggestions.Add(new AISuggestion
@@ -75,7 +73,6 @@ public class AIService : ServiceBase, IAIService
                 });
             }
 
-            // 基于内存使用率建议
             if (metrics.MemoryUsagePercent > 85)
             {
                 suggestions.Add(new AISuggestion
@@ -88,7 +85,6 @@ public class AIService : ServiceBase, IAIService
                 });
             }
 
-            // 基于GPU温度建议
             if (metrics.GpuTemperature > 80)
             {
                 suggestions.Add(new AISuggestion
@@ -101,7 +97,6 @@ public class AIService : ServiceBase, IAIService
                 });
             }
 
-            // 基于FPS建议
             if (metrics.Fps > 0 && metrics.Fps < 60)
             {
                 suggestions.Add(new AISuggestion
@@ -114,7 +109,6 @@ public class AIService : ServiceBase, IAIService
                 });
             }
 
-            // 基于使用习惯的个性化建议
             suggestions.AddRange(await GetPersonalizedSuggestionsAsync());
 
             _cachedSuggestions.Clear();
@@ -128,20 +122,16 @@ public class AIService : ServiceBase, IAIService
         }
         catch (Exception ex)
         {
-            Program.Log($"[AI] 生成建议失败: {ex.Message}");
+            Program.Log($"[智能建议] 生成建议失败: {ex.Message}");
         }
 
         return suggestions;
     }
 
-    /// <summary>
-    /// 获取个性化建议
-    /// </summary>
     private async Task<List<AISuggestion>> GetPersonalizedSuggestionsAsync()
     {
         var suggestions = new List<AISuggestion>();
 
-        // 获取历史数据进行分析
         var cpuHistory = _performanceMonitor.GetHistoricalMetrics("CpuUsagePercent", TimeSpan.FromHours(24));
         var memoryHistory = _performanceMonitor.GetHistoricalMetrics("MemoryUsagePercent", TimeSpan.FromHours(24));
 
@@ -150,7 +140,6 @@ public class AIService : ServiceBase, IAIService
             var avgCpu = cpuHistory.Average(m => m.Value);
             var peakCpu = cpuHistory.Max(m => m.Value);
 
-            // 如果峰值远高于平均值，可能是间歇性问题
             if (peakCpu > avgCpu * 2 && peakCpu > 70)
             {
                 suggestions.Add(new AISuggestion
@@ -164,7 +153,6 @@ public class AIService : ServiceBase, IAIService
             }
         }
 
-        // 检查是否长时间未进行维护
         suggestions.Add(new AISuggestion
         {
             Title = "建议进行系统维护",
@@ -189,24 +177,15 @@ public class AIService : ServiceBase, IAIService
         {
             var metrics = _performanceMonitor.CurrentMetrics;
 
-            // 分析整体健康状态
-            var componentHealths = new List<ComponentHealth>();
-
-            // CPU健康分析
-            var cpuHealth = AnalyzeCpuHealth(metrics);
-            componentHealths.Add(cpuHealth);
-
-            // GPU健康分析
-            var gpuHealth = AnalyzeGpuHealth(metrics);
-            componentHealths.Add(gpuHealth);
-
-            // 内存健康分析
-            var memoryHealth = AnalyzeMemoryHealth(metrics);
-            componentHealths.Add(memoryHealth);
+            var componentHealths = new List<ComponentHealth>
+            {
+                AnalyzeCpuHealth(metrics),
+                AnalyzeGpuHealth(metrics),
+                AnalyzeMemoryHealth(metrics)
+            };
 
             analysis.Components = componentHealths;
 
-            // 计算整体健康状态
             var avgHealth = componentHealths.Average(c => c.HealthScore);
             analysis.OverallHealth = avgHealth switch
             {
@@ -217,7 +196,6 @@ public class AIService : ServiceBase, IAIService
                 _ => HealthStatus.Critical
             };
 
-            // 生成建议
             foreach (var component in componentHealths.Where(c => c.Status != HealthStatus.Excellent))
             {
                 foreach (var issue in component.Issues)
@@ -228,7 +206,7 @@ public class AIService : ServiceBase, IAIService
         }
         catch (Exception ex)
         {
-            Program.Log($"[AI] 硬件分析失败: {ex.Message}");
+            Program.Log($"[智能建议] 硬件分析失败: {ex.Message}");
         }
 
         await Task.CompletedTask;
@@ -238,10 +216,8 @@ public class AIService : ServiceBase, IAIService
     private ComponentHealth AnalyzeCpuHealth(PerformanceMetrics metrics)
     {
         var health = new ComponentHealth { ComponentName = "CPU" };
-
         var healthScore = 100.0;
 
-        // 温度影响
         if (metrics.CpuTemperature > 90)
         {
             health.Issues.Add("温度过高，可能需要清理散热器");
@@ -253,7 +229,6 @@ public class AIService : ServiceBase, IAIService
             healthScore -= 15;
         }
 
-        // 使用率影响
         if (metrics.CpuUsagePercent > 95)
         {
             health.Issues.Add("CPU持续满载，可能影响响应速度");
@@ -271,7 +246,6 @@ public class AIService : ServiceBase, IAIService
                         healthScore >= 60 ? HealthStatus.Fair :
                         healthScore >= 40 ? HealthStatus.Poor :
                         HealthStatus.Critical;
-
         return health;
     }
 
@@ -289,7 +263,6 @@ public class AIService : ServiceBase, IAIService
 
         var healthScore = 100.0;
 
-        // 温度影响
         if (metrics.GpuTemperature > 85)
         {
             health.Issues.Add("GPU温度过高，可能导致降频或重启");
@@ -301,7 +274,6 @@ public class AIService : ServiceBase, IAIService
             healthScore -= 15;
         }
 
-        // 显存使用率影响
         if (metrics.GpuMemoryUsedMB > 0 && metrics.GpuMemoryTotalMB > 0)
         {
             var vramUsage = (metrics.GpuMemoryUsedMB / metrics.GpuMemoryTotalMB) * 100;
@@ -317,14 +289,12 @@ public class AIService : ServiceBase, IAIService
                         healthScore >= 75 ? HealthStatus.Good :
                         healthScore >= 60 ? HealthStatus.Fair :
                         HealthStatus.Poor;
-
         return health;
     }
 
     private ComponentHealth AnalyzeMemoryHealth(PerformanceMetrics metrics)
     {
         var health = new ComponentHealth { ComponentName = "Memory" };
-
         var healthScore = 100.0;
 
         if (metrics.MemoryUsagePercent > 95)
@@ -348,12 +318,11 @@ public class AIService : ServiceBase, IAIService
                         healthScore >= 75 ? HealthStatus.Good :
                         healthScore >= 60 ? HealthStatus.Fair :
                         HealthStatus.Poor;
-
         return health;
     }
 
     /// <summary>
-    /// 预测异常
+    /// 预测异常（基于历史趋势分析）
     /// </summary>
     public async Task<IEnumerable<AnomalyPrediction>> PredictAnomaliesAsync()
     {
@@ -363,15 +332,13 @@ public class AIService : ServiceBase, IAIService
         {
             var metrics = _performanceMonitor.CurrentMetrics;
 
-            // 获取历史数据
             var cpuHistory = _performanceMonitor.GetHistoricalMetrics("CpuUsagePercent", TimeSpan.FromHours(1));
             var memoryHistory = _performanceMonitor.GetHistoricalMetrics("MemoryUsagePercent", TimeSpan.FromHours(1));
 
-            // CPU温度预测
             if (metrics.CpuTemperature > 75)
             {
                 var trend = CalculateTrend(cpuHistory.Select(h => h.Value).ToList());
-                if (trend > 0.5) // 上升趋势
+                if (trend > 0.5)
                 {
                     predictions.Add(new AnomalyPrediction
                     {
@@ -380,21 +347,15 @@ public class AIService : ServiceBase, IAIService
                         Probability = Math.Min(metrics.CpuTemperature / 100, 0.9),
                         PredictedTime = DateTime.UtcNow.AddMinutes(10),
                         Description = "CPU温度呈上升趋势，预计10分钟内可能超过安全阈值",
-                        Mitigations = new List<string>
-                        {
-                            "降低CPU负载",
-                            "检查散热器",
-                            "改善机箱通风"
-                        }
+                        Mitigations = new List<string> { "降低CPU负载", "检查散热器", "改善机箱通风" }
                     });
                 }
             }
 
-            // 内存泄漏检测
-            if (memoryHistory.Count() >= 60) // 至少1小时数据
+            if (memoryHistory.Count() >= 60)
             {
                 var memoryGrowth = CalculateGrowthRate(memoryHistory.Select(h => h.Value).ToList());
-                if (memoryGrowth > 0.1) // 增长率超过10%
+                if (memoryGrowth > 0.1)
                 {
                     predictions.Add(new AnomalyPrediction
                     {
@@ -403,22 +364,16 @@ public class AIService : ServiceBase, IAIService
                         Probability = Math.Min(memoryGrowth, 0.85),
                         PredictedTime = DateTime.UtcNow.AddMinutes(30),
                         Description = "检测到内存使用呈持续增长趋势，可能存在内存泄漏",
-                        Mitigations = new List<string>
-                        {
-                            "重启相关应用程序",
-                            "检查是否有内存泄漏的程序",
-                            "考虑升级内存"
-                        }
+                        Mitigations = new List<string> { "重启相关应用程序", "检查是否有内存泄漏的程序", "考虑升级内存" }
                     });
                 }
             }
 
-            // 性能下降预测
             var fpsHistory = _performanceMonitor.GetHistoricalMetrics("Fps", TimeSpan.FromMinutes(30));
             if (fpsHistory.Count() >= 30)
             {
                 var fpsTrend = CalculateTrend(fpsHistory.Select(h => h.Value).ToList());
-                if (fpsTrend < -0.3) // 下降趋势
+                if (fpsTrend < -0.3)
                 {
                     predictions.Add(new AnomalyPrediction
                     {
@@ -427,12 +382,7 @@ public class AIService : ServiceBase, IAIService
                         Probability = 0.7,
                         PredictedTime = DateTime.UtcNow.AddMinutes(15),
                         Description = "游戏性能呈下降趋势，可能与温度或后台进程有关",
-                        Mitigations = new List<string>
-                        {
-                            "检查GPU温度",
-                            "关闭不必要的后台程序",
-                            "清理磁盘空间"
-                        }
+                        Mitigations = new List<string> { "检查GPU温度", "关闭不必要的后台程序", "清理磁盘空间" }
                     });
                 }
             }
@@ -444,63 +394,43 @@ public class AIService : ServiceBase, IAIService
         }
         catch (Exception ex)
         {
-            Program.Log($"[AI] 异常预测失败: {ex.Message}");
+            Program.Log($"[智能建议] 异常预测失败: {ex.Message}");
         }
 
         await Task.CompletedTask;
         return predictions;
     }
 
-    /// <summary>
-    /// 计算趋势（正数表示上升，负数表示下降）
-    /// </summary>
     private double CalculateTrend(List<double> values)
     {
-        if (values.Count < 2)
-            return 0;
-
-        // 简单线性回归
+        if (values.Count < 2) return 0;
         var n = values.Count;
         var xMean = (n - 1) / 2.0;
         var yMean = values.Average();
-
         var numerator = 0.0;
         var denominator = 0.0;
-
         for (int i = 0; i < n; i++)
         {
             numerator += (i - xMean) * (values[i] - yMean);
             denominator += (i - xMean) * (i - xMean);
         }
-
         var slope = denominator != 0 ? numerator / denominator : 0;
-
-        // 归一化到 -1 到 1 之间
-        var maxSlope = yMean * 0.1; // 假设10%的变化是显著的
+        var maxSlope = yMean * 0.1;
         return Math.Max(-1, Math.Min(1, slope / maxSlope));
     }
 
-    /// <summary>
-    /// 计算增长率
-    /// </summary>
     private double CalculateGrowthRate(List<double> values)
     {
-        if (values.Count < 2)
-            return 0;
-
-        // 使用前半部分和后半部分的平均值比较
+        if (values.Count < 2) return 0;
         var half = values.Count / 2;
         var firstHalf = values.Take(half).Average();
         var secondHalf = values.Skip(half).Average();
-
-        if (firstHalf == 0)
-            return 0;
-
+        if (firstHalf == 0) return 0;
         return (secondHalf - firstHalf) / firstHalf;
     }
 
     /// <summary>
-    /// 处理自然语言命令
+    /// 处理自然语言命令（基于关键词匹配）
     /// </summary>
     public async Task<string> ProcessCommandAsync(string command)
     {
@@ -508,7 +438,6 @@ public class AIService : ServiceBase, IAIService
         {
             command = command.ToLowerInvariant().Trim();
 
-            // 意图识别
             if (command.Contains("温度") || command.Contains("temperature"))
             {
                 var metrics = _performanceMonitor.CurrentMetrics;
@@ -546,7 +475,7 @@ public class AIService : ServiceBase, IAIService
         }
         catch (Exception ex)
         {
-            Program.Log($"[AI] 处理命令失败: {ex.Message}");
+            Program.Log($"[智能建议] 处理命令失败: {ex.Message}");
             return "处理命令时发生错误，请稍后重试。";
         }
     }
