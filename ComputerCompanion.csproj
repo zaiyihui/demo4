@@ -3,7 +3,6 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
-    <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <EnableDefaultAvaloniaXamlItems>true</EnableDefaultAvaloniaXamlItems>
     <DefaultItemExcludes>$(DefaultItemExcludes);Tests/**/*;src/ComputerCompanion.Overlay/**/*</DefaultItemExcludes>
@@ -56,8 +55,7 @@
 
   <!-- 资源文件 - 确保 UTF-8 编码 -->
   <ItemGroup>
-    <None Include="README.md" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="CONTRIBUTING.md" CopyToOutputDirectory="PreserveNewest" />
+  <None Include="README.md" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
   <!-- 确保所有源文件使用 UTF-8 编码 -->
@@ -89,7 +87,6 @@
       </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
-        <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
         
         <!-- LiveCharts2 图表库 -->
         <PackageReference Include="LiveChartsCore" Version="2.0.0" />
